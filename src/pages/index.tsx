@@ -1,118 +1,198 @@
-import Image from "next/image";
-import { Inter } from "next/font/google";
+import { useSiwbbContext } from '@/chains/chain_contexts/siwbb/SIWBBContext';
+import { useWeb2Context } from '@/chains/chain_contexts/web2/Web2Context';
+import { Tabs } from '@/components/display/Tabs';
+import { BlockinDisplay } from '@/components/insite/BlockinDisplay';
+import { ManualDisplay } from '@/components/manual/manual';
+import { SiwbbDisplay } from '@/components/siwbb/siwbb';
+import { Web2Display } from '@/components/web2/web2';
+import { NumberType } from 'bitbadgesjs-proto';
+import { ChallengeParams, VerifyChallengeOptions } from 'blockin';
+import { NextPage } from 'next/types';
+import { useEffect, useMemo, useState } from 'react';
+import { getPrivateInfo, signIn, signOut } from '../chains/backend_connectors';
+import { useChainContext } from '../chains/chain_contexts/ChainContext';
+import Header from '../components/Header';
+import { BroadcastTxPopupButton, SignTxInSiteButton } from './transactions';
 
-const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+const Home: NextPage = () => {
+  const chain = useChainContext();
+  const siwbbContext = useSiwbbContext();
+  const web2Context = useWeb2Context();
+
+  const [signInMethodTabSelected, setSignInMethodTab] = useState('web3');
+  const signInMethodTab = web2Context.active ? 'web2' : signInMethodTabSelected;
+  const [web3SignInTypeSelected, setWeb3SignInType] = useState('siwbb');
+  const web3SignInType = chain.loggedIn ? siwbbContext.active ? 'siwbb' : 'insite' : web3SignInTypeSelected   //Use the active one if logged in
+
+  //TODO: Customize
+  // Function to generate challengeParams. Refreshes every 15 seconds to refresh issuedAt / expirationDate
+  const generateChallengeParams = () => {
+    return {
+      domain: 'http://localhost:3000',
+      statement: 'By signing in, you agree to the privacy policy and terms of service.',
+      address: '', //overridden by allowAddressSelect
+      uri: 'http://localhost:3000',
+      nonce: '*',
+      notBefore: undefined,
+      issuedAt: new Date(Date.now()).toISOString(),
+      expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(),
+      resources: [],
+      assetOwnershipRequirements: {
+        assets: [{
+          chain: 'BitBadges',
+          collectionId: 1,
+          assetIds: [{ start: 9, end: 9 }],
+          mustOwnAmounts: { start: 0, end: 0 },
+          ownershipTimes: [],
+        }]
+      }
+    } as ChallengeParams<NumberType>;
+  };
+
+  // Define state to hold the challengeParams
+  const [challengeParams, setChallengeParams] = useState<ChallengeParams<NumberType>>(generateChallengeParams());
+
+
+  // useEffect to update challengeParams every 15 seconds
+  useEffect(() => {
+    setChallengeParams(generateChallengeParams());
+
+    // Set up interval to update challengeParams every 15 seconds
+    const interval = setInterval(() => {
+      setChallengeParams(generateChallengeParams());
+    }, 15000);
+
+    // Clean up interval on component unmount
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array ensures this effect runs only once
+
+
+
+  const SecretInfoButton = <>
+    <button
+      className='landing-button m-2' style={{ width: 200 }} onClick={async () => {
+        const res = await getPrivateInfo();
+        alert(res.message);
+      }}>
+      Get Private User Info
+    </button>
+  </>
+
+
+  const expectedChallengeParams: Partial<ChallengeParams<NumberType>> = useMemo(() => {
+    const params: Partial<ChallengeParams<NumberType>> = { ...challengeParams };
+    //We allow the user to select their address
+    //delete bc if undefined this checks address === undefined
+    delete params.address;
+    return params;
+  }, [challengeParams]);
+
+
+  const verifyOnBackend = async (message: string, signature: string, sessionDetails: {
+    username?: string,
+    password?: string,
+    siwbb?: boolean,
+  }, verifyOptions?: VerifyChallengeOptions) => {
+
+    try {
+      const backendChecksRes = await signIn(message, signature, sessionDetails, verifyOptions);
+      if (!backendChecksRes.success) throw new Error(backendChecksRes.errorMessage ?? 'Error');
+    } catch (e: any) {
+      console.log(e.errorMessage ?? e.message ?? e);
+      alert(e.errorMessage ?? e.message ?? e);
+      throw e;
+    }
+  }
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <>
+      <Header />
+      <div>
+        <div className='flex-center'>
+          <Tabs
+            tab={signInMethodTab}
+            setTab={async (tab) => {
+              if (chain.loggedIn) await signOut();
+              setSignInMethodTab(tab)
+            }}
+            tabInfo={[
+              {
+                key: 'web3',
+                content: 'Web3',
+                disabled: chain.connected && chain.loggedIn && web2Context.active
+              },
+              {
+                key: 'web2',
+                content: 'Web2',
+                disabled: chain.connected && chain.loggedIn && !web2Context.active
+              },
+              {
+                key: 'manual',
+                content: 'Manual'
+              }
+            ]}
+          />
+
         </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+        <br />
+        {signInMethodTab == 'manual' && <ManualDisplay verifyOnBackend={verifyOnBackend} />}
+        {signInMethodTab == 'web3' && <>
+          <div className='flex-center'>
+            <Tabs type='underline'
+              tab={web3SignInType}
+              setTab={setWeb3SignInType}
+              tabInfo={[
+                {
+                  key: 'siwbb',
+                  content: 'Popup',
+                  disabled: chain.connected && chain.loggedIn
+                },
+                {
+                  key: 'insite',
+                  content: 'In-Site',
+                  disabled: chain.connected && chain.loggedIn
+                }
+              ]}
+            />
+          </div>
+        </>}
+        {signInMethodTab == 'web2' && (
+          <Web2Display
+            verifyOnBackend={verifyOnBackend}
+            challengeParams={challengeParams}
+            verifyOptions={{
+              issuedAtTimeWindowMs: 5 * 60 * 1000, //5 minute "redeem" window
+              expectedChallengeParams,
+            }}
+          />
+        )}
+        {signInMethodTab == 'web3' && web3SignInType == 'insite' &&
+          <div className='flex-center flex-column'>
+            <BlockinDisplay
+              verifyOnBackend={verifyOnBackend}
+              challengeParams={challengeParams}
+              verifyOptions={{
+                issuedAtTimeWindowMs: 5 * 60 * 1000, //5 minute "redeem" window
+                expectedChallengeParams,
+              }}
+            />
+          </div>
+        }
+        {signInMethodTab == 'web3' && web3SignInType == 'siwbb' && <SiwbbDisplay verifyOnBackend={verifyOnBackend} challengeParams={challengeParams} verifyOptions={{ issuedAtTimeWindowMs: 5 * 60 * 1000, expectedChallengeParams }} />}
+        <br />
+        <br />
+        <br />
+        {signInMethodTab !== 'manual' && <>
+          <div className='flex-center flex-wrap'>
+            {SecretInfoButton}
+            <SignTxInSiteButton signInMethodTab={signInMethodTab} web3SignInType={web3SignInType} />
+            <BroadcastTxPopupButton signInMethodTab={signInMethodTab} />
+          </div>
+        </>}
+      </div >
+    </>
+  )
 }
+
+export default Home;

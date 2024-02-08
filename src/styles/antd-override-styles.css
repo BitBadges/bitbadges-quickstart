@@ -1,0 +1,346 @@
+/* 
+  .ant-row-rtl #components-layout-demo-top .logo {
+    float: right;
+    margin: 16px 0 16px 24px;
+  } */
+
+  
+  .ant-popover-arrow {
+    display: none;
+}
+
+.ant-collapse-content-box {
+    padding: 4px !important; 
+}
+
+
+.ant-form-item {
+    margin-bottom: 10px;
+}
+
+.ant-radio-button-wrapper {
+    background: inherit;
+    color: white;
+}
+
+.ant-upload {
+    width: 100%;
+}
+
+.ant-upload.ant-upload-select-picture-card {
+  background: inherit;
+}
+.ant-progress-circle .ant-progress-text {
+    color: white;
+}
+.ant-popover-placement-top {
+    left: 0;
+}
+.ant-input {
+  background: inherit;
+  color: black;
+
+  @apply rounded-md p-1 px-2
+} 
+
+.dark .ant-input {
+  color: white;
+
+
+  @apply rounded-md p-1 px-2
+}
+
+.blockin-header {
+  min-width: 200px !important;
+}
+
+.ant-timeline-item-head-custom {
+    padding: 0;
+}
+
+.selector > .ant-select-selector {
+  background-color: inherit !important;
+}
+
+.selector > .ant-select-selector.selector::after {
+  color: white;
+}
+
+.ant-picker-input > input {
+  color: black;
+}
+
+.dark .ant-picker-input > input {
+  color: white;
+}
+
+.ant-radio-inner {
+  width: 40px;
+  height: 40px;
+}
+
+.ant-radio-inner::after {
+  width: 20px;
+  height: 20px;
+}
+
+.ant-statistic-content {
+  color: inherit;
+}
+
+.ant-switch {
+  background-color: grey;
+}
+
+.ant-switch-checked {
+    background-color: #1890ff;
+}
+
+
+.ant-modal {
+  padding-bottom: 100px;
+}
+
+.ant-modal-mask {
+  min-height: 1000px;
+}
+
+.ant-modal-header {
+  border: none;
+}
+
+.ant-modal-content {
+  margin-bottom: 100px;
+}
+
+.ant-modal-footer {
+  border: none;
+}
+
+.ant-steps-navigation {
+    min-height: 60px;
+}
+.dark .ant-modal-header {
+  background: #001529;
+}
+
+.dark .ant-modal-body {
+  background: #001529;
+}
+
+.dark .ant-modal-footer {
+  background: #001529;
+}
+
+
+.dark .ant-steps-navigation .ant-steps-item-container {
+    padding-bottom: 0;
+}
+
+.dark .ant-steps-navigation .ant-steps-item::after {
+    border-color: white;
+}
+
+.dark  .ant-steps-item-wait .ant-steps-item-icon > .ant-steps-icon {
+    color: white;
+}
+
+.dark  .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title {
+    color: white;
+    border: none;
+} 
+
+.dark  .ant-steps-item-wait .ant-steps-item-icon {
+  border-color: white;
+  color: white;
+  background-color: #001529;
+}  
+
+.dark  .ant-steps-item-finish .ant-steps-item-icon {
+  border-color: white;
+  color: white;
+  background-color: #001529;
+}  
+
+
+.dark .ant-drawer-header {
+    background-color: #001529;
+    color: white;
+    border-bottom: 1px solid gray;
+}
+
+.dark .ant-drawer-body {
+    background-color: #001529;
+}
+
+.ant-collapse-content {
+  background-color: inherit !important;
+}
+.ant-collapse-expand-icon {
+  color: black;
+}
+
+.dark .ant-collapse-expand-icon {
+  color: white;
+}
+
+.ant-collapse-header:hover {
+    background-color: whitesmoke;
+    color: white;
+}
+
+.dark .ant-collapse-header:hover {
+    background-color: #192c3e;
+    color: white;
+}
+
+.dark .ant-pagination-item {
+    background-color: inherit;
+    color: white;
+}
+
+.dark .ant-pagination-item a {
+    color: white;
+}
+
+.dark .ant-pagination-prev {
+    background-color: inherit;
+    color: white;
+}
+.dark .ant-pagination-prev .ant-pagination-item-link, .dark  .ant-pagination-next .ant-pagination-item-link {
+    background-color: inherit;
+    color: white;
+}
+
+.dark .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis, .dark .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis
+{
+    background-color: inherit;
+    color: white;
+}
+
+.ant-collapse-expand-icon {
+    align-self: center;
+}
+
+.ant-tooltip-disabled-compatible-wrapper {
+    display: flex !important;
+}
+
+.ant-menu.ant-menu-dark, .ant-menu-dark .ant-menu-sub, .ant-menu.ant-menu-dark .ant-menu-sub {
+  background: inherit;
+}
+
+.ant-pagination.ant-pagination-mini .ant-pagination-options-quick-jumper input
+{
+    background-color: inherit;
+    color: white;
+}
+/* 
+#w3m-modal { 
+    z-index: 2000 !important; 
+} */
+
+.infinite-scroll-component__outerdiv {
+    width: 100%
+}
+
+.blockin-chain-select-logo-right {
+    padding-right: 0px !important;
+    margin-right: 4px !important;
+}
+
+.ant-modal-mask {
+    z-index: 80;
+}
+
+.ant-modal-wrap {
+    z-index: 80;
+}
+
+/* .ant-popover-placement-bottom, .ant-popover-placement-bottomLeft, .ant-popover-placement-bottomRight {
+    width: 100%;
+} */
+
+.blockin-popup-container {
+    max-width: 80vw !important;
+    margin: 0 !important;
+    max-height: 80vh !important;
+}
+
+.blockin-popup {
+    max-height: 75vh !important;
+}
+
+
+.blockin-root {
+    display: flex !important;
+    justify-content: center !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    align-items: center !important;
+    padding: 0 !important;
+    /* max-height: 80vh !important; */
+    /* max-width: fit-content !important; */
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+/* .ant-table {
+  background-color: black;
+  color: white;
+}
+
+.ant-table:hover {
+  background-color: #192c3e;
+}
+
+.ant-table-thead > tr > th {
+  background-color: black;
+  color: white;
+}
+
+.ant-table-cell-row-hover {
+  background-color: black !important;
+} */
+
+.ant-dropdown-menu-item:hover, .ant-dropdown-menu-submenu-title:hover, .ant-dropdown-menu-item.ant-dropdown-menu-item-active, .ant-dropdown-menu-item.ant-dropdown-menu-submenu-title-active, .ant-dropdown-menu-submenu-title.ant-dropdown-menu-item-active, .ant-dropdown-menu-submenu-title.ant-dropdown-menu-submenu-title-active
+{
+  background-color: inherit;
+}
+
+
+.ant-popover-inner-content {
+  width: 100%;
+}
+
+.blockin-listitem-logo {
+  display: flex;
+}
+
+.ant-divider {
+  color: transparent !important;
+  border-color: transparent;
+}
+
+.ant-notification-notice {
+  @apply rounded-lg
+  
+}
+
+.ant-notification-notice-message {
+  font-weight: bold;
+}
+
+.ant-radio-button-wrapper:not(:first-child)::before {
+  width: 0
+}
+
+.token {
+  background: inherit !important;
+}
+
+/* //when highlighted set color to white */
+.token.highlight {
+  background: inherit !important;
+  color: white !important;
+}

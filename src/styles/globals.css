@@ -16,18 +16,23 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.banner {
+  @apply flex justify-center items-center font-bold text-3xl pt-10;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
