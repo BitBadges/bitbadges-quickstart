@@ -1,31 +1,52 @@
-import { BigIntify } from "bitbadgesjs-proto";
-import { getChainForAddress } from "bitbadgesjs-utils";
+import { BigIntify } from "bitbadgesjs-sdk";
+import { getChainForAddress } from "bitbadgesjs-sdk";
 import { constructChallengeObjectFromString } from "blockin";
 import cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from "next";
 import { BitBadgesApi } from "./bitbadges-api";
 import { db } from "./web2/db";
 
+//For self verification
+// import { getChainDriver } from "./selfverify/chainDriverHandlers";
+// import { verifyChallenge } from "./selfverify/verifyChallenge";
+
+
 //This will sign the user in to your backend. This is just an example and should be replaced with your own logic.
 //This example uses session cookies to store the user's session. 
 //IMPORTANT: pre-requisite is that you have already verified the message and signature using the blockin library.
 const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
   const body = req.body;
-  let { message, signature, options, username, password, siwbb } = body;
+  let { message, signature, options, username, password, siwbb, publicKey } = body;
 
   try {
-    const chain = getChainForAddress(constructChallengeObjectFromString(message, BigIntify).address);
-    const verificationResponse = await BitBadgesApi.verifySignInGeneric({ chain, message, signature, options });
+    const params = constructChallengeObjectFromString(message, BigIntify);
+    const verificationResponse = await BitBadgesApi.verifySignInGeneric({ message, signature, options, publicKey });
     if (!verificationResponse.success) {
       return res.status(400).json({ success: false, errorMessage: 'Did not pass Blockin verification' });
     }
+
+    // Alternative to using the BitBadgesApi is to self-verify directly with the Blockin library
+    // See the selfverify folder
+    //
+    // const chain = getChainForAddress(params.address);
+    // const chainDriver = getChainDriver(chain);
+    // const verificationResponseSelfVerify = await verifyChallenge(
+    //   chainDriver,
+    //   body.message,
+    //   body.signature,
+    //   body.options,
+    //   body.publicKey
+    // );
+    // if (!verificationResponseSelfVerify.success) {
+    //   return res.status(400).json({ success: false, errorMessage: 'Did not pass self-verification' });
+    // }
+
 
     //If you reach here, the Blockin message is verified (pre-requisite). This means you now know the signature is valid and any assets specified are owned by the user. 
     //We have also checked that the message parameters match what is expected and were not altered by the user (via options.expectedChallengeParams).
 
     //TODO: You now implement any additional checks or custom logic for your application, such as assigning sesssions, cookies, etc.
     //It is also important to prevent replay attacks or flash ownership attacks (https://blockin.gitbook.io/blockin/developer-docs/core-concepts).
-    const params = constructChallengeObjectFromString(message, BigIntify);
     if (!params.expirationDate) {
       return res.status(400).json({ success: false, errorMessage: 'This sign-in does not have an expiration timestamp' });
     }

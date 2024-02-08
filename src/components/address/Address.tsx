@@ -4,7 +4,7 @@ import {
   MINT_ACCOUNT,
   getAbbreviatedAddress,
   isAddressValid
-} from "bitbadgesjs-utils"
+} from "bitbadgesjs-sdk"
 import { useRouter } from "next/router"
 
 const { Text } = Typography

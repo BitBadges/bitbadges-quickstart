@@ -1,5 +1,5 @@
-import { NumberType, Numberify } from "bitbadgesjs-proto";
-import { getChainForAddress } from "bitbadgesjs-utils";
+import { NumberType, Numberify } from "bitbadgesjs-sdk";
+import { getChainForAddress } from "bitbadgesjs-sdk";
 import { ChallengeParams, VerifyChallengeOptions, constructChallengeObjectFromString } from "blockin";
 import { SignInWithBitBadgesButton } from "blockin/dist/ui";
 import { AddressDisplay } from "../address/AddressDisplay";

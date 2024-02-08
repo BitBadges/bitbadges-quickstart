@@ -1,16 +1,10 @@
 import { checkSignIn } from '@/chains/backend_connectors';
+import { BaseDefaultChainContext } from '@/chains/utils';
 import { useAccount } from '@/redux/accounts/AccountsContext';
 import { notification } from 'antd';
-import {
-  TransactionPayload,
-  TxContext,
-  createTxBroadcastBodyBitcoin
-} from 'bitbadgesjs-proto';
-import { convertToCosmosAddress } from 'bitbadgesjs-utils';
-import { createContext, useCallback, useContext, useState } from 'react';
-import { useCookies } from 'react-cookie';
+import { TransactionPayload, TxContext, convertToCosmosAddress, createTxBroadcastBodyBitcoin } from 'bitbadgesjs-sdk';
+import { createContext, useContext, useState } from 'react';
 import { ChainSpecificContextType } from '../ChainContext';
-import { BaseDefaultChainContext } from '@/chains/utils';
 
 export type BitcoinContextType = ChainSpecificContextType & {};
 export const BitcoinContext = createContext<BitcoinContextType>({
@@ -22,7 +16,6 @@ type Props = {
 };
 
 export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
-  const [cookies, setCookies] = useCookies(['blockincookie', 'pub_key']);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [pubKey, setPubKey] = useState<string>('');
   const [address, setAddress] = useState<string>('');
@@ -46,55 +39,38 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
   };
 
   const connect = async () => {
-    await connectAndPopulate(address ?? '', cookies.blockincookie);
-  };
+    if (!address) {
+      try {
+        const provider = getProvider(); // see "Detecting the Provider"
 
-  const connectAndPopulate = useCallback(
-    async (address: string, cookie: string) => {
-      if (!address) {
-        try {
-          const provider = getProvider(); // see "Detecting the Provider"
-
-          const accounts = await provider.requestAccounts();
-          if (accounts.length === 0) {
-            throw new Error('No account found');
-          }
-
-          const address = accounts[0].address;
-          if (accounts[0].addressType !== 'p2wpkh') {
-            throw new Error('Invalid account type');
-          }
-
-          const cosmosAddress = convertToCosmosAddress(address);
-          const publicKey = accounts[0].publicKey; //Hex public key
-          const base64PublicKey = Buffer.from(publicKey, 'hex').toString('base64');
-
-          setAddress(address);
-          setPubKey(base64PublicKey);
-          setCookies(
-            'pub_key',
-            `${cosmosAddress}-${base64PublicKey}`,
-            { path: '/' }
-          );
-
-          if (cookie === convertToCosmosAddress(address)) {
-            const signedInRes = await checkSignIn();
-            setLoggedIn(signedInRes.signedIn);
-          } else {
-            setLoggedIn(false);
-          }
-        } catch (e) {
-          console.log(e);
-          notification.error({
-            message: 'Error connecting to wallet',
-            description:
-              'Make sure you have Phantom installed and are logged in.',
-          });
+        const accounts = await provider.requestAccounts();
+        if (accounts.length === 0) {
+          throw new Error('No account found');
         }
+
+        const address = accounts[0].address;
+        if (accounts[0].addressType !== 'p2wpkh') {
+          throw new Error('Invalid account type');
+        }
+
+        const publicKey = accounts[0].publicKey; //Hex public key
+        const base64PublicKey = Buffer.from(publicKey, 'hex').toString('base64');
+
+        setAddress(address);
+        setPubKey(base64PublicKey);
+
+        const signedInRes = await checkSignIn();
+        setLoggedIn(signedInRes.signedIn && signedInRes.address === address);
+      } catch (e) {
+        console.log(e);
+        notification.error({
+          message: 'Error connecting to wallet',
+          description:
+            'Make sure you have Phantom installed and are logged in.',
+        });
       }
-    },
-    [setCookies]
-  );
+    }
+  };
 
   const disconnect = async () => {
     setLoggedIn(false);

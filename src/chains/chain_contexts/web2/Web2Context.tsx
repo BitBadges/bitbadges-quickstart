@@ -1,10 +1,10 @@
-import { SupportedChain } from 'bitbadgesjs-utils';
+import { SupportedChain } from 'bitbadgesjs-sdk';
 import { createContext, useContext, useState } from 'react';
 import { signOut, signWithWeb2 } from '../../backend_connectors';
 import { ChainSpecificContextType } from '../ChainContext';
 
 import { useAccount } from '@/redux/accounts/AccountsContext';
-import { TransactionPayload, TxContext, createTxBroadcastBodyEthereum } from 'bitbadgesjs-proto';
+import { TransactionPayload, TxContext, createTxBroadcastBodyEthereum } from 'bitbadgesjs-sdk';
 import { BaseDefaultChainContext } from '@/chains/utils';
 
 export type SignChallengeResponse = {

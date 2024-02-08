@@ -1,6 +1,6 @@
 import { createWeb2Account } from "@/chains/backend_connectors";
 import { useChainContext } from "@/chains/chain_contexts/ChainContext";
-import { NumberType, Numberify } from "bitbadgesjs-proto";
+import { NumberType, Numberify } from "bitbadgesjs-sdk";
 import { createChallenge, constructChallengeObjectFromString, ChallengeParams, VerifyChallengeOptions } from "blockin";
 import { useState } from "react";
 import { AddressDisplay } from "../address/AddressDisplay";

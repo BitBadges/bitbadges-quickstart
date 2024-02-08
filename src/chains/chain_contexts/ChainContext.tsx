@@ -1,8 +1,7 @@
 import { fetchAccountsWithOptions } from '@/redux/accounts/AccountsContext';
-import { SupportedChain, convertToCosmosAddress } from 'bitbadgesjs-utils';
+import { SupportedChain, convertToCosmosAddress } from 'bitbadgesjs-sdk';
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { INFINITE_LOOP_MODE } from '../../../constants';
 import { useBitcoinContext } from './insite/BitcoinContext';
 import { useCosmosContext } from './insite/CosmosContext';
 import { useEthereumContext } from './insite/EthereumContext';
@@ -10,12 +9,13 @@ import { useSolanaContext } from './insite/SolanaContext';
 import { useSiwbbContext } from './siwbb/SIWBBContext';
 import { useWeb2Context } from './web2/Web2Context';
 import { checkSignIn, signOut } from '../backend_connectors';
-import { TransactionPayload, TxContext } from 'bitbadgesjs-proto';
+import { TransactionPayload, TxContext } from 'bitbadgesjs-sdk';
 import { BaseDefaultChainContext } from '../utils';
 
 export type SignChallengeResponse = {
   signature: string
   message: string;
+  publicKey?: string;
 }
 
 export type ChainContextType = ChainSpecificContextType & {
@@ -43,9 +43,6 @@ export type ChainSpecificContextType = {
   signTxn: (context: TxContext, payload: TransactionPayload, simulate: boolean) => Promise<string>, //Returns broadcast post body
   getPublicKey: (cosmosAddress: string) => Promise<string>,
 }
-
-
-
 
 const ChainContext = createContext<ChainContextType>({
   ...BaseDefaultChainContext,
@@ -101,8 +98,6 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (INFINITE_LOOP_MODE) console.log('useEffect: chainContext');
-
     if (cookies.latestChain !== chain) {
       setCookies('latestChain', chain);
     }

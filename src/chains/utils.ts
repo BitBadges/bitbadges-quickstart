@@ -1,4 +1,4 @@
-import { SupportedChain } from "bitbadgesjs-proto"
+import { SupportedChain } from "bitbadgesjs-sdk"
 import { ChainContextType } from "./chain_contexts/ChainContext"
 
 export const BaseDefaultChainContext: ChainContextType = {

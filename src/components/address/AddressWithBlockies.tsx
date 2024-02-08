@@ -1,6 +1,6 @@
 import { useAccount } from "@/redux/accounts/AccountsContext";
 import { Avatar, Tooltip } from "antd";
-import { SupportedChain, getChainForAddress } from "bitbadgesjs-utils";
+import { SupportedChain, getChainForAddress } from "bitbadgesjs-sdk";
 import { getChainLogo } from "../../../constants";
 import { Address } from "./Address";
 import { BlockiesAvatar } from "./Blockies";

@@ -1,4 +1,4 @@
-import { deepCopy } from 'bitbadgesjs-proto';
+import { deepCopy } from 'bitbadgesjs-sdk';
 import {
   AccountFetchDetails,
   AccountMap,
@@ -9,10 +9,10 @@ import {
   convertBitBadgesUserInfo,
   convertToCosmosAddress,
   isAddressValid,
-} from 'bitbadgesjs-utils';
+} from 'bitbadgesjs-sdk';
 import { ThunkAction } from 'redux-thunk';
 import { initialState, reservedNames } from './AccountsContext';
-import { updateAccountWithResponse } from 'bitbadgesjs-utils';
+import { updateAccountWithResponse } from 'bitbadgesjs-sdk';
 import { BitBadgesApi, DesiredNumberType } from '@/chains/api';
 import { AccountReducerState, GlobalReduxState, AppDispatch } from '@/pages/_app';
 import { compareObjects } from '@/utils/compare';

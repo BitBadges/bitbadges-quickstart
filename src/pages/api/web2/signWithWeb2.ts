@@ -1,5 +1,5 @@
 import { Secp256k1 } from "@cosmjs/crypto";
-import { BigIntify } from "bitbadgesjs-proto";
+import { BigIntify } from "bitbadgesjs-sdk";
 import { constructChallengeObjectFromString, createChallenge } from "blockin";
 import { TypedDataField, Wallet, utils } from 'ethers';
 import { NextApiRequest, NextApiResponse } from "next";

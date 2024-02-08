@@ -1,19 +1,19 @@
-import { BigIntify, EIP712TypedData } from "bitbadgesjs-proto";
-import { getChainForAddress } from "bitbadgesjs-utils";
+import { BigIntify, EIP712TypedData } from "bitbadgesjs-sdk";
+import { getChainForAddress } from "bitbadgesjs-sdk";
 import { VerifyChallengeOptions, constructChallengeObjectFromString } from "blockin";
 
 export const signIn = async (message: string, sig: string, sessionDetails: {
   username?: string,
   password?: string
   siwbb?: boolean
-}, options?: VerifyChallengeOptions): Promise<{
+}, options?: VerifyChallengeOptions, publicKey?: string): Promise<{
   success: true;
   errorMessage?: string;
 }> => {
   const chain = getChainForAddress(constructChallengeObjectFromString(message, BigIntify).address);
   const verificationRes = await fetch('../api/signIn', {
     method: 'post',
-    body: JSON.stringify({ ...sessionDetails, message: message, signature: sig, options, chain }),
+    body: JSON.stringify({ ...sessionDetails, message: message, signature: sig, options, chain, publicKey }),
     headers: { 'Content-Type': 'application/json' }
   }).then(res => res.json());
 

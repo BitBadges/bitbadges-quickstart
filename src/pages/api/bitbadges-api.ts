@@ -1,4 +1,4 @@
-import { BigIntify, BitBadgesAPI } from 'bitbadgesjs-utils';
+import { BigIntify, BitBadgesAPI } from 'bitbadgesjs-sdk';
 
 const BACKEND_URL = process.env.BITBADGES_API_URL ?? 'https://api.bitbadges.io'
 const API_KEY = process.env.BITBADGES_API_KEY ?? '';

@@ -6,10 +6,10 @@ import { useChainContext } from "@/chains/chain_contexts/ChainContext";
 import { useWeb2Context } from "@/chains/chain_contexts/web2/Web2Context";
 import { fetchAccountsWithOptions, useAccount } from "@/redux/accounts/AccountsContext";
 import { Spin } from "antd";
-import { TxContext, createTransactionPayload, proto } from "bitbadgesjs-proto";
-import { BETANET_CHAIN_DETAILS } from "bitbadgesjs-utils";
+import { TxContext, createTransactionPayload, proto } from "bitbadgesjs-sdk";
+import { BETANET_CHAIN_DETAILS } from "bitbadgesjs-sdk";
 import { useMemo, useState, useEffect } from "react";
-import { BitBadgesApi } from "./api/bitbadges-api";
+import { BitBadgesApi } from "../pages/api/bitbadges-api";
 
 
 const MsgCreateProtocol = proto.protocols.MsgCreateProtocol;

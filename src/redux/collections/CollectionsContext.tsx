@@ -1,7 +1,7 @@
 import { BitBadgesApi, DesiredNumberType } from '@/chains/api';
 import { CollectionReducerState, GlobalReduxState, dispatch, store } from '@/pages/_app';
-import { CollectionPermissions, NumberType, deepCopy } from 'bitbadgesjs-proto';
-import { AnnouncementDoc, ApprovalTrackerDoc, BadgeMetadataDetails, BalanceDoc, BigIntify, BitBadgesCollection, CollectionPermissionsWithDetails, CollectionViewKey, DefaultPlaceholderMetadata, GetAdditionalCollectionDetailsRequestBody, GetMetadataForCollectionRequestBody, MerkleChallengeDoc, MetadataFetchOptions, ReviewDoc, TransferActivityDoc, convertBitBadgesCollection } from 'bitbadgesjs-utils';
+import { CollectionPermissions, NumberType, deepCopy } from 'bitbadgesjs-sdk';
+import { AnnouncementDoc, ApprovalTrackerDoc, BadgeMetadataDetails, BalanceDoc, BigIntify, BitBadgesCollection, CollectionPermissionsWithDetails, CollectionViewKey, DefaultPlaceholderMetadata, GetAdditionalCollectionDetailsRequestBody, GetMetadataForCollectionRequestBody, MerkleChallengeDoc, MetadataFetchOptions, ReviewDoc, TransferActivityDoc, convertBitBadgesCollection } from 'bitbadgesjs-sdk';
 import { useSelector } from 'react-redux';
 import { getAccount, updateAccount } from '../accounts/AccountsContext';
 import { deleteCollectionRedux, fetchAndUpdateMetadataRedux, fetchCollectionsRedux, setCollectionRedux, updateCollectionsRedux } from './reducer';

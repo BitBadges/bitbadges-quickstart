@@ -48,7 +48,7 @@ The site by default uses cookies for sessions and short redeem windows for signa
 
 You will need to handle sessions in your preferred manner, prevent common attacks, and implement any custom logic for your specific requirements. If you do not need instant authentication, consider outsourcing the frontend by letting BitBadges handle the signature and cache it for you to fetch later via the API (see [here](https://blockin.gitbook.io/blockin/developer-docs/getting-started/sign-in-with-bitbadges)).
 
-All verification logic (i.e. checking signatures, ownership, etc) is handled by the BitBadges API. If you want to handle this yourself, reference the Blockin documentation for more information [here](https://blockin.gitbook.io/blockin/developer-docs). This might be useful for offline verification, or if you want to add additional logic to the verification process.
+All verification logic (i.e. checking signatures, ownership, etc) is handled by the BitBadges API by default. If you want to handle this yourself, reference the Blockin documentation for more information [here](https://blockin.gitbook.io/blockin/developer-docs).  The boilerplate code for this is in the pages/api/selfverify folder, but you can further customize this to your needs. This might be useful for offline verification, or if you want to add additional logic to the verification process.
 
 ## Web3 Authentication
 
@@ -72,10 +72,16 @@ The Web2 authentication currently is a very simple implementation. You will need
 
 Lastly, there is manual authentication. This may be used for more specific use cases, like in-person events. Maybe you want to authenticate users based on a QR code or a physical badge. For example, you could set a QR code scanner to keyboard mode and have it type in the QR code value (i.e. signature) for you to verify. NFC is also a possibility. The QR codes being signatures is how the BitBadges QR code system works on the official frontend for authentication codes.
 
+# BitBadges SDK 
+
+You have access to the BitBadges SDK via the "bitbadgesjs-sdk" package. This includes loads of useful functions for interacting with BitBadges.
+
 # BitBadges API
 
 You have access to the BitBadges API (assuming you have a valid .env set). See [here for more documentation](https://docs.bitbadges.io/for-developers/bitbadges-api/api). This is accessed via the BitBadgesApi variable such as   
 ```ts
+import { BitBadgesApi } from 'bitbadgesjs-sdk'
+
 await BitBadgesApi.getStatus(challengeId)
 ```
 
@@ -105,3 +111,7 @@ Or, you can use the [broadcast helper tool](https://docs.bitbadges.io/for-develo
 # Frontend Components
 
 Out of the box, we really only provide an Address UI component, but if you need more, you can reference the official BitBadges Frontend repository. It has a lot of useful components and patterns that you can copy from. Some might be a bit messy and over-engineered for the frontend, but you can use them as a reference or copy them directly.
+
+# Self-Hosting
+
+In the pages/api/selfhost folder, you will see examples of how to host metadata and balances yourself. You will just need to host it in a manner that is queryable from the BitBadges API, accounting for CORS and such. The on-chain URL will be the URL of your self-hosted values.

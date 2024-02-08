@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 //react cooki
-import { SupportedChain } from 'bitbadgesjs-utils';
+import { SupportedChain } from 'bitbadgesjs-sdk';
 import { signOut } from '../../backend_connectors';
 import { ChainSpecificContextType } from '../ChainContext';
 import { BaseDefaultChainContext } from '@/chains/utils';

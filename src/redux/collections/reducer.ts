@@ -1,8 +1,8 @@
 import { BitBadgesApi, DesiredNumberType } from "@/chains/api";
 import { AppDispatch, CollectionReducerState, GlobalReduxState } from "@/pages/_app";
 import { compareObjects } from "@/utils/compare";
-import { BigIntify, CollectionPermissions, deepCopy } from "bitbadgesjs-proto";
-import { BitBadgesCollection, GetAdditionalCollectionDetailsRequestBody, GetCollectionBatchRouteRequestBody, GetMetadataForCollectionRequestBody, MetadataFetchOptions, convertBitBadgesCollection, pruneMetadataToFetch, updateCollectionWithResponse } from "bitbadgesjs-utils";
+import { BigIntify, CollectionPermissions, deepCopy } from "bitbadgesjs-sdk";
+import { BitBadgesCollection, GetAdditionalCollectionDetailsRequestBody, GetCollectionBatchRouteRequestBody, GetMetadataForCollectionRequestBody, MetadataFetchOptions, convertBitBadgesCollection, pruneMetadataToFetch, updateCollectionWithResponse } from "bitbadgesjs-sdk";
 import { ThunkAction } from "redux-thunk";
 import { initialState } from "./CollectionsContext";
 

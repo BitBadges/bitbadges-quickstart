@@ -9,7 +9,7 @@ import '../styles/antd-override-styles.css';
 
 import type { } from 'redux-thunk/extend-redux';
 import { configureStore, createSerializableStateInvariantMiddleware } from '@reduxjs/toolkit';
-import { BitBadgesUserInfo, CollectionMap } from 'bitbadgesjs-utils';
+import { BitBadgesUserInfo, CollectionMap } from 'bitbadgesjs-sdk';
 import { Provider, useDispatch } from 'react-redux';
 import { combineReducers } from 'redux';
 import thunk from 'redux-thunk';

@@ -1,4 +1,4 @@
-import { BETANET_CHAIN_DETAILS, SupportedChain } from "bitbadgesjs-utils";
+import { BETANET_CHAIN_DETAILS, SupportedChain } from "bitbadgesjs-sdk";
 import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
@@ -13,9 +13,6 @@ export const RPC_URL = `${HOSTNAME !== 'localhost' ? 'https://node.' + HOSTNAME 
 export const BACKEND_URL = `https://${HOSTNAME !== 'localhost' ? 'api.' + HOSTNAME : HOSTNAME}${BACKEND_PORT}`;
 export const WEBSITE_HOSTNAME = `https://${HOSTNAME}`;
 export const EXPLORER_URL = `https://explorer.${HOSTNAME}`;
-
-export const DEV_MODE = process.env.PRODUCTION ? false : false;
-export const INFINITE_LOOP_MODE = process.env.PRODUCTION ? false : true;
 
 export const ETH_LOGO = '/images/ethereum-logo.png';
 export const COSMOS_LOGO = '/images/cosmos-logo.png';
@@ -48,56 +45,4 @@ export function getChainLogo(chain: string) {
   }
 
   return chainLogo;
-}
-
-export const BitBadgesKeplrSuggestChainInfo = {
-  chainId: "bitbadges_1-2",
-  chainName: "BitBadges",
-  chainSymbolImageUrl: "https://avatars.githubusercontent.com/u/86890740",
-  coinImageUrl: "https://avatars.githubusercontent.com/u/86890740",
-  rpc: RPC_URL,
-  rest: NODE_API_URL,
-  // rpc: 'https://node.bitbadges.io/rpc',
-  // rest: 'https://node.bitbadges.io/api',
-  bip44: {
-    coinType: 118,
-  },
-  bech32Config: {
-    bech32PrefixAccAddr: "cosmos",
-    bech32PrefixAccPub: "cosmos" + "pub",
-    bech32PrefixValAddr: "cosmos" + "valoper",
-    bech32PrefixValPub: "cosmos" + "valoperpub",
-    bech32PrefixConsAddr: "cosmos" + "valcons",
-    bech32PrefixConsPub: "cosmos" + "valconspub",
-  },
-  currencies: [
-    {
-      coinDenom: "BADGE",
-      coinMinimalDenom: "badge",
-      coinDecimals: 0,
-      coinGeckoId: "cosmos",
-      coinImageUrl: "https://avatars.githubusercontent.com/u/86890740",
-    },
-  ],
-  feeCurrencies: [
-    {
-      coinDenom: "BADGE",
-      coinMinimalDenom: "badge",
-      coinDecimals: 0,
-      coinGeckoId: "cosmos",
-      gasPriceStep: {
-        low: 0.000000000001,
-        average: 0.000000000001,
-        high: 0.000000000001,
-      },
-      coinImageUrl: "https://avatars.githubusercontent.com/u/86890740",
-    },
-  ],
-  stakeCurrency: {
-    coinDenom: "BADGE",
-    coinMinimalDenom: "badge",
-    coinDecimals: 0,
-    coinGeckoId: "cosmos",
-    coinImageUrl: "https://avatars.githubusercontent.com/u/86890740",
-  }
 }

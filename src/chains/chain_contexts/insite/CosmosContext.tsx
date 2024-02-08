@@ -2,14 +2,14 @@ import { checkSignIn } from '@/chains/backend_connectors';
 import { useAccount } from '@/redux/accounts/AccountsContext';
 import { verifyADR36Amino } from '@keplr-wallet/cosmos';
 import { AccountData, Window as KeplrWindow } from "@keplr-wallet/types";
-import { TransactionPayload, TxContext, createTxBroadcastBodyCosmos } from 'bitbadgesjs-proto';
-import { convertToCosmosAddress } from 'bitbadgesjs-utils';
+import { BitBadgesKeplrSuggestBetanetChainInfo, TransactionPayload, TxContext, createTxBroadcastBodyCosmos } from 'bitbadgesjs-sdk';
+import { convertToCosmosAddress } from 'bitbadgesjs-sdk';
 import Long from 'long';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
-import { BitBadgesKeplrSuggestChainInfo, CHAIN_DETAILS, INFINITE_LOOP_MODE } from '../../../../constants';
-import {  ChainSpecificContextType } from '../ChainContext';
+import { CHAIN_DETAILS } from '../../../../constants';
+import { ChainSpecificContextType } from '../ChainContext';
 import { BaseDefaultChainContext } from '@/chains/utils';
+
 declare global {
   interface Window extends KeplrWindow { }
 }
@@ -30,30 +30,23 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
   const [address, setAddress] = useState<string>('')
   const [connected, setConnected] = useState<boolean>(false);
   const [cosmosAddress, setCosmosAddress] = useState<string>('');
-  const [cookies] = useCookies(['blockincookie', 'pub_key']);
   const [loggedIn, setLoggedIn] = useState<boolean>(false)
   const account = useAccount(address)
 
   useEffect(() => {
     async function fetchDetails() {
-      if (INFINITE_LOOP_MODE) console.log('useEffect: cosmosContext');
       if (address) {
         setAddress(address);
         setCosmosAddress(convertToCosmosAddress(address));
-
-        if (cookies.blockincookie === convertToCosmosAddress(address)) {
-          const signedInRes = await checkSignIn();
-          setLoggedIn(signedInRes.signedIn);
-        }
-
-        setLoggedIn(cookies.blockincookie === convertToCosmosAddress(address));
+        const signedInRes = await checkSignIn();
+        setLoggedIn(signedInRes.signedIn && signedInRes.address === address);
         setConnected(true);
       } else {
         setConnected(false);
       }
     }
     fetchDetails();
-  }, [address, cookies.blockincookie, loggedIn])
+  }, [address, loggedIn])
 
   const connect = async () => {
     const { keplr } = window
@@ -62,7 +55,7 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
       return
     }
 
-    await keplr.experimentalSuggestChain(BitBadgesKeplrSuggestChainInfo)
+    await keplr.experimentalSuggestChain(BitBadgesKeplrSuggestBetanetChainInfo)
     const offlineSigner = window.getOfflineSigner(chainId);
     const account: AccountData = (await offlineSigner.getAccounts())[0]
     setConnected(true);
@@ -91,7 +84,8 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
 
     return {
       message: message,
-      signature: sig.pub_key.value + ':' + sig.signature,
+      signature: sig.signature,
+      publicKey: sig.pub_key.value,
     }
   }
 

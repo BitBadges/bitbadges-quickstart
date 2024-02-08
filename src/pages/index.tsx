@@ -5,14 +5,14 @@ import { BlockinDisplay } from '@/components/insite/BlockinDisplay';
 import { ManualDisplay } from '@/components/manual/manual';
 import { SiwbbDisplay } from '@/components/siwbb/siwbb';
 import { Web2Display } from '@/components/web2/web2';
-import { NumberType } from 'bitbadgesjs-proto';
+import { NumberType } from 'bitbadgesjs-sdk';
 import { ChallengeParams, VerifyChallengeOptions } from 'blockin';
 import { NextPage } from 'next/types';
 import { useEffect, useMemo, useState } from 'react';
 import { getPrivateInfo, signIn, signOut } from '../chains/backend_connectors';
 import { useChainContext } from '../chains/chain_contexts/ChainContext';
 import Header from '../components/Header';
-import { BroadcastTxPopupButton, SignTxInSiteButton } from './transactions';
+import { BroadcastTxPopupButton, SignTxInSiteButton } from '../components/transactions';
 
 
 const Home: NextPage = () => {
@@ -22,6 +22,7 @@ const Home: NextPage = () => {
 
   const [signInMethodTabSelected, setSignInMethodTab] = useState('web3');
   const signInMethodTab = web2Context.active ? 'web2' : signInMethodTabSelected;
+
   const [web3SignInTypeSelected, setWeb3SignInType] = useState('siwbb');
   const web3SignInType = chain.loggedIn ? siwbbContext.active ? 'siwbb' : 'insite' : web3SignInTypeSelected   //Use the active one if logged in
 
@@ -68,18 +69,6 @@ const Home: NextPage = () => {
   }, []); // Empty dependency array ensures this effect runs only once
 
 
-
-  const SecretInfoButton = <>
-    <button
-      className='landing-button m-2' style={{ width: 200 }} onClick={async () => {
-        const res = await getPrivateInfo();
-        alert(res.message);
-      }}>
-      Get Private User Info
-    </button>
-  </>
-
-
   const expectedChallengeParams: Partial<ChallengeParams<NumberType>> = useMemo(() => {
     const params: Partial<ChallengeParams<NumberType>> = { ...challengeParams };
     //We allow the user to select their address
@@ -93,10 +82,10 @@ const Home: NextPage = () => {
     username?: string,
     password?: string,
     siwbb?: boolean,
-  }, verifyOptions?: VerifyChallengeOptions) => {
+  }, verifyOptions?: VerifyChallengeOptions, publicKey?: string) => {
 
     try {
-      const backendChecksRes = await signIn(message, signature, sessionDetails, verifyOptions);
+      const backendChecksRes = await signIn(message, signature, sessionDetails, verifyOptions, publicKey);
       if (!backendChecksRes.success) throw new Error(backendChecksRes.errorMessage ?? 'Error');
     } catch (e: any) {
       console.log(e.errorMessage ?? e.message ?? e);
@@ -129,7 +118,8 @@ const Home: NextPage = () => {
               },
               {
                 key: 'manual',
-                content: 'Manual'
+                content: 'Manual',
+                disabled: chain.connected && chain.loggedIn
               }
             ]}
           />
@@ -185,13 +175,25 @@ const Home: NextPage = () => {
         <br />
         {signInMethodTab !== 'manual' && <>
           <div className='flex-center flex-wrap'>
-            {SecretInfoButton}
+            <SecretInfoButton />
             <SignTxInSiteButton signInMethodTab={signInMethodTab} web3SignInType={web3SignInType} />
             <BroadcastTxPopupButton signInMethodTab={signInMethodTab} />
           </div>
         </>}
       </div >
     </>
+  )
+}
+
+const SecretInfoButton = () => {
+  return (
+    <button
+      className='landing-button m-2' style={{ width: 200 }} onClick={async () => {
+        const res = await getPrivateInfo();
+        alert(res.message);
+      }}>
+      Get Private User Info
+    </button>
   )
 }
 

@@ -13,9 +13,9 @@ import { notification } from "antd"
 import {
   TransactionPayload,
   TxContext,
+  convertToCosmosAddress,
   createTxBroadcastBodyEthereum
-} from "bitbadgesjs-proto"
-import { convertToCosmosAddress } from "bitbadgesjs-utils"
+} from "bitbadgesjs-sdk"
 import { ethers } from "ethers"
 import {
   createContext,
@@ -24,7 +24,6 @@ import {
   useEffect,
   useState
 } from "react"
-import { useCookies } from "react-cookie"
 import { useAccount as useWeb3Account } from "wagmi"
 import { ChainSpecificContextType } from "../ChainContext"
 
@@ -39,7 +38,6 @@ type Props = {
 }
 
 export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
-  const [cookies, setCookies] = useCookies(["blockincookie", "pub_key"])
   const [loggedIn, setLoggedIn] = useState<boolean>(false)
   const { open } = useWeb3Modal()
   const web3AccountContext = useWeb3Account()
@@ -51,13 +49,12 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
 
   const connect = async () => {
     await connectAndPopulate(
-      web3AccountContext.address ?? "",
-      cookies.blockincookie
+      web3AccountContext.address ?? ""
     )
   }
 
   const connectAndPopulate = useCallback(
-    async (address: string, cookie: string) => {
+    async (address: string) => {
       if (!address) {
         try {
           await open()
@@ -69,12 +66,8 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
           })
         }
       } else if (address) {
-        if (cookie === convertToCosmosAddress(address)) {
-          const signedInRes = await checkSignIn();
-          setLoggedIn(signedInRes.signedIn)
-        } else {
-          setLoggedIn(false)
-        }
+        const signedInRes = await checkSignIn();
+        setLoggedIn(signedInRes.signedIn && signedInRes.address === address);
       }
     },
     [open]
@@ -82,7 +75,7 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     if (web3AccountContext.address) {
-      connectAndPopulate(web3AccountContext.address, cookies.blockincookie)
+      connectAndPopulate(web3AccountContext.address)
     }
   }, [web3AccountContext.address, loggedIn])
 
@@ -106,7 +99,6 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
     )
     const base64PubKey = Buffer.from(compressedPublicKey).toString("base64")
     setPublicKey(cosmosAddress, base64PubKey)
-    setCookies("pub_key", `${cosmosAddress}-${base64PubKey}`, { path: "/" })
 
     return {
       message,
@@ -133,17 +125,7 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
 
   const getPublicKey = async (_cosmosAddress: string) => {
     try {
-      const currAccount = account
-
-      //If we have stored the public key in cookies, use that instead (for Ethereum)
-      if (
-        currAccount &&
-        cookies.pub_key &&
-        cookies.pub_key.split("-")[0] === currAccount.cosmosAddress
-      ) {
-        return cookies.pub_key.split("-")[1]
-      }
-
+      const currAccount = account      
       if (currAccount && currAccount.publicKey) {
         return currAccount.publicKey
       }
@@ -165,7 +147,6 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
       )
       const base64PubKey = Buffer.from(compressedPublicKey).toString("base64")
       setPublicKey(_cosmosAddress, base64PubKey)
-      setCookies("pub_key", `${_cosmosAddress}-${base64PubKey}`, { path: "/" })
 
       return base64PubKey
     } catch (e) {

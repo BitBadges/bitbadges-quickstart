@@ -2,7 +2,7 @@ import { signOut } from "@/chains/backend_connectors";
 import { SignChallengeResponse, useChainContext } from "@/chains/chain_contexts/ChainContext";
 import { useAccount } from "@/redux/accounts/AccountsContext";
 import { Avatar, Typography, notification } from "antd";
-import { NumberType, Numberify, SupportedChain } from "bitbadgesjs-utils";
+import { NumberType, Numberify, SupportedChain } from "bitbadgesjs-sdk";
 import { ChallengeParams, SignAndVerifyChallengeResponse, SupportedChainMetadata, VerifyChallengeOptions, constructChallengeObjectFromString } from 'blockin';
 import { BlockinUIDisplay } from 'blockin/dist/ui';
 import Image from 'next/image';
@@ -22,7 +22,7 @@ export const BlockinDisplay = ({
 }: {
   hideLogo?: boolean;
   hideLogin?: boolean;
-  verifyOnBackend: (message: string, signature: string, sessionDetails: { username?: string, password?: string, siwbb?: boolean }, options?: VerifyChallengeOptions) => Promise<void>;
+  verifyOnBackend: (message: string, signature: string, sessionDetails: { username?: string, password?: string, siwbb?: boolean }, options?: VerifyChallengeOptions, publicKey?: string) => Promise<void>;
   challengeParams: ChallengeParams<NumberType>;
   verifyOptions?: VerifyChallengeOptions;
 }) => {
@@ -56,7 +56,7 @@ export const BlockinDisplay = ({
     address
   }
 
-  const handleVerifyChallenge = async (message: string, signature: string) => {
+  const handleVerifyChallenge = async (message: string, signature: string, publicKey?: string) => {
 
     try {
       //Verify the pair on your backend and handle sessions
@@ -64,7 +64,7 @@ export const BlockinDisplay = ({
 
       await verifyOnBackend(message, signature, {
         //nothing here bc we are signing normally
-      }, verifyOptions);
+      }, verifyOptions, publicKey);
 
 
       /**
@@ -96,7 +96,8 @@ export const BlockinDisplay = ({
 
     const verifyChallengeResponse: SignAndVerifyChallengeResponse = await handleVerifyChallenge(
       signChallengeResponse.message,
-      signChallengeResponse.signature
+      signChallengeResponse.signature,
+      signChallengeResponse.publicKey
     );
 
     return verifyChallengeResponse;

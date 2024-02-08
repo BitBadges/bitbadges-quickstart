@@ -1,13 +1,11 @@
 
 import { checkSignIn } from '@/chains/backend_connectors';
+import { BaseDefaultChainContext } from '@/chains/utils';
 import { useAccount } from '@/redux/accounts/AccountsContext';
 import { notification } from 'antd';
-import { TransactionPayload, TxContext, createTxBroadcastBodySolana } from 'bitbadgesjs-proto';
-import { convertToCosmosAddress, solanaToCosmos } from 'bitbadgesjs-utils';
-import { Dispatch, SetStateAction, createContext, useCallback, useContext, useState } from 'react';
-import { useCookies } from 'react-cookie';
+import { TransactionPayload, TxContext, convertToCosmosAddress, createTxBroadcastBodySolana } from 'bitbadgesjs-sdk';
+import { Dispatch, SetStateAction, createContext, useContext, useState } from 'react';
 import { ChainSpecificContextType } from '../ChainContext';
-import { BaseDefaultChainContext } from '@/chains/utils';
 
 const bs58 = require('bs58');
 
@@ -28,7 +26,6 @@ type Props = {
 };
 
 export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
-  const [cookies, setCookies] = useCookies(['blockincookie', 'pub_key']);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [solanaProvider, setSolanaProvider] = useState<any>();
   const [pubKey, setPubKey] = useState<string>('');
@@ -53,10 +50,6 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
   };
 
   const connect = async () => {
-    await connectAndPopulate(address ?? '', cookies.blockincookie);
-  }
-
-  const connectAndPopulate = useCallback(async (address: string, cookie: string) => {
     if (!address) {
       try {
         const provider = getProvider(); // see "Detecting the Provider"
@@ -64,7 +57,6 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
         const resp = await provider.request({ method: "connect" });
         const address = resp.publicKey.toBase58();
         const pubKey = resp.publicKey.toBase58();
-        const cosmosAddress = solanaToCosmos(address);
 
         setSolanaProvider(provider);
         setAddress(address);
@@ -73,14 +65,9 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
         const solanaPublicKeyBuffer = bs58.decode(solanaPublicKeyBase58);
         const publicKeyToSet = Buffer.from(solanaPublicKeyBuffer).toString('base64')
         setPubKey(publicKeyToSet);
-        setCookies('pub_key', `${cosmosAddress}-${publicKeyToSet}`, { path: '/' });
 
-        if (cookie === convertToCosmosAddress(address)) {
-          const signedInRes = await checkSignIn();
-          setLoggedIn(signedInRes.signedIn);
-        } else {
-          setLoggedIn(false);
-        }
+        const signedInRes = await checkSignIn();
+        setLoggedIn(signedInRes.signedIn && signedInRes.address === address);
       } catch (e) {
         console.error(e);
         notification.error({
@@ -89,8 +76,7 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
         })
       }
     }
-  }, [setCookies]);
-
+  }
 
   const disconnect = async () => {
     setLoggedIn(false);
