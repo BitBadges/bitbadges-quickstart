@@ -66,10 +66,8 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
 
   //Handle setting chain by default based on last signed in cookie
   useEffect(() => {
-    if (cookies.latestChain !== chain) {
-      setChain(cookies.latestChain);
-    }
-  }, [cookies.latestChain, chain]);
+    setChain(cookies.latestChain);
+  }, [cookies.latestChain]);
 
   useEffect(() => {
     checkSignIn().then((res) => {

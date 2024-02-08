@@ -37,3 +37,6 @@ next-env.d.ts
 
 #envirnment
 .env
+
+#quickdb
+json.sqlite

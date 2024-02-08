@@ -85,7 +85,7 @@ You have access to the BitBadges API (assuming you have a valid .env set). See [
 ```ts
 import { BitBadgesApi } from 'bitbadgesjs-sdk'
 
-await BitBadgesApi.getStatus(challengeId)
+await BitBadgesApi.getStatus()
 ```
 
 We have also implemented a simple Redux store for fetching collections and accounts. This automatically handles pruning requests to not fetch stuff
