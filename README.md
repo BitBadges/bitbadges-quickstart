@@ -8,6 +8,9 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 The frontend uses AntDesign and TailwindCSS. The backend uses Next.js API routes and a simple cookie-based session system. 
 
+<!-- public/images/bitbadges-quickstart.png -->
+<img src="https://github.com/bitbadges/bitbadges-quickstart/blob/main/public/images/bitbadges-quickstart.png" alt="BitBadges Quickstart" width="100%"/>
+
 ## Getting Started
 
 First, you will need to configure your .env file. An example is provided at .env.example.
