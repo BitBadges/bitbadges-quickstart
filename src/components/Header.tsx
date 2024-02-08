@@ -22,6 +22,7 @@ const Header = () => {
           links={[
             { title: 'Documentation', href: 'https://docs.bitbadges.io' },
             { title: 'Github', href: 'https://github.com/bitbadges' },
+            { title: 'Explorer', href: 'https://explorer.bitbadges.io' },
             { title: 'Discord Support', href: 'https://discord.com/invite/TJMaEd9bar' },
           ]}
         />
