@@ -49,7 +49,8 @@ export const ManualDisplay = ({
       This is typically for in-person events where they pre-generate their pair and present to you in-person, such as a QR code.
       For example, you might set up a QR code scanner that writes the values into the input boxes upon scanning and auto verifies.
 
-      This example simply checks Blockin verification. You need to handle sessions and prevent common attacks youself, as well as any application
+      This example simply checks Blockin verification and does not actually sign you into the site because it is most likely used for non-digital verification. 
+      You need to handle sessions and prevent common attacks youself, as well as any application
       specific logic.
     </div>
     <br />
