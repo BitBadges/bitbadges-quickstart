@@ -11,6 +11,10 @@ The frontend uses AntDesign and TailwindCSS. The backend uses Next.js API routes
 <!-- public/images/bitbadges-quickstart.png -->
 <img src="https://github.com/bitbadges/bitbadges-quickstart/blob/main/public/images/bitbadges-quickstart.png" alt="BitBadges Quickstart" width="100%"/>
 
+## Branches
+
+The main branch is the default branch, but there are also other branches that you may find useful. We hope to support multiple use cases and provide a variety of starting points for different projects via the different branches. For example, there may be a branch with a subscription starter kit already implemented.
+
 ## Getting Started
 
 First, you will need to configure your .env file. An example is provided at .env.example.
@@ -63,7 +67,7 @@ For Ethereum connection (if you choose to use), the default code uses WalletConn
 
 ## Web2 Authentication
 
-We also support a basic implementation of a [hybrid dApp](https://blockin.gitbook.io/blockin/developer-docs/getting-started/user-signatures#which-one-to-use) that uses Web2 authentication. This allows you to use standard (username, password) authentication and map everything behind the scenes to a Web3 address. Wherever signatures are required, you manage the mnemonic / private key and handle the signature for the user.
+We also support a basic implementation of a [hybrid dApp](https://blockin.gitbook.io/blockin/developer-docs/getting-started/user-signatures#which-one-to-use) that uses Web2 authentication. This allows you to use standard (username, password) authentication and map everything behind the scenes to a Web3 address. Wherever signatures are required, you manage the mnemonic / private key and handle the signature for the user. This app by default maps usernames to addresses, but you could also do the reverse (i.e. addresses to custom in-app usernames).
 
 Whenever a new user creates an account, a new mnemonic is generated for them and stored in the database. You simply use the mnemonic to sign for the user. 
 
@@ -118,3 +122,7 @@ Out of the box, we really only provide an Address UI component, but if you need 
 # Self-Hosting
 
 In the pages/api/selfhost folder, you will see examples of how to host metadata and balances yourself. You will just need to host it in a manner that is queryable from the BitBadges API, accounting for CORS and such. The on-chain URL will be the URL of your self-hosted values.
+
+# Distribution / Balance Assgnment
+
+You may also use this starter as a way to distribute codes / passwords or update the allocated off-chain balances based on some criteria or interaction. For example, you may want to give a claim code only to users who subscribe. Or, you assign and update your off-chain balances if the user has completed a certain task. 

@@ -11,7 +11,7 @@ const Header = () => {
         </h1>
         <br />
         <div className='secondary-text text-center px-10'>
-          See the README for more information on how to use this template.
+          Please read the README before you edit this template.
         </div>
         <br />
         <div className='flex-center'>
