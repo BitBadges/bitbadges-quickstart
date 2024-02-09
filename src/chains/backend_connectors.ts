@@ -96,3 +96,14 @@ export const createWeb2Account = async (username: string, password: string): Pro
 
   return verificationRes;
 }
+
+// Im not calling this function anywhere. Its a redirect only
+// export const discordVerify = async (code: string): Promise<any> => {
+//   const verificationRes = await fetch('../api/discordVerify?' + new URLSearchParams({ code }), {
+//     method: 'post',
+//     body: '',
+//     headers: { 'Content-Type': 'application/json' }
+//   }).then(res => res.json());
+
+//   return verificationRes;
+// }
