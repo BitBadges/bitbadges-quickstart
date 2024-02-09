@@ -39,6 +39,8 @@ const discordVerify = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(400).json({ success: false, errorMessage: "Did not pass Blockin verification" });
     }
 
+    // You could also just use the Blockin library for signature verification and query badge balances here
+
     console.log("This sign in request was verified by Blockin for the user", params.address);
 
     //Step 2: Verify the Discord code authentication
@@ -83,7 +85,6 @@ const discordVerify = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const member = await guild.members.fetch(userId);
       const role = guild.roles.cache.find(role => role.name === process.env.ROLE_ID);
-      console.log(role, member);
       if (role && member) {
         await member.roles.add(role)
           .then(() => {
