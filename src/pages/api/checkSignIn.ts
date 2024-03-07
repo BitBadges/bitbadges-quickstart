@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from 'next';
 
 // For all authentication attempts, we will check the session cookie to see if the user is signed in
 // The session cookie consists of the chain / address of the user signed in.

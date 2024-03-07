@@ -26,7 +26,7 @@
   @apply flex justify-center items-center font-bold text-3xl pt-10;
   display: flex;
   justify-content: center;
-  align-items: center; 
+  align-items: center;
   font-weight: bold;
   font-size: 30px;
 }

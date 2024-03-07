@@ -1,14 +1,13 @@
-import { Secp256k1 } from "@cosmjs/crypto";
-import { BigIntify } from "bitbadgesjs-sdk";
-import { constructChallengeObjectFromString, createChallenge } from "blockin";
+import { Secp256k1 } from '@cosmjs/crypto';
+import { BigIntify } from 'bitbadgesjs-sdk';
+import { constructChallengeObjectFromString, createChallenge } from 'blockin';
 import { TypedDataField, Wallet, utils } from 'ethers';
-import { NextApiRequest, NextApiResponse } from "next";
-import { DBAccountType } from "./types";
-import { db } from "./db";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { DBAccountType } from './types';
+import { db } from './db';
 
 const signWithWeb2 = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-
     const username = req.body.username;
     const message = req.body.message;
     const eipToSign = req.body.eipToSign;
@@ -34,34 +33,33 @@ const signWithWeb2 = async (req: NextApiRequest, res: NextApiResponse) => {
     let isBlockinMessage = false;
     let signature = '';
     try {
-
       constructChallengeObjectFromString(message, BigIntify);
       isBlockinMessage = true;
-    } catch (err) { }
+    } catch (err) {}
 
     let messageToSign = message;
-    let publicKey = ''
+    let publicKey = '';
     if (isBlockinMessage) {
       //We didn't yet specify the address, so we need to do that now with the mapped one
       //Then, sign the message with the mapped mnemonic
       const wallet = Wallet.fromMnemonic(mappedMnemonic);
-      messageToSign = createChallenge({ ...constructChallengeObjectFromString(message, BigIntify), address: mappedAddress });
+      messageToSign = createChallenge({
+        ...constructChallengeObjectFromString(message, BigIntify),
+        address: mappedAddress
+      });
       signature = await wallet.signMessage(messageToSign);
-
 
       //If signing a transaction, we will eventually need the public key
       //This snippet gets the base64 public key from the signature
       //https://docs.bitbadges.io/for-developers/create-and-broadcast-txs/transaction-context
-      const msgHash = utils.hashMessage(messageToSign)
-      const msgHashBytes = utils.arrayify(msgHash)
-      const pubKey = utils.recoverPublicKey(msgHashBytes, signature)
+      const msgHash = utils.hashMessage(messageToSign);
+      const msgHashBytes = utils.arrayify(msgHash);
+      const pubKey = utils.recoverPublicKey(msgHashBytes, signature);
 
-      const pubKeyHex = pubKey.substring(2)
-      const compressedPublicKey = Secp256k1.compressPubkey(
-        new Uint8Array(Buffer.from(pubKeyHex, "hex"))
-      )
-      const base64PubKey = Buffer.from(compressedPublicKey).toString("base64")
-      publicKey = base64PubKey
+      const pubKeyHex = pubKey.substring(2);
+      const compressedPublicKey = Secp256k1.compressPubkey(new Uint8Array(Buffer.from(pubKeyHex, 'hex')));
+      const base64PubKey = Buffer.from(compressedPublicKey).toString('base64');
+      publicKey = base64PubKey;
 
       await db.set(username, { ...details, publicKey: base64PubKey });
     } else {
@@ -70,18 +68,16 @@ const signWithWeb2 = async (req: NextApiRequest, res: NextApiResponse) => {
       //https://docs.bitbadges.io/for-developers/create-and-broadcast-txs/signing-ethereum
       const types_ = (Object.entries(eipToSign.types) as any)
         .filter(([key]: any) => key !== 'EIP712Domain')
-        .reduce((types: any, [key, attributes]: [string, TypedDataField[]]) => {
-          types[key] = attributes.filter((attr) => attr.type !== 'EIP712Domain')
-          return types
-        }, {} as Record<string, TypedDataField[]>)
+        .reduce(
+          (types: any, [key, attributes]: [string, TypedDataField[]]) => {
+            types[key] = attributes.filter((attr) => attr.type !== 'EIP712Domain');
+            return types;
+          },
+          {} as Record<string, TypedDataField[]>
+        );
 
-      signature = await Wallet.fromMnemonic(mappedMnemonic)._signTypedData(
-        eipToSign.domain,
-        types_,
-        eipToSign.message
-      );
+      signature = await Wallet.fromMnemonic(mappedMnemonic)._signTypedData(eipToSign.domain, types_, eipToSign.message);
     }
-
 
     //TODO: You can return stuff whatever you want in your frontend. You should keep mnemonic private though
     return res.status(200).json({
@@ -91,8 +87,8 @@ const signWithWeb2 = async (req: NextApiRequest, res: NextApiResponse) => {
       publicKey
     });
   } catch (err) {
-    console.log("error", err)
-    console.log(err)
+    console.log('error', err);
+    console.log(err);
     return res.status(401).json({ message: `${err}` });
   }
 };

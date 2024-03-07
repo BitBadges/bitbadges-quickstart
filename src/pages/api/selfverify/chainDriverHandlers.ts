@@ -15,7 +15,7 @@ import { CHAIN_DETAILS } from '../../../../constants';
 
 //0x1 is the Moralis chain ID for Ethereum Mainnet
 const ethDriver = new EthDriver('0x1', {
-  apiKey: process.env.MORALIS_API_KEY ? process.env.MORALIS_API_KEY : '',
+  apiKey: process.env.MORALIS_API_KEY ? process.env.MORALIS_API_KEY : ''
 });
 
 const cosmosDriver = new CosmosDriver(CHAIN_DETAILS.cosmosChainId);
@@ -23,7 +23,6 @@ const solDriver = new SolDriver('Solana');
 const btcDriver = new BtcDriver('Bitcoin');
 
 export const getChainDriver = (chain: string) => {
-
   switch (chain) {
     case 'Ethereum':
       return ethDriver;
@@ -36,4 +35,4 @@ export const getChainDriver = (chain: string) => {
     default:
       return ethDriver;
   }
-}
+};

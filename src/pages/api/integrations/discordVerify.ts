@@ -2,11 +2,11 @@ import axios from 'axios';
 import { BigIntify } from 'bitbadgesjs-sdk';
 import { constructChallengeObjectFromString } from 'blockin';
 import Discord from 'discord.js';
-import { NextApiRequest, NextApiResponse } from "next";
-import { BitBadgesApi } from './bitbadges-api';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { BitBadgesApi } from '../bitbadges-api';
 
 const client = new Discord.Client({
-  intents: ["Guilds", "GuildMembers"]
+  intents: ['Guilds', 'GuildMembers']
 });
 
 //See signIn.ts for self-verification example (not API)
@@ -26,7 +26,6 @@ const discordVerify = async (req: NextApiRequest, res: NextApiResponse) => {
   const code = req.query.code;
   const state = req.query.state as string;
 
-
   try {
     const stateData = JSON.parse(state ?? '{}');
     const { message, signature, publicKey, options } = stateData; //You can also check the verificationResponse.success field to see if the message was verified on the clientside but this value should not be trusted.
@@ -34,28 +33,35 @@ const discordVerify = async (req: NextApiRequest, res: NextApiResponse) => {
     //Step 1: Verify the message and signature on the backend yourself
     const params = constructChallengeObjectFromString(message, BigIntify);
 
-    const verificationResponse = await BitBadgesApi.verifySignInGeneric({ message, signature, options: options ? JSON.parse(options) : undefined, publicKey });
-    if (!verificationResponse.success) {
-      return res.status(400).json({ success: false, errorMessage: "Did not pass Blockin verification" });
-    }
+    //Throws an error if the message and signature are not verified
+    await BitBadgesApi.verifySignInGeneric({
+      message,
+      signature,
+      options: options ? JSON.parse(options) : undefined,
+      publicKey
+    });
 
     // You could also just use the Blockin library for signature verification and query badge balances here
 
-    console.log("This sign in request was verified by Blockin for the user", params.address);
+    console.log('This sign in request was verified by Blockin for the user', params.address);
 
     //Step 2: Verify the Discord code authentication
     // Exchange authorization code for access token
-    const response = await axios.post('https://discord.com/api/oauth2/token', {
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      grant_type: 'authorization_code',
-      code: code,
-      redirect_uri: REDIRECT_URI
-    }, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+    const response = await axios.post(
+      'https://discord.com/api/oauth2/token',
+      {
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: REDIRECT_URI
+      },
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       }
-    });
+    );
 
     const access_token = response.data.access_token;
     if (!access_token) {
@@ -84,22 +90,25 @@ const discordVerify = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       const member = await guild.members.fetch(userId);
-      const role = guild.roles.cache.find(role => role.name === process.env.ROLE_ID);
+      const role = guild.roles.cache.find((role) => role.name === process.env.ROLE_ID);
       if (role && member) {
-        await member.roles.add(role)
-          .then(() => {
-            console.log(`User has been whitelisted and assigned the ${role.name} role.`);
-          });
+        await member.roles.add(role).then(() => {
+          console.log(`User has been whitelisted and assigned the ${role.name} role.`);
+        });
       } else {
         throw new Error('Role or member not found');
       }
     }
 
-    return res.status(200).send(`Successfully assigned the owner role to ${discordUsername} on the Discord server. You can now close this window.`);
+    return res
+      .status(200)
+      .send(
+        `Successfully assigned the owner role to ${discordUsername} on the Discord server. You can now close this window.`
+      );
   } catch (error: any) {
-    console.log("Error:", error);
+    console.log('Error:', error);
     res.status(500).send('Error handling sign in request: ' + error.errorMessage ?? error.message);
   }
-}
+};
 
 export default discordVerify;

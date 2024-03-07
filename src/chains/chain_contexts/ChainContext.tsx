@@ -1,61 +1,66 @@
-import { fetchAccountsWithOptions } from '@/redux/accounts/AccountsContext';
-import { SupportedChain, convertToCosmosAddress } from 'bitbadgesjs-sdk';
+import {
+  BitBadgesUserInfo,
+  SupportedChain,
+  TransactionPayload,
+  TxContext,
+  convertToCosmosAddress
+} from 'bitbadgesjs-sdk';
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
+import { BitBadgesApi } from '../api';
+import { checkSignIn, signOut } from '../backend_connectors';
+import { BaseDefaultChainContext } from '../utils';
+import { useAccountsContext } from './AccountsContext';
 import { useBitcoinContext } from './insite/BitcoinContext';
 import { useCosmosContext } from './insite/CosmosContext';
 import { useEthereumContext } from './insite/EthereumContext';
 import { useSolanaContext } from './insite/SolanaContext';
 import { useSiwbbContext } from './siwbb/SIWBBContext';
 import { useWeb2Context } from './web2/Web2Context';
-import { checkSignIn, signOut } from '../backend_connectors';
-import { TransactionPayload, TxContext } from 'bitbadgesjs-sdk';
-import { BaseDefaultChainContext } from '../utils';
 
 export type SignChallengeResponse = {
-  signature: string
+  signature: string;
   message: string;
   publicKey?: string;
-}
+};
 
 export type ChainContextType = ChainSpecificContextType & {
-  chain: SupportedChain,
-  setChain: Dispatch<SetStateAction<SupportedChain>>,
+  chain: SupportedChain;
+  setChain: Dispatch<SetStateAction<SupportedChain>>;
 
-  cosmosAddress: string,
-}
+  cosmosAddress: string;
+
+  loggedIn: boolean;
+  connected: boolean;
+
+  setLoggedInAddress: Dispatch<SetStateAction<string>>;
+};
 
 export type ChainSpecificContextType = {
-  address: string,
-
-  loggedIn: boolean,
-  setLoggedIn: Dispatch<SetStateAction<boolean>>,
-
-
-  //Chain Specific
-  connected: boolean,
-  setConnected: Dispatch<SetStateAction<boolean>>,
+  address: string;
 
   //These are assumed to remain constant, but included because they are chain-specific
-  disconnect: () => Promise<any>,
-  connect: () => Promise<any>,
-  signChallenge: (challenge: string) => Promise<SignChallengeResponse>,
-  signTxn: (context: TxContext, payload: TransactionPayload, simulate: boolean) => Promise<string>, //Returns broadcast post body
-  getPublicKey: (cosmosAddress: string) => Promise<string>,
-}
+  disconnect: () => Promise<any>;
+  connect: () => Promise<any>;
+  signChallenge: (challenge: string) => Promise<SignChallengeResponse>;
+  signTxn: (context: TxContext, payload: TransactionPayload, simulate: boolean) => Promise<string>; //Returns broadcast post body
+  getPublicKey: (cosmosAddress: string) => Promise<string>;
+};
 
 const ChainContext = createContext<ChainContextType>({
-  ...BaseDefaultChainContext,
+  ...BaseDefaultChainContext
 });
 
 type Props = {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 };
 
 export const ChainContextProvider: React.FC<Props> = ({ children }) => {
   const [chain, setChain] = useState<SupportedChain>(SupportedChain.ETH);
   const [cookies, setCookies] = useCookies(['latestChain']);
+  const [loggedInAddress, setLoggedInAddress] = useState<string>('');
 
+  const { setAccounts } = useAccountsContext();
 
   const ethereumContext = useEthereumContext();
   const cosmosContext = useCosmosContext();
@@ -67,13 +72,20 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
   //Handle setting chain by default based on last signed in cookie
   useEffect(() => {
     setChain(cookies.latestChain);
-  }, [cookies.latestChain]);
+  }, []);
+
+  useEffect(() => {
+    if (cookies.latestChain !== chain) {
+      setCookies('latestChain', chain);
+    }
+  }, [chain]);
 
   useEffect(() => {
     checkSignIn().then((res) => {
       const { signedIn, username, address, chain, publicKey, siwbb } = res;
 
       if (signedIn) {
+        setLoggedInAddress(address);
         //We have signed in with Web2 if username is returned
         //We have signed in with SIWBB if siwbb is returned
         //We have signed in with normal Web3 if neither is returned
@@ -87,18 +99,11 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
           siwbbContext.setAddress(address);
           siwbbContext.setChain(chain);
         } else {
-
         }
       } else {
         signOut();
       }
     });
-  }, []);
-
-  useEffect(() => {
-    if (cookies.latestChain !== chain) {
-      setCookies('latestChain', chain);
-    }
   }, []);
 
   let currentChainContext: ChainSpecificContextType;
@@ -112,28 +117,38 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
     currentChainContext = ethereumContext;
   }
 
-  const chainContext: ChainContextType = web2Context.active || siwbbContext.active ?
-    {
-      ...(web2Context.active ? web2Context : siwbbContext),
-      cosmosAddress: convertToCosmosAddress(siwbbContext.address),
-      setChain: () => { },
-    } : {
-      ...currentChainContext,
-      cosmosAddress: convertToCosmosAddress(currentChainContext.address),
-      chain,
-      setChain,
-    };
+  const chainContext: ChainContextType = {
+    ...(web2Context.active ? web2Context : siwbbContext.active ? siwbbContext : currentChainContext),
+    chain,
+    setChain,
+    cosmosAddress: '',
+    loggedIn: false,
+    connected: false,
+    setLoggedInAddress
+  };
+  chainContext.cosmosAddress = convertToCosmosAddress(chainContext.address);
+  chainContext.connected = chainContext.address ? true : false;
+  chainContext.loggedIn = !!(
+    loggedInAddress &&
+    chainContext.address &&
+    convertToCosmosAddress(loggedInAddress) === convertToCosmosAddress(chainContext.address)
+  );
 
   //Fetch account info on address change
   useEffect(() => {
-    fetchAccountsWithOptions([{ address: chainContext.address, fetchBalance: true, fetchSequence: true }]);
+    async function fetchAccountInfo() {
+      if (!chainContext.address) return;
+      const account = await BitBadgesUserInfo.FetchAndInitialize(BitBadgesApi, {
+        address: chainContext.address,
+        fetchBalance: true,
+        fetchSequence: true
+      });
+      setAccounts([account]);
+    }
+    fetchAccountInfo();
   }, [chainContext.address]);
 
-  return <ChainContext.Provider value={chainContext}>
-    {children}
-  </ChainContext.Provider>;
-}
-
+  return <ChainContext.Provider value={chainContext}>{children}</ChainContext.Provider>;
+};
 
 export const useChainContext = () => useContext(ChainContext);
-

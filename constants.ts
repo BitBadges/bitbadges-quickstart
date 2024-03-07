@@ -1,4 +1,4 @@
-import { BETANET_CHAIN_DETAILS, SupportedChain } from "bitbadgesjs-sdk";
+import { BETANET_CHAIN_DETAILS, SupportedChain } from 'bitbadgesjs-sdk';
 import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
@@ -28,7 +28,8 @@ export function getChainLogo(chain: string) {
       chainLogo = ETH_LOGO;
       break;
     case SupportedChain.UNKNOWN:
-      chainLogo = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Blue_question_mark_icon.svg/1024px-Blue_question_mark_icon.svg.png';
+      chainLogo =
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Blue_question_mark_icon.svg/1024px-Blue_question_mark_icon.svg.png';
       break;
     case SupportedChain.COSMOS:
       chainLogo = COSMOS_LOGO;

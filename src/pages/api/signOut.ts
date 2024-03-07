@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from 'next';
 
 //Signs the user out by clearing the session cookie
 const signOut = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -17,5 +17,3 @@ const signOut = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 export default signOut;
-
-

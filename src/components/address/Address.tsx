@@ -1,13 +1,10 @@
-import { useAccount } from "@/redux/accounts/AccountsContext"
-import { Spin, Tooltip, Typography } from "antd"
-import {
-  MINT_ACCOUNT,
-  getAbbreviatedAddress,
-  isAddressValid
-} from "bitbadgesjs-sdk"
-import { useRouter } from "next/router"
+import { useAccount } from '@/chains/chain_contexts/AccountsContext';
+import { Spin, Tooltip, Typography } from 'antd';
+import { BitBadgesUserInfo, getAbbreviatedAddress, isAddressValid } from 'bitbadgesjs-sdk';
+import { useRouter } from 'next/router';
 
-const { Text } = Typography
+const MINT_ACCOUNT = BitBadgesUserInfo.MintAccount();
+const { Text } = Typography;
 
 export function Address({
   addressOrUsername,
@@ -15,25 +12,25 @@ export function Address({
   fontColor,
   hideTooltip,
   hidePortfolioLink,
-  doNotShowName,
+  doNotShowName
 }: {
-  addressOrUsername: string
-  fontSize?: number | string
-  fontColor?: string
-  hideTooltip?: boolean
-  hidePortfolioLink?: boolean
-  doNotShowName?: boolean
+  addressOrUsername: string;
+  fontSize?: number | string;
+  fontColor?: string;
+  hideTooltip?: boolean;
+  hidePortfolioLink?: boolean;
+  doNotShowName?: boolean;
 }) {
-  const router = useRouter()
-  const userInfo = useAccount(addressOrUsername)
+  const router = useRouter();
+  const userInfo = useAccount(addressOrUsername);
 
-  const addressName = !doNotShowName ? userInfo?.username : ""
-  const resolvedName = !doNotShowName ? userInfo?.resolvedName : ""
-  let address = userInfo?.address || addressOrUsername || ""
-  let chain = userInfo?.chain
+  const addressName = !doNotShowName ? userInfo?.username : '';
+  const resolvedName = !doNotShowName ? userInfo?.resolvedName : '';
+  let address = userInfo?.address || addressOrUsername || '';
+  let chain = userInfo?.chain;
 
-  const isValidAddress = isAddressValid(address) || address == "All";
-  const displayAddress = addressName ? addressName : resolvedName ? resolvedName : getAbbreviatedAddress(address)
+  const isValidAddress = isAddressValid(address) || address == 'All';
+  const displayAddress = addressName ? addressName : resolvedName ? resolvedName : getAbbreviatedAddress(address);
 
   const innerContent =
     !hideTooltip && userInfo ? (
@@ -47,18 +44,17 @@ export function Address({
                 <div
                   className="primary-text"
                   style={{
-                    textAlign: "center",
+                    textAlign: 'center'
                   }}
                 >
-                  This is a special escrow address used when badges are first
-                  created. Badges can only be transferred from this address, not
-                  to it.
+                  This is a special escrow address used when badges are first created. Badges can only be transferred
+                  from this address, not to it.
                 </div>
-              ) : address == "All" ? (
+              ) : address == 'All' ? (
                 <div
                   className="primary-text"
                   style={{
-                    textAlign: "center",
+                    textAlign: 'center'
                   }}
                 >
                   This represents all possible user addresses.
@@ -67,7 +63,7 @@ export function Address({
                 <div
                   className="primary-text"
                   style={{
-                    textAlign: "center",
+                    textAlign: 'center'
                   }}
                 >
                   {`${chain} Address`}
@@ -77,7 +73,7 @@ export function Address({
                       {`${resolvedName}`}
                     </>
                   ) : (
-                    ""
+                    ''
                   )}
 
                   <br />
@@ -89,56 +85,49 @@ export function Address({
           </>
         }
         overlayStyle={{
-          minWidth: 320,
+          minWidth: 320
         }}
       >
         {displayAddress}
       </Tooltip>
     ) : (
       displayAddress
-    )
+    );
 
-  const showLink = !hidePortfolioLink &&
-    address &&
-    address !== MINT_ACCOUNT.address &&
-    address != "All"
-  const invalidAddress = !isValidAddress
+  const showLink = !hidePortfolioLink && address && address !== MINT_ACCOUNT.address && address != 'All';
+  const invalidAddress = !isValidAddress;
 
   return (
     <div>
       <div
         style={{
-          verticalAlign: "middle",
+          verticalAlign: 'middle',
           paddingLeft: 5,
-          fontSize: fontSize,
+          fontSize: fontSize
         }}
         className="whitespace-nowrap"
       >
         <Text
-          className={"primary-text " + (!showLink ? "" : " link-button-nav")}
+          className={'primary-text ' + (!showLink ? '' : ' link-button-nav')}
           onClick={
             !showLink
               ? undefined
               : () => {
-                router.push(`/account/${address}`)
-              }
+                  router.push(`/account/${address}`);
+                }
           }
           copyable={{
             text: address,
-            tooltips: ["Copy Address", "Copied!"],
+            tooltips: ['Copy Address', 'Copied!']
           }}
           style={{
-            color: invalidAddress ? "red" : fontColor,
-            display: "inline-flex",
+            color: invalidAddress ? 'red' : fontColor,
+            display: 'inline-flex'
           }}
         >
-          <b>
-            {userInfo ? (
-              <>{innerContent}</>
-            ) : !invalidAddress ? (<Spin />) : (<>{displayAddress}</>)}
-          </b>
+          <b>{userInfo ? <>{innerContent}</> : !invalidAddress ? <Spin /> : <>{displayAddress}</>}</b>
         </Text>
       </div>
     </div>
-  )
+  );
 }

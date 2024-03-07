@@ -1,36 +1,36 @@
 import { createContext, useContext, useState } from 'react';
 //react cooki
+import { BaseDefaultChainContext } from '@/chains/utils';
 import { SupportedChain } from 'bitbadgesjs-sdk';
 import { signOut } from '../../backend_connectors';
 import { ChainSpecificContextType } from '../ChainContext';
-import { BaseDefaultChainContext } from '@/chains/utils';
 
 export type SignChallengeResponse = {
   message: string;
-  signature: string
-}
+  signature: string;
+};
 
 export type SiwbbContextType = ChainSpecificContextType & {
-  chain: SupportedChain
-  setChain: (chain: SupportedChain) => void,
+  chain: SupportedChain;
+  setChain: (chain: SupportedChain) => void;
 
-  setAddress: (address: string) => void,
+  setAddress: (address: string) => void;
 
-  active: boolean,
-  setActive: (active: boolean) => void,
-}
+  active: boolean;
+  setActive: (active: boolean) => void;
+};
 
 const SiwbbContext = createContext<SiwbbContextType>({
   ...BaseDefaultChainContext,
   active: false,
-  setActive: () => { },
+  setActive: () => {},
   chain: SupportedChain.UNKNOWN,
-  setChain: () => { },
-  setAddress: () => { },
+  setChain: () => {},
+  setAddress: () => {}
 });
 
 type Props = {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 };
 
 export const SiwbbContextProvider: React.FC<Props> = ({ children }) => {
@@ -38,12 +38,10 @@ export const SiwbbContextProvider: React.FC<Props> = ({ children }) => {
   const [chain, setChain] = useState<SupportedChain>(SupportedChain.UNKNOWN);
   const [address, setAddress] = useState<string>('');
 
-  const loggedIn = active;
-
   const disconnect = async () => {
     await signOut();
     setActive(false);
-  }
+  };
 
   const siwbbContext: SiwbbContextType = {
     //Dummy values for interface compatibility
@@ -52,12 +50,9 @@ export const SiwbbContextProvider: React.FC<Props> = ({ children }) => {
     },
     signChallenge: async () => {
       throw new Error('Not implemented. N/A to SIWBB.');
-      //Outsourced to the popup
-      return { message: '', signature: '' };
     },
     getPublicKey: async () => {
       throw new Error('Not implemented. N/A to SIWBB.');
-      return '';
     },
     signTxn: async () => {
       throw new Error('Not implemented. N/A to SIWBB.');
@@ -65,30 +60,16 @@ export const SiwbbContextProvider: React.FC<Props> = ({ children }) => {
       // If necessary, you can outsource to the broadcast popup
       // Can't be done in-site with SIWBB since all connection was handled on bitbadges.io
     },
-    setConnected: () => {
-      throw new Error('Not implemented. N/A to SIWBB.');
-    },
-    setLoggedIn: () => {
-      throw new Error('Not implemented. N/A to SIWBB.');
-    },
-
-    //Real values
-    connected: true,
     chain,
-    loggedIn,
     address,
     disconnect,
     active,
     setActive,
     setChain,
-    setAddress,
+    setAddress
   };
 
-  return <SiwbbContext.Provider value={siwbbContext}>
-    {children}
-  </SiwbbContext.Provider>;
-}
-
+  return <SiwbbContext.Provider value={siwbbContext}>{children}</SiwbbContext.Provider>;
+};
 
 export const useSiwbbContext = () => useContext(SiwbbContext);
-

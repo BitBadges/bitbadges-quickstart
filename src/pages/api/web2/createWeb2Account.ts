@@ -1,6 +1,6 @@
 import { Wallet } from 'ethers';
-import { NextApiRequest, NextApiResponse } from "next";
-import { DBAccountType } from "./types";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { DBAccountType } from './types';
 import { db } from './db';
 
 const createWeb2Account = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -23,7 +23,7 @@ const createWeb2Account = async (req: NextApiRequest, res: NextApiResponse) => {
 
     return res.status(200).json({ success: true });
   } catch (err) {
-    console.log("error", err)
+    console.log('error', err);
     return res.status(401).json({ message: `${err}` });
   }
 };

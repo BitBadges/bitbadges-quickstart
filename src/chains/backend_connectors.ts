@@ -1,105 +1,73 @@
-import { BigIntify, EIP712TypedData } from "bitbadgesjs-sdk";
-import { getChainForAddress } from "bitbadgesjs-sdk";
-import { VerifyChallengeOptions, constructChallengeObjectFromString } from "blockin";
+import { EIP712TypedData, iBalance } from 'bitbadgesjs-sdk';
+import { VerifyChallengeOptions } from 'blockin';
 
-export const signIn = async (message: string, sig: string, sessionDetails: {
-  username?: string,
-  password?: string
-  siwbb?: boolean
-}, options?: VerifyChallengeOptions, publicKey?: string): Promise<{
+const fetchFromApi = async (path: string, body?: object | string | undefined, method: string = 'post') => {
+  return fetch(path, {
+    method,
+    body: body ? JSON.stringify(body) : undefined,
+    headers: { 'Content-Type': 'application/json' }
+  }).then((res) => res.json());
+};
+
+export const signIn = async (
+  message: string,
+  sig: string,
+  sessionDetails: {
+    username?: string;
+    password?: string;
+    siwbb?: boolean;
+  },
+  options?: VerifyChallengeOptions,
+  publicKey?: string
+): Promise<{
   success: true;
   errorMessage?: string;
 }> => {
-  const chain = getChainForAddress(constructChallengeObjectFromString(message, BigIntify).address);
-  const verificationRes = await fetch('../api/signIn', {
-    method: 'post',
-    body: JSON.stringify({ ...sessionDetails, message: message, signature: sig, options, chain, publicKey }),
-    headers: { 'Content-Type': 'application/json' }
-  }).then(res => res.json());
-
-  return verificationRes;
-}
-
+  return await fetchFromApi('../api/signIn', {
+    ...sessionDetails,
+    message: message,
+    signature: sig,
+    options,
+    publicKey
+  });
+};
 
 export const getPrivateInfo = async (): Promise<any> => {
-  const verificationRes = await fetch('../api/getPrivateInfo', {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' }
-  }).then(res => res.json());
-
-  return verificationRes;
-}
-
-export const signOut = async (): Promise<any> => {
-  const verificationRes = await fetch('../api/signOut', {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' }
-  }).then(res => res.json());
-
-  return verificationRes;
-}
+  return await fetchFromApi('../api/getPrivateInfo');
+};
 
 export const checkSignIn = async (): Promise<any> => {
-  const verificationRes = await fetch('../api/checkSignIn', {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' }
-  }).then(res => res.json());
+  return await fetchFromApi('../api/checkSignIn');
+};
 
-  return verificationRes;
-}
-
-
-export const getMetadata = async (): Promise<any> => {
-  const verificationRes = await fetch('../api/selfHostMetadata', {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' }
-  }).then(res => res.json());
-
-  return verificationRes;
-}
+export const signOut = async (): Promise<any> => {
+  return await fetchFromApi('../api/signOut');
+};
 
 export const getBalancesIndexed = async (): Promise<any> => {
-  const verificationRes = await fetch('../api/selfHostBalancesIndexed', {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' }
-  }).then(res => res.json());
+  return await fetchFromApi('../api/selfhost/balancesIndexed');
+};
 
-  return verificationRes;
-}
+export const setBalances = async (address: string, balances: iBalance<bigint>[]): Promise<any> => {
+  return await fetchFromApi('../api/selfhost/setBalances', { address, balances });
+};
 
-export const getBalancesNonIndexed = async (cosmosAddress: string): Promise<any> => {
-  const verificationRes = await fetch('../api/selfHostBalancesNonIndexed', {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ cosmosAddress })
-  }).then(res => res.json());
-
-  return verificationRes;
-}
-
-export const signWithWeb2 = async (username: string, password: string, message: string, eipToSign?: EIP712TypedData): Promise<any> => {
-  const verificationRes = await fetch('../api/web2/signWithWeb2', {
-    method: 'post',
-    body: JSON.stringify({ username, password, message, eipToSign }),
-    headers: { 'Content-Type': 'application/json' }
-  }).then(res => res.json());
-
-  return verificationRes;
-}
+export const signWithWeb2 = async (
+  username: string,
+  password: string,
+  message: string,
+  eipToSign?: EIP712TypedData
+): Promise<any> => {
+  return await fetchFromApi('../api/web2/signWithWeb2', { username, password, message, eipToSign });
+};
 
 export const createWeb2Account = async (username: string, password: string): Promise<any> => {
-  const verificationRes = await fetch('../api/web2/createWeb2Account', {
-    method: 'post',
-    body: JSON.stringify({ username, password }),
-    headers: { 'Content-Type': 'application/json' }
-  }).then(res => res.json());
-
-  return verificationRes;
-}
+  return await fetchFromApi('../api/web2/createWeb2Account', { username, password });
+};
 
 // Im not calling this function anywhere. Its a redirect only
 // export const discordVerify = async (code: string): Promise<any> => {
-//   const verificationRes = await fetch('../api/discordVerify?' + new URLSearchParams({ code }), {
+//   const verificationRes = await fetch('../api/integrations/discordVerify?' + new URLSearchParams({ code }), {
 //     method: 'post',
 //     body: '',
 //     headers: { 'Content-Type': 'application/json' }

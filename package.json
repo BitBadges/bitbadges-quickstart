@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
   },
   "dependencies": {
     "@keplr-wallet/cosmos": "^0.12.67",
@@ -15,12 +17,12 @@
     "@web3modal/wagmi": "^3.5.7",
     "antd": "^4.24.15",
     "better-sqlite3": "^9.4.0",
-    "bitbadgesjs-sdk": "^0.0.6",
-    "blockin": "^1.2.110",
-    "blockin-btc-driver": "^1.0.1",
-    "blockin-cosmos-driver": "^1.0.11",
-    "blockin-eth-driver": "^1.0.19",
-    "blockin-sol-driver": "^1.0.6",
+    "bitbadgesjs-sdk": "^0.1.70",
+    "blockin": "^1.2.111",
+    "blockin-btc-driver": "^1.0.2",
+    "blockin-cosmos-driver": "^1.0.12",
+    "blockin-eth-driver": "^1.0.20",
+    "blockin-sol-driver": "^1.0.7",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.1",
     "joi": "^17.12.1",
@@ -45,7 +47,10 @@
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "postcss": "^8",
+    "prettier": "^3.2.5",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }

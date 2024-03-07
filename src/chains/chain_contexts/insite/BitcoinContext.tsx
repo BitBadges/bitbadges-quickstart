@@ -1,14 +1,12 @@
-import { checkSignIn } from '@/chains/backend_connectors';
 import { BaseDefaultChainContext } from '@/chains/utils';
-import { useAccount } from '@/redux/accounts/AccountsContext';
 import { notification } from 'antd';
-import { TransactionPayload, TxContext, convertToCosmosAddress, createTxBroadcastBodyBitcoin } from 'bitbadgesjs-sdk';
+import { TransactionPayload, TxContext, createTxBroadcastBody } from 'bitbadgesjs-sdk';
 import { createContext, useContext, useState } from 'react';
 import { ChainSpecificContextType } from '../ChainContext';
 
 export type BitcoinContextType = ChainSpecificContextType & {};
 export const BitcoinContext = createContext<BitcoinContextType>({
-  ...BaseDefaultChainContext,
+  ...BaseDefaultChainContext
 });
 
 type Props = {
@@ -16,14 +14,8 @@ type Props = {
 };
 
 export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [pubKey, setPubKey] = useState<string>('');
   const [address, setAddress] = useState<string>('');
-
-  const cosmosAddress = convertToCosmosAddress(address);
-  const connected = address ? true : false;
-  const setConnected = () => { };
-  const account = useAccount(cosmosAddress);
 
   //See Phantom docs for more info
   const getProvider = () => {
@@ -58,22 +50,17 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
 
         setAddress(address);
         setPubKey(base64PublicKey);
-
-        const signedInRes = await checkSignIn();
-        setLoggedIn(signedInRes.signedIn && signedInRes.address === address);
       } catch (e) {
         console.log(e);
         notification.error({
           message: 'Error connecting to wallet',
-          description:
-            'Make sure you have Phantom installed and are logged in.',
+          description: 'Make sure you have Phantom installed and are logged in.'
         });
       }
     }
   };
 
   const disconnect = async () => {
-    setLoggedIn(false);
     setAddress('');
   };
 
@@ -91,48 +78,35 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
   };
 
   const signTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
-    if (!account) throw new Error('Account not found.');
     const bitcoinProvider = getProvider();
 
     let sig = '';
     if (!simulate) {
       const message = payload.jsonToSign;
       const encodedMessage = new TextEncoder().encode(message);
-      const signedMessage = await bitcoinProvider.signMessage(
-        address,
-        encodedMessage
-      );
+      const signedMessage = await bitcoinProvider.signMessage(address, encodedMessage);
 
       const base64Sig = bytesToBase64(signedMessage.signature);
       sig = Buffer.from(base64Sig, 'base64').toString('hex');
     }
 
-    const txBody = createTxBroadcastBodyBitcoin(context, payload, sig);
-    return txBody;
+    return createTxBroadcastBody(context, payload, sig);
   };
 
-  const getPublicKey = async (_cosmosAddress: string) => {
+  const getPublicKey = async () => {
     return pubKey;
   };
 
   const bitcoinContext: BitcoinContextType = {
-    connected,
-    setConnected,
     connect,
     disconnect,
     signChallenge,
     signTxn,
     address,
-    getPublicKey,
-    loggedIn,
-    setLoggedIn,
+    getPublicKey
   };
 
-  return (
-    <BitcoinContext.Provider value={bitcoinContext}>
-      {children}
-    </BitcoinContext.Provider>
-  );
+  return <BitcoinContext.Provider value={bitcoinContext}>{children}</BitcoinContext.Provider>;
 };
 
 export const useBitcoinContext = () => useContext(BitcoinContext);

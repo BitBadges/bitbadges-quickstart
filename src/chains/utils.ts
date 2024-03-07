@@ -1,18 +1,23 @@
-import { SupportedChain } from "bitbadgesjs-sdk"
-import { ChainContextType } from "./chain_contexts/ChainContext"
+import { SupportedChain } from 'bitbadgesjs-sdk';
+import { ChainContextType } from './chain_contexts/ChainContext';
 
 export const BaseDefaultChainContext: ChainContextType = {
   address: '',
   connected: false,
-  setConnected: () => { },
   loggedIn: false,
   cosmosAddress: '',
-  setLoggedIn: () => { },
-  connect: async () => { },
-  disconnect: async () => { },
-  signChallenge: async () => { return { message: '', signature: '' } },
-  signTxn: async () => { return '' },
-  getPublicKey: async () => { return '' },
+  setLoggedInAddress: () => {},
+  connect: async () => {},
+  disconnect: async () => {},
+  signChallenge: async () => {
+    return { message: '', signature: '' };
+  },
+  signTxn: async () => {
+    return '';
+  },
+  getPublicKey: async () => {
+    return '';
+  },
   chain: SupportedChain.UNKNOWN,
-  setChain: () => { },
-}
+  setChain: () => {}
+};
