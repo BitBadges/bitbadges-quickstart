@@ -17,7 +17,7 @@
     "@web3modal/wagmi": "^3.5.7",
     "antd": "^4.24.15",
     "better-sqlite3": "^9.4.0",
-    "bitbadgesjs-sdk": "^0.1.70",
+    "bitbadgesjs-sdk": "^0.1.81",
     "blockin": "^1.2.111",
     "blockin-btc-driver": "^1.0.2",
     "blockin-cosmos-driver": "^1.0.12",
