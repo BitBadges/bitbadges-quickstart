@@ -92,7 +92,7 @@ const Home: NextPage = () => {
         viewsToFetch: []
       });
       setAccounts([vitalikAccount]);
-      console.log(vitalikAccount);
+      
       //Fetch first page of collected badges
       await vitalikAccount.fetchNextForView(BitBadgesApi, 'badgesCollected', 'badgesCollected');
 
