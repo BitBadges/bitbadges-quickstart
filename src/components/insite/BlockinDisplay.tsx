@@ -164,7 +164,7 @@ export const BlockinDisplay = ({
               await logout();
             }}
             selectedChainName={chain}
-            displayedAssetGroups={[
+            accessTiers={[
               {
                 assetConditionGroup: {
                   assets: [

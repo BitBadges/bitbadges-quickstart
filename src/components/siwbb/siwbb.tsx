@@ -65,7 +65,8 @@ export const SiwbbDisplay = ({
                 challengeParams: challengeParams,
                 allowAddressSelect: true,
                 verifyOptions: verifyOptions,
-                expectVerifySuccess: true
+                expectVerifySuccess: true,
+                expectSecretsProofs: true
               }}
               onSignAndBlockinVerify={async (message, signature, _verificationResponse) => {
                 //TODO: Handle pre-checks
