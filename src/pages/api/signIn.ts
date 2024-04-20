@@ -41,6 +41,10 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
     //We have also checked that the message parameters match what is expected and were not altered by the user (via options.expectedChallengeParams).
 
     //TODO: You now implement any additional checks or custom logic for your application, such as assigning sesssions, cookies, etc.
+
+    //TODO: If you expect proof of secrets to be attached to the message, you can also verify them here.
+    //https://docs.bitbadges.io/for-developers/verifiable-secrets/creating-and-verifying-a-proof
+
     //It is also important to prevent replay attacks or flash ownership attacks (https://blockin.gitbook.io/blockin/developer-docs/core-concepts).
     if (!params.expirationDate) {
       return res.status(400).json({

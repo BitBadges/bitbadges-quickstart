@@ -103,7 +103,8 @@ export const SignTxInSiteButton = ({
           //Forcefully update the account info (fetch new sequence and info)
 
           await signedInAccount?.fetchAndUpdate(BitBadgesApi, { fetchBalance: true, fetchSequence: true }, true);
-        }}>
+        }}
+      >
         Sign Transaction
       </button>
     </>
@@ -171,7 +172,8 @@ export const BroadcastTxPopupButton = ({ signInMethodTab }: { signInMethodTab: s
               setLoading(false);
             }
           }, 1000);
-        }}>
+        }}
+      >
         Sign Transaction (Popup) {loading && <Spin />}
       </button>
     </>

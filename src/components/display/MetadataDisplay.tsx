@@ -8,7 +8,7 @@ export const MetadataDisplay = ({ collectionId }: { collectionId: bigint }) => {
 
   return (
     <>
-      <div className="flex-center">
+      <div className="flex-center flex-wrap">
         <div className="mx-8">
           <div className="text-center my-3">
             Collection {collection?.collectionId.toString()}: {collectionMetadata?.name}

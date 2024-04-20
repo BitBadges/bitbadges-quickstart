@@ -1,5 +1,7 @@
 import { VerifyChallengeOptions } from 'blockin';
 import { useState } from 'react';
+import { Tabs } from '../display/Tabs';
+import { BitBadgesApi } from '@/chains/api';
 
 export const ManualDisplay = ({
   verifyOnBackend
@@ -12,11 +14,14 @@ export const ManualDisplay = ({
   ) => Promise<void>;
 }) => {
   const [message, setMessage] = useState(
-    `http://localhost:3000 wants you to sign in with your Ethereum account:\n0xf1F7198d9AE8c6975F43d2303D3D9aDea3821864\n\nBy signing in, you agree to the privacy policy and terms of service.\n\nURI: http://localhost:3000\nVersion: 1\nChain ID: 1\nNonce: *\nIssued At: 2024-02-07T13:17:27.365Z\nExpiration Time: 2024-02-14T13:17:27.365Z\nResources:\nAsset Ownership Requirements:\n- Requirement A-1:\n    Chain: BitBadges\n    Collection ID: 1\n    Asset IDs: 9 to 9\n    Ownership Time: Authentication Time\n    Ownership Amount: x0\n\n`
+    'http://localhost:3000 wants you to sign in with your Ethereum account:\n0xb246a3764d642BABbd6b075bca3e77E1cD563d78\n\nBy signing in, you agree to the privacy policy and terms of service.\n\nURI: http://localhost:3000\nVersion: 1\nChain ID: 1\nNonce: *\nIssued At: 2024-04-20T11:32:48.422Z\nExpiration Time: 2024-04-27T11:32:48.422Z\nResources:\nAsset Ownership Requirements:\n- Requirement :\n    Chain: BitBadges\n    Collection ID: 1\n    Asset IDs: 9 to 9\n    Ownership Time: Authentication Time\n    Ownership Amount: x0\n\n'
   );
   const [signature, setSignature] = useState(
-    '0x95f200aa19798984e7d8ba733c5076df35c4a0f98c3af38f8e63bba09e9339f456abb34166b23ad50f128497519f3b8758712c8c95c7319b78424487bc35e42a1b'
+    '0x2e0e92e73836dc26809e72d94777cbe1366016e91d7415d98dd90690e82d822662628e8f32866b32862a285781ae23ff48faf2cb1764a0d204e56780f1e37df21c'
   );
+  const [qrCode, setQrCode] = useState('');
+
+  const [tab, setTab] = useState('manual');
 
   //This manually verifies a (message, signature) pair using the BitBadges API and your backend
   //If the pair is stored by BitBadges, you can also use the await BitBadgesApi.getAuthCode(...) route
@@ -65,43 +70,90 @@ export const ManualDisplay = ({
         youself, as well as any application specific logic.
       </div>
       <br />
-      <div className="flex-center">
-        <b className="primary-text text-center">Message</b>
-      </div>
-      <div className="flex-center">
-        <textarea
-          placeholder="Message"
-          className="input-box primary-text primary-border rounded"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          style={{ width: 500, height: 500, padding: 10, background: 'inherit' }}
-        />
-      </div>
+      <Tabs
+        tab={tab}
+        setTab={setTab}
+        tabInfo={[
+          {
+            key: 'manual',
+            content: 'Manual'
+          },
+          {
+            key: 'qr',
+            content: 'QR Code (BitBadges API)'
+          }
+        ]}
+        fullWidth
+        type="underline"
+      />
       <br />
-      {/* //signature input */}
-      {/* //message input */}
-      <div className="flex-center">
-        <b className="primary-text text-center">Signature</b>
-      </div>
-      <div className="flex-center">
-        <textarea
-          placeholder="Signature"
-          className="input-box primary-text primary-border rounded"
-          value={signature}
-          onChange={(e) => setSignature(e.target.value)}
-          style={{ width: 500, height: 100, padding: 10, background: 'inherit' }}
-        />
-      </div>
+      {tab == 'manual' && (
+        <>
+          <div className="flex-center">
+            <b className="primary-text text-center">Message</b>
+          </div>
+          <div className="flex-center">
+            <textarea
+              placeholder="Message"
+              className="input-box primary-text primary-border rounded"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              style={{ width: 500, height: 500, padding: 10, background: 'inherit' }}
+            />
+          </div>
+          <br />
+          <div className="flex-center">
+            <b className="primary-text text-center">Signature </b>
+          </div>
+          <div className="flex-center">
+            <textarea
+              placeholder="Signature"
+              className="input-box primary-text primary-border rounded"
+              value={signature}
+              onChange={(e) => setSignature(e.target.value)}
+              style={{ width: 500, height: 100, padding: 10, background: 'inherit' }}
+            />
+          </div>
+        </>
+      )}
       <br />
+      {tab == 'qr' && (
+        <>
+          <div className="flex-center">
+            <b className="primary-text text-center">QR Code Value</b>
+          </div>
+          <div className="flex-center">
+            <textarea
+              placeholder="QR Code"
+              className="input-box primary-text primary-border rounded"
+              value={qrCode}
+              onChange={(e) => setQrCode(e.target.value)}
+              style={{ width: 500, height: 100, padding: 10, background: 'inherit' }}
+            />
+          </div>
+          <br />
+        </>
+      )}
 
-      <div className="flex-center">
+      <div className="flex-center mt-3">
         <button
           className="landing-button"
+          style={{ width: 200 }}
           onClick={async () => {
-            await manualVerify(message, signature);
+            if (tab == 'manual') {
+              await manualVerify(message, signature);
+            } else {
+              const fetchedAuthCode = await BitBadgesApi.getAuthCode({ id: qrCode, options: {} });
+              console.log(fetchedAuthCode.verificationResponse); //Checked by the API but you should also check it here
+              console.log(fetchedAuthCode.message);
+              console.log(fetchedAuthCode.signature);
+
+              const { message, signature } = fetchedAuthCode;
+              await manualVerify(message, signature);
+            }
           }}
         >
-          Verify
+          {tab == 'qr' ? 'Fetch and Verify' : 'Verify'}
         </button>
       </div>
     </>

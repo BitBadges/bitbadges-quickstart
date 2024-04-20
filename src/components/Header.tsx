@@ -1,7 +1,8 @@
+import { Switch } from 'antd';
 import DarkModeSwitcher from './display/DarkModeSwitcher';
 import { LinkGroup } from './display/LinkGroup';
 
-const Header = () => {
+const Header = ({ devMode, setDevMode }: { devMode: boolean; setDevMode: (val: boolean) => void }) => {
   return (
     <>
       <header className="primary-text">
@@ -12,6 +13,11 @@ const Header = () => {
         <div className="flex-center">
           <div className="m-2">{'Dark Mode'}</div>
           <DarkModeSwitcher />
+
+          <div className="m-2">{'Dev Mode'}</div>
+          <div className="flex-center flex items-center justify-center text-xs font-medium text-yellow-500">
+            <Switch checked={devMode} onChange={() => setDevMode(!devMode)} className="dark-mode-switcher" />
+          </div>
         </div>
         <LinkGroup
           links={[

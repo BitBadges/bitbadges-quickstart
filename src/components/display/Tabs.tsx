@@ -53,7 +53,7 @@ export function Tabs({
           float: 'left',
           backgroundColor: type == 'underline' ? 'inherit' : undefined,
           color: tab.key == selectedTab && type != 'underline' ? 'white' : undefined,
-          borderBottom: type == 'underline' && selectedTab == tab.key ? '2px solid blue' : undefined
+          borderBottom: type == 'underline' && selectedTab == tab.key ? '2px solid lightblue' : undefined
         }}
         key={`${tab.key}`}
         onClick={

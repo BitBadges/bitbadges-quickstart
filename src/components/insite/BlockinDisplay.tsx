@@ -2,7 +2,7 @@ import { signOut } from '@/chains/backend_connectors';
 import { useAccount } from '@/chains/chain_contexts/AccountsContext';
 import { SignChallengeResponse, useChainContext } from '@/chains/chain_contexts/ChainContext';
 import { Avatar, Typography, notification } from 'antd';
-import { NumberType, Numberify, SupportedChain } from 'bitbadgesjs-sdk';
+import { NumberType, Numberify, SupportedChain, iSecretsProof } from 'bitbadgesjs-sdk';
 import {
   ChallengeParams,
   SignAndVerifyChallengeResponse,
@@ -32,6 +32,7 @@ export const BlockinDisplay = ({
     signature: string,
     sessionDetails: { username?: string; password?: string; siwbb?: boolean },
     options?: VerifyChallengeOptions,
+    secretsProofs?: iSecretsProof<bigint>[], 
     publicKey?: string
   ) => Promise<void>;
   challengeParams: ChallengeParams<NumberType>;
@@ -66,6 +67,7 @@ export const BlockinDisplay = ({
           //nothing here bc we are signing normally
         },
         verifyOptions,
+        undefined,
         publicKey
       );
 
@@ -93,6 +95,8 @@ export const BlockinDisplay = ({
     if (!signChallengeResponse.message || !signChallengeResponse.signature) {
       return { success: false, message: `${signChallengeResponse.message}` };
     }
+
+    console.log('Sign Challenge Response:', signChallengeResponse);
 
     const verifyChallengeResponse: SignAndVerifyChallengeResponse = await handleVerifyChallenge(
       signChallengeResponse.message,

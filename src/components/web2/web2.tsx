@@ -113,7 +113,8 @@ export const Web2Display = ({
               className="landing-button"
               onClick={async () => {
                 await signInWeb2(false);
-              }}>
+              }}
+            >
               Sign In
             </button>
 
@@ -127,7 +128,8 @@ export const Web2Display = ({
                   alert(e.errorMessage ?? e.message ?? e);
                   console.log(e);
                 }
-              }}>
+              }}
+            >
               Create Account + Sign In
             </button>
           </div>
@@ -143,7 +145,8 @@ export const Web2Display = ({
                 chain.setLoggedInAddress('');
                 chain.disconnect();
                 signOut();
-              }}>
+              }}
+            >
               Sign Out
             </button>
           </div>

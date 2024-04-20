@@ -20,7 +20,8 @@ import {
   NumberType,
   UintRange,
   addBalances,
-  convertToCosmosAddress
+  convertToCosmosAddress,
+  iSecretsProof
 } from 'bitbadgesjs-sdk';
 import { ChallengeParams, VerifyChallengeOptions } from 'blockin';
 import { NextPage } from 'next/types';
@@ -29,6 +30,7 @@ import { getBalancesIndexed, getPrivateInfo, setBalances, signIn, signOut } from
 import { useChainContext } from '../chains/chain_contexts/ChainContext';
 import Header from '../components/Header';
 import { BroadcastTxPopupButton, SignTxInSiteButton } from '../components/transactions';
+import { DevMode } from '@/components/DevMode';
 
 declare global {
   interface BigInt {
@@ -46,6 +48,8 @@ const Home: NextPage = () => {
   const siwbbContext = useSiwbbContext();
   const web2Context = useWeb2Context();
 
+  const [devMode, setDevMode] = useState(false);
+
   //Global State Contexts
   const { setCollections } = useCollectionsContext();
   const { setAccounts } = useAccountsContext();
@@ -62,6 +66,8 @@ const Home: NextPage = () => {
   const web3SignInType = chain.loggedIn ? (siwbbContext.active ? 'siwbb' : 'insite') : web3SignInTypeSelected; //Use the active one if logged in
 
   const [passwordIsVisible, setPasswordIsVisible] = useState(false);
+
+  const [balancesAssignmentResult, setBalancesAssignmentResult] = useState('');
 
   const vitalikBalances = useMemo(() => {
     return vitalikAccount?.collected.find((collected) => collected.collectionId === 16n)?.balances ?? [];
@@ -91,13 +97,14 @@ const Home: NextPage = () => {
         fetchSequence: true,
         viewsToFetch: []
       });
-      setAccounts([vitalikAccount]);
-      
+
       //Fetch first page of collected badges
       await vitalikAccount.fetchNextForView(BitBadgesApi, 'badgesCollected', 'badgesCollected');
 
       //Fetch balance for a specific collection, if not already fetched prior
       await vitalikAccount.fetchBadgeBalances(BitBadgesApi, 16n);
+
+      setAccounts([vitalikAccount]);
     }
     fetch();
   }, []);
@@ -164,6 +171,7 @@ const Home: NextPage = () => {
       siwbb?: boolean;
     },
     verifyOptions?: VerifyChallengeOptions,
+    secretsProofs?: iSecretsProof<bigint>[], 
     publicKey?: string
   ) => {
     try {
@@ -180,9 +188,9 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <Header />
+      <Header setDevMode={setDevMode} devMode={devMode} />
       <div>
-        <div className="px-20">
+        <div className="px-8">
           <DisplayCard title="Authentication" md={24} xs={24} sm={24}>
             <br />
             <div className="flex-center">
@@ -263,6 +271,7 @@ const Home: NextPage = () => {
                 verifyOnBackend={verifyOnBackend}
                 challengeParams={challengeParams}
                 verifyOptions={{ issuedAtTimeWindowMs: 5 * 60 * 1000, expectedChallengeParams }}
+                devMode={devMode}
               />
             )}
             <br />
@@ -279,7 +288,7 @@ const Home: NextPage = () => {
             )}
           </DisplayCard>
         </div>
-        <div className="flex-center flex-wrap px-20" style={{ alignItems: 'normal' }}>
+        <div className="flex-center flex-wrap px-8" style={{ alignItems: 'normal' }}>
           <DisplayCard
             title={
               <div className="flex-center">
@@ -288,7 +297,8 @@ const Home: NextPage = () => {
             }
             md={12}
             xs={24}
-            sm={24}>
+            sm={24}
+          >
             <div className="text-center">{vitalikAccount?.balance?.amount.toString()} $BADGE</div>
             {firstEthTxCollection && <MetadataDisplay collectionId={16n} />}
             <br />
@@ -296,24 +306,28 @@ const Home: NextPage = () => {
             <div className="flex-center">
               <BalanceDisplay balances={vitalikBalances} />
             </div>
+            <DevMode obj={vitalikBalances} override={devMode} />
           </DisplayCard>
           <DisplayCard title={`Collection ${exampleCollection?.collectionId}`} md={12} xs={24} sm={24}>
             {exampleCollection && <MetadataDisplay collectionId={1n} />}
+            <DevMode obj={exampleCollection?.getCollectionMetadata()} override={devMode} />
           </DisplayCard>
         </div>
-        <div className="flex-center flex-wrap px-20" style={{ alignItems: 'normal' }}>
+        <div className="flex-center flex-wrap px-8" style={{ alignItems: 'normal' }}>
           <DisplayCard
-            title={'Code / Password Distribution'}
+            title={'Claim Distribution'}
             md={12}
             xs={24}
             sm={24}
-            subtitle="Distribute codes or passwords to users who meet criteria (e.g. check location, query if they were in attendance, etc).">
+            subtitle="Distribute claim details to users who meet criteria (e.g. check location, query if they were in attendance, etc)."
+          >
             <br />
             <div className="flex-center">
               <button
                 className="landing-button"
                 onClick={() => setPasswordIsVisible(!passwordIsVisible)}
-                style={{ width: 200 }}>
+                style={{ width: 200 }}
+              >
                 {passwordIsVisible ? 'Hide' : 'Check Something'}
               </button>
             </div>
@@ -330,14 +344,16 @@ const Home: NextPage = () => {
                   <a
                     href="https://bitbadges.io/collections/ADD_COLLECTION_ID_HERE?approvalId=APPROVAL_ID&code=CODE"
                     target="_blank"
-                    rel="noreferrer">
+                    rel="noreferrer"
+                  >
                     Code Claim Link
                   </a>
                   <br />
                   <a
                     href="https://bitbadges.io/collections/ADD_COLLECTION_ID_HERE?approvalId=APPROVAL_ID&password=PASSWORD"
                     target="_blank"
-                    rel="noreferrer">
+                    rel="noreferrer"
+                  >
                     Password Claim Link
                   </a>
                 </div>
@@ -354,14 +370,14 @@ const Home: NextPage = () => {
             md={12}
             xs={24}
             sm={24}
-            subtitle="If your collection uses self-hosted off-chain balances, you can update the balances dynamically according to interactions. For example, maybe when a user pays a subscription fee, you allocate them x1 of the subscription badge.">
+            subtitle="If your collection uses self-hosted off-chain balances, you can update the balances dynamically according to interactions. For example, maybe when a user pays a subscription fee, you allocate them x1 of the subscription badge."
+          >
             <br />
             <div className="flex-center">
               <button
                 className="landing-button"
                 onClick={async () => {
                   //TODO: Add your own logic checking
-
                   //TODO: Update your self-hosted balances URL to include the new user balances
                   const currBalances = await getBalancesIndexed();
                   const currVitalikBalance =
@@ -384,15 +400,28 @@ const Home: NextPage = () => {
                   console.log(res);
                   const fetchedBalance = res.balances[convertToCosmosAddress(addressToUpdate)];
                   alert(`Updated balances for ${addressToUpdate} to ${JSON.stringify(fetchedBalance)}`);
+                  setBalancesAssignmentResult(res.balances);
 
                   //TODO: If your collection is indexed, you will need to refresh the cached values on the BitBadges API (note there are cooldowns though)
                   // await BitBadgesApi.refreshMetadata(collectionId)
                 }}
-                style={{ width: 300 }}>
+                style={{ width: 300 }}
+              >
                 {'Check Something and Update Balances'}
               </button>
-            </div>
+            </div>{' '}
+            <DevMode obj={balancesAssignmentResult} override={devMode} />
           </DisplayCard>
+          {devMode && (
+            <DisplayCard title={`Full Collection ${firstEthTxCollection?.collectionId}`} md={12} xs={24} sm={24}>
+              <DevMode obj={firstEthTxCollection} override={devMode} />
+            </DisplayCard>
+          )}
+          {devMode && (
+            <DisplayCard title={`Full Account`} md={12} xs={24} sm={24}>
+              <DevMode obj={vitalikAccount} override={devMode} />
+            </DisplayCard>
+          )}
         </div>
       </div>
     </>
@@ -407,7 +436,8 @@ const SecretInfoButton = () => {
       onClick={async () => {
         const res = await getPrivateInfo();
         alert(res.message);
-      }}>
+      }}
+    >
       Get Private User Info
     </button>
   );

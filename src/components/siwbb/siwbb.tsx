@@ -1,24 +1,29 @@
+import { signOut } from '@/chains/backend_connectors';
 import { useChainContext } from '@/chains/chain_contexts/ChainContext';
 import { useSiwbbContext } from '@/chains/chain_contexts/siwbb/SIWBBContext';
-import { NumberType, Numberify, getChainForAddress } from 'bitbadgesjs-sdk';
+import { NumberType, Numberify, SecretsProof, getChainForAddress, iSecretsProof } from 'bitbadgesjs-sdk';
 import { ChallengeParams, VerifyChallengeOptions, constructChallengeObjectFromString } from 'blockin';
 import { SignInWithBitBadgesButton } from 'blockin/dist/ui';
+import { useState } from 'react';
+import { DevMode } from '../DevMode';
 import { AddressDisplay } from '../address/AddressDisplay';
-import { signOut } from '@/chains/backend_connectors';
 
 export const SiwbbDisplay = ({
   verifyOnBackend,
   challengeParams,
-  verifyOptions
+  verifyOptions,
+  devMode
 }: {
   verifyOnBackend: (
     message: string,
     signature: string,
     sessionDetails: { username?: string; password?: string; siwbb?: boolean },
-    options?: VerifyChallengeOptions
+    options?: VerifyChallengeOptions,
+    secretsProofs?: iSecretsProof<bigint>[]
   ) => Promise<void>;
   challengeParams: ChallengeParams<NumberType>;
   verifyOptions?: VerifyChallengeOptions;
+  devMode?: boolean;
 }) => {
   const chain = useChainContext();
   const siwbbContext = useSiwbbContext();
@@ -28,6 +33,24 @@ export const SiwbbDisplay = ({
     fontWeight: 600,
     color: 'white'
   };
+
+  const popupParams = {
+    name: 'Website Sign In',
+    description: 'To gain access to premium features, please sign in.',
+    image: 'https://bitbadges-ipfs.infura-ipfs.io/ipfs/QmPfdaLWBUxH6ZrWmX1t7zf6zDiNdyZomafBqY5V5Lgwvj',
+    challengeParams: challengeParams,
+    allowAddressSelect: true,
+    verifyOptions: verifyOptions,
+    expectVerifySuccess: true,
+    expectSecretsProofs: true
+  };
+
+  const [siwbbRes, setSiwbbRes] = useState<{
+    message: string;
+    signature: string;
+    verificationResponse: { success: boolean; errorMessage?: string };
+    secretsProofs: any;
+  } | null>(null);
 
   return (
     <>
@@ -58,17 +81,8 @@ export const SiwbbDisplay = ({
             <SignInWithBitBadgesButton
               //TODO: Customize your popup parameters here. See the documentation for more details.
 
-              popupParams={{
-                name: 'Website Sign In',
-                description: 'To gain access to premium features, please sign in.',
-                image: 'https://bitbadges-ipfs.infura-ipfs.io/ipfs/QmPfdaLWBUxH6ZrWmX1t7zf6zDiNdyZomafBqY5V5Lgwvj',
-                challengeParams: challengeParams,
-                allowAddressSelect: true,
-                verifyOptions: verifyOptions,
-                expectVerifySuccess: true,
-                expectSecretsProofs: true
-              }}
-              onSignAndBlockinVerify={async (message, signature, _verificationResponse) => {
+              popupParams={popupParams}
+              onSignAndBlockinVerify={async (message, signature, _verificationResponse, _secretsProofs) => {
                 //TODO: Handle pre-checks
                 //want to cache the signature and message for later use?
                 //If verifying with assets, is the asset transferable and prone to flash ownership attacks?
@@ -82,11 +96,19 @@ export const SiwbbDisplay = ({
                 // this is not guaranteed.
                 //
                 // It is typically easiest to verify the (message, signature) yourself on the backend.
-                console.log(_verificationResponse, message, signature);
+                console.log(_verificationResponse, message, signature, _secretsProofs);
                 if (!_verificationResponse.success) throw new Error(_verificationResponse.errorMessage ?? 'Error');
 
-                // Verify on your backend and handle sessions
-                await verifyOnBackend(message, signature, { siwbb: true }, verifyOptions);
+                setSiwbbRes({
+                  message,
+                  signature,
+                  verificationResponse: _verificationResponse,
+                  secretsProofs: _secretsProofs
+                });
+
+                // Verify on your backend and handle sessions 
+                const secretsProofs: iSecretsProof<bigint>[] = _secretsProofs?.map((proof) => new SecretsProof(proof));
+                await verifyOnBackend(message, signature, { siwbb: true }, verifyOptions, secretsProofs);
                 const challengeObj = constructChallengeObjectFromString(message, Numberify);
                 chain.setLoggedInAddress(challengeObj.address);
 
@@ -100,6 +122,7 @@ export const SiwbbDisplay = ({
           </>
         )}
       </div>
+      <DevMode obj={siwbbRes && chain.loggedIn ? siwbbRes : popupParams} override={devMode} />
     </>
   );
 };
