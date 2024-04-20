@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -25,7 +27,5 @@ const nextConfig = {
     '@trevormil/bbs-signatures'
   ]
 };
-
-require('dotenv').config();
 
 module.exports = nextConfig;

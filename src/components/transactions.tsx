@@ -4,12 +4,22 @@
 import { useAccount } from '@/chains/chain_contexts/AccountsContext';
 import { useChainContext } from '@/chains/chain_contexts/ChainContext';
 import { useWeb2Context } from '@/chains/chain_contexts/web2/Web2Context';
-import { Spin } from 'antd';
-import { BETANET_CHAIN_DETAILS, TxContext, createTransactionPayload, proto } from 'bitbadgesjs-sdk';
+import { Spin, notification } from 'antd';
+import {
+  //All Msgs are exported from the SDK as proto types (Protocol Buffers). This includes all native Cosmos modules.
+  proto, //Ex: proto.cosmos.bank.v1beta1.MsgSend or proto.badges.MsgDeleteCollection
+
+  // Native x/badges Msgs also have helper types exported from the SDK w/ NumberType conversions
+  // You can use these or the native Proto types
+  // If you use the helpers, you can use the .toProto() to get the proto converted object where necessary
+  // MsgTransferBadges,
+  // MsgCreateCollection,
+  MsgDeleteCollection
+} from 'bitbadgesjs-sdk';
+import { BETANET_CHAIN_DETAILS, TxContext, createTransactionPayload } from 'bitbadgesjs-sdk';
 import { useEffect, useMemo, useState } from 'react';
 import { BitBadgesApi } from '../pages/api/bitbadges-api';
 
-const MsgCreateProtocol = proto.protocols.MsgCreateProtocol;
 const MsgSend = proto.cosmos.bank.v1beta1.MsgSend;
 
 //For Web2, we sign this behind the scenes with the mapped mnemonic for the user
@@ -67,8 +77,9 @@ export const SignTxInSiteButton = ({
             txDetails.sender.pubkey = pubKey;
           }
 
+          //TODO: Build your transaction w/ proto converted messages here
           const protoMsgs = [
-            // new ProtoMsgDeleteCollection({ collectionId: "1", creator: chain.cosmosAddress })
+            // new MsgDeleteCollection({ creator: chain.cosmosAddress, collectionId: '1' }).toProto(),
             new MsgSend({
               fromAddress: chain.cosmosAddress,
               toAddress: 'cosmos14d0y596ujj7s40n7nxu86qg4c835p3xa8vucja',
@@ -97,11 +108,15 @@ export const SignTxInSiteButton = ({
             return;
           }
 
+          notification.success({
+            message: 'Transaction Broadcasted',
+            description: `Transaction Hash: ${initialRes.tx_response.txhash}`
+          });
+
           //Note that the transaction may not be confirmed right away
           //You can use the tx hash to check the status of the transaction
 
           //Forcefully update the account info (fetch new sequence and info)
-
           await signedInAccount?.fetchAndUpdate(BitBadgesApi, { fetchBalance: true, fetchSequence: true }, true);
         }}
       >
@@ -111,6 +126,11 @@ export const SignTxInSiteButton = ({
   );
 };
 
+interface TxInfo {
+  type: string;
+  msg: object;
+}
+
 //Broadcast popup helper tool button. Outsource the transaction signing to a popup window.
 //Note users can also manually sign through the official BitBadges frontend as well
 //https://docs.bitbadges.io/for-developers/create-and-broadcast-txs/sign-+-broadcast-bitbadges.io
@@ -118,11 +138,52 @@ export const BroadcastTxPopupButton = ({ signInMethodTab }: { signInMethodTab: s
   const [loading, setLoading] = useState(false);
   const chain = useChainContext();
 
+  //TODO: Customize your transaction info here
+  const [txsInfo, setTxsInfo] = useState<TxInfo[]>([
+    {
+      type: 'MsgDeleteCollection',
+      msg: new MsgDeleteCollection({
+        creator: chain.cosmosAddress,
+        collectionId: '1'
+      })
+    }
+  ]);
+  let x = false;
+  if (x) console.log(setTxsInfo); //For TypeScript to not complain about unused variable
+
+  //The creator and other fields may need to be dynamic based on the user's address
+  //Options:
+  //  1. Use the chain context to get the user's address and setTxsInfo directly (such as the useEffect below).
+  //  2. Set autoPopulateCreator to true and BitBadges will auto-populate the creator field with the user's selected address.
+  //     Note this does not work for all fields, just ones where signer must == creator.
+  const autoPopulateCreator = true;
+  // userMode is used to tell BitBadges how to display the transaction signing UI
+  // For developers, we allow editing
+  // For end users, we pretty it up and do now allow edits
+  const userMode = true;
+
+  // useEffect(() => {
+  //   setTxsInfo([
+  //     {
+  //       type: 'MsgDeleteCollection',
+  //       msg: new MsgDeleteCollection({
+  //         creator: chain.cosmosAddress,
+  //         collectionId: '1'
+  //       })
+  //     }
+  //   ]);
+  // }, [chain.cosmosAddress]);
+
   //https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
   const FRONTEND_URL = 'https://bitbadges.io';
   const handleChildWindowMessage = async (event: MessageEvent) => {
     if (event.source && event.origin === FRONTEND_URL) {
-      // const txHash = event.data.txHash;
+      const txHash = event.data.txHash;
+      if (!txHash) return; //Probably a different message
+      notification.success({
+        message: 'Transaction Broadcasted',
+        description: `Transaction Hash: ${txHash}`
+      });
       setLoading(false);
     }
   };
@@ -144,17 +205,8 @@ export const BroadcastTxPopupButton = ({ signInMethodTab }: { signInMethodTab: s
         style={{ width: 240 }}
         disabled={!chain.address || !chain.loggedIn || loading || signInMethodTab == 'web2'}
         onClick={async () => {
-          const msgCreateProtocol = new MsgCreateProtocol({
-            name: 'Test',
-            uri: 'https://www.youtube.com/watch?v=5qap5aO4i9A',
-            customData: 'Test',
-            isFrozen: false,
-            creator: chain.cosmosAddress
-          });
-          const url =
-            'https://bitbadges.io/dev/broadcast?txsInfo=[{ "type": "MsgCreateProtocol", "msg": ' +
-            msgCreateProtocol.toJsonString() +
-            ' }]';
+          const url = `https://bitbadges.io/dev/broadcast?txsInfo=${encodeURIComponent(JSON.stringify(txsInfo))}&autoPopulateCreator=${autoPopulateCreator}&userMode=${userMode}`;
+
           const openedWindow = window.open(
             url,
             '_blank',

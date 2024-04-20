@@ -1,10 +1,10 @@
-import { Balance, GO_MAX_UINT_64, OffChainBalancesMap } from 'bitbadgesjs-sdk';
+import { Balance, GO_MAX_UINT_64, OffChainBalancesMap, convertToCosmosAddress } from 'bitbadgesjs-sdk';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '../web2/db';
 
 if (!db.get('balances')) {
   db.set('balances', {
-    cosmos1example: [
+    cosmos1mrdxhunfvjhe6lhdncp72dq46da2jcz9d9sh93: [
       new Balance({
         amount: 1n,
         badgeIds: [{ start: 1n, end: 1n }],
@@ -14,11 +14,11 @@ if (!db.get('balances')) {
   });
 }
 
-const getBalancesIndexed = async (_req: NextApiRequest, res: NextApiResponse) => {
+const getBalancesNonIndexed = async (_req: NextApiRequest, res: NextApiResponse) => {
   try {
     const balances: OffChainBalancesMap<bigint> = await db.get('balances');
 
-    const balancesForUser = balances[_req.body.address];
+    const balancesForUser = balances[convertToCosmosAddress(_req.query.address as string)];
     if (!balancesForUser) {
       return res.status(200).json({ balances: [] });
     } else {
@@ -29,4 +29,4 @@ const getBalancesIndexed = async (_req: NextApiRequest, res: NextApiResponse) =>
   }
 };
 
-export default getBalancesIndexed;
+export default getBalancesNonIndexed;

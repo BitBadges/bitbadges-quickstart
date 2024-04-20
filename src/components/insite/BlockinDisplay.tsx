@@ -32,7 +32,7 @@ export const BlockinDisplay = ({
     signature: string,
     sessionDetails: { username?: string; password?: string; siwbb?: boolean },
     options?: VerifyChallengeOptions,
-    secretsProofs?: iSecretsProof<bigint>[], 
+    secretsProofs?: iSecretsProof<bigint>[],
     publicKey?: string
   ) => Promise<void>;
   challengeParams: ChallengeParams<NumberType>;

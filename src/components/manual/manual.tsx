@@ -80,7 +80,7 @@ export const ManualDisplay = ({
           },
           {
             key: 'qr',
-            content: 'QR Code (BitBadges API)'
+            content: 'Authentication Code (BitBadges API)'
           }
         ]}
         fullWidth
@@ -120,11 +120,11 @@ export const ManualDisplay = ({
       {tab == 'qr' && (
         <>
           <div className="flex-center">
-            <b className="primary-text text-center">QR Code Value</b>
+            <b className="primary-text text-center">Authentication Code Value</b>
           </div>
           <div className="flex-center">
             <textarea
-              placeholder="QR Code"
+              placeholder="This is obtained by the user from their BitBadges account."
               className="input-box primary-text primary-border rounded"
               value={qrCode}
               onChange={(e) => setQrCode(e.target.value)}

@@ -106,7 +106,7 @@ export const SiwbbDisplay = ({
                   secretsProofs: _secretsProofs
                 });
 
-                // Verify on your backend and handle sessions 
+                // Verify on your backend and handle sessions
                 const secretsProofs: iSecretsProof<bigint>[] = _secretsProofs?.map((proof) => new SecretsProof(proof));
                 await verifyOnBackend(message, signature, { siwbb: true }, verifyOptions, secretsProofs);
                 const challengeObj = constructChallengeObjectFromString(message, Numberify);
@@ -122,7 +122,7 @@ export const SiwbbDisplay = ({
           </>
         )}
       </div>
-      <DevMode obj={siwbbRes && chain.loggedIn ? siwbbRes : popupParams} override={devMode} />
+      <DevMode obj={siwbbRes && chain.loggedIn ? siwbbRes : popupParams} toShow={devMode} />
     </>
   );
 };

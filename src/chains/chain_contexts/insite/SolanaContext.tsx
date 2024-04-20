@@ -4,6 +4,7 @@ import { TransactionPayload, TxContext, convertToCosmosAddress, createTxBroadcas
 import { createContext, useContext, useState } from 'react';
 import { useAccount } from '../AccountsContext';
 import { ChainSpecificContextType } from '../ChainContext';
+import CryptoJS from 'crypto-js';
 
 const bs58 = require('bs58');
 
@@ -84,8 +85,26 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
 
     let sig = '';
     if (!simulate) {
-      const message = payload.jsonToSign;
-      const encodedMessage = new TextEncoder().encode(message);
+      //Phantom has a weird error where messages must be < ~1000 bytes
+      //If we are within limit, we can have user sign the JSON
+      //Else, we hash the JSON and have user sign the hash
+
+      const normalMessage = payload.jsonToSign.length < 1000;
+      let message = payload.jsonToSign;
+      let encodedMessage = new TextEncoder().encode(message);
+
+      if (!normalMessage) {
+        notification.warn({
+          message: 'Message Length Warning',
+          description: `This transaction message is very large, and Solana has a limit of ~1000 characters for messages it can sign.
+            We will use an alternative method to sign this message (hashing). You will see a series of numbers and letters to sign instead.`
+        });
+
+        message = payload.jsonToSign;
+        const sha256Message = CryptoJS.SHA256(message).toString();
+        encodedMessage = new TextEncoder().encode(sha256Message);
+      }
+
       const signedMessage = await getProvider().request({
         method: 'signMessage',
         params: {
@@ -96,6 +115,7 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
       sig = signedMessage.signature.toString('hex');
     }
 
+    //We need to pass in solAddress manually here
     const txBody = createTxBroadcastBody(context, payload, sig, address);
     return txBody;
   };

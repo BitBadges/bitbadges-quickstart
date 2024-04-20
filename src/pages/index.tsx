@@ -3,34 +3,27 @@ import { useAccount, useAccountsContext } from '@/chains/chain_contexts/Accounts
 import { useCollection, useCollectionsContext } from '@/chains/chain_contexts/CollectionsContext';
 import { useSiwbbContext } from '@/chains/chain_contexts/siwbb/SIWBBContext';
 import { useWeb2Context } from '@/chains/chain_contexts/web2/Web2Context';
+import { DevMode } from '@/components/DevMode';
 import { AddressDisplay } from '@/components/address/AddressDisplay';
 import { BalanceDisplay } from '@/components/display/BalanceDisplay';
 import { DisplayCard } from '@/components/display/DisplayCard';
 import { MetadataDisplay } from '@/components/display/MetadataDisplay';
 import { Tabs } from '@/components/display/Tabs';
+import { ClaimHelpers } from '@/components/distribute.tsx';
 import { BlockinDisplay } from '@/components/insite/BlockinDisplay';
 import { ManualDisplay } from '@/components/manual/manual';
+import { VerifySecrets } from '@/components/secrets/secrets';
+import { SelfHostBalances } from '@/components/selfHostBalances';
 import { SiwbbDisplay } from '@/components/siwbb/siwbb';
 import { Web2Display } from '@/components/web2/web2';
-import {
-  Balance,
-  BitBadgesCollection,
-  BitBadgesUserInfo,
-  GO_MAX_UINT_64,
-  NumberType,
-  UintRange,
-  addBalances,
-  convertToCosmosAddress,
-  iSecretsProof
-} from 'bitbadgesjs-sdk';
+import { BitBadgesCollection, BitBadgesUserInfo, NumberType, UintRange, iSecretsProof } from 'bitbadgesjs-sdk';
 import { ChallengeParams, VerifyChallengeOptions } from 'blockin';
 import { NextPage } from 'next/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getBalancesIndexed, getPrivateInfo, setBalances, signIn, signOut } from '../chains/backend_connectors';
+import { getPrivateInfo, signIn, signOut } from '../chains/backend_connectors';
 import { useChainContext } from '../chains/chain_contexts/ChainContext';
 import Header from '../components/Header';
 import { BroadcastTxPopupButton, SignTxInSiteButton } from '../components/transactions';
-import { DevMode } from '@/components/DevMode';
 
 declare global {
   interface BigInt {
@@ -64,10 +57,6 @@ const Home: NextPage = () => {
 
   const [web3SignInTypeSelected, setWeb3SignInType] = useState('siwbb');
   const web3SignInType = chain.loggedIn ? (siwbbContext.active ? 'siwbb' : 'insite') : web3SignInTypeSelected; //Use the active one if logged in
-
-  const [passwordIsVisible, setPasswordIsVisible] = useState(false);
-
-  const [balancesAssignmentResult, setBalancesAssignmentResult] = useState('');
 
   const vitalikBalances = useMemo(() => {
     return vitalikAccount?.collected.find((collected) => collected.collectionId === 16n)?.balances ?? [];
@@ -171,11 +160,18 @@ const Home: NextPage = () => {
       siwbb?: boolean;
     },
     verifyOptions?: VerifyChallengeOptions,
-    secretsProofs?: iSecretsProof<bigint>[], 
+    secretsProofs?: iSecretsProof<bigint>[],
     publicKey?: string
   ) => {
     try {
-      const backendChecksRes = await signIn(message, signature, sessionDetails, verifyOptions, publicKey);
+      const backendChecksRes = await signIn(
+        message,
+        signature,
+        sessionDetails,
+        verifyOptions,
+        secretsProofs,
+        publicKey
+      );
       if (!backendChecksRes.success) throw new Error(backendChecksRes.errorMessage ?? 'Error');
     } catch (e: any) {
       console.log(e.errorMessage ?? e.message ?? e);
@@ -306,11 +302,11 @@ const Home: NextPage = () => {
             <div className="flex-center">
               <BalanceDisplay balances={vitalikBalances} />
             </div>
-            <DevMode obj={vitalikBalances} override={devMode} />
+            <DevMode obj={vitalikBalances} toShow={devMode} />
           </DisplayCard>
           <DisplayCard title={`Collection ${exampleCollection?.collectionId}`} md={12} xs={24} sm={24}>
             {exampleCollection && <MetadataDisplay collectionId={1n} />}
-            <DevMode obj={exampleCollection?.getCollectionMetadata()} override={devMode} />
+            <DevMode obj={exampleCollection?.getCollectionMetadata()} toShow={devMode} />
           </DisplayCard>
         </div>
         <div className="flex-center flex-wrap px-8" style={{ alignItems: 'normal' }}>
@@ -319,109 +315,32 @@ const Home: NextPage = () => {
             md={12}
             xs={24}
             sm={24}
-            subtitle="Distribute claim details to users who meet criteria (e.g. check location, query if they were in attendance, etc)."
+            subtitle="Check certain criteria or distribute important claim details to users. If the criteria is met, you can redirect them
+            to the claim link on the BitBadges site."
           >
-            <br />
-            <div className="flex-center">
-              <button
-                className="landing-button"
-                onClick={() => setPasswordIsVisible(!passwordIsVisible)}
-                style={{ width: 200 }}
-              >
-                {passwordIsVisible ? 'Hide' : 'Check Something'}
-              </button>
-            </div>
-            <br />
-            {/* TODO: You will need to store the password and/or codes somewhere. */}
-            {passwordIsVisible && (
-              <>
-                <div className="text-center">
-                  Password: abc123
-                  <br />
-                  Code: 123456
-                </div>
-                <div className="text-center">
-                  <a
-                    href="https://bitbadges.io/collections/ADD_COLLECTION_ID_HERE?approvalId=APPROVAL_ID&code=CODE"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Code Claim Link
-                  </a>
-                  <br />
-                  <a
-                    href="https://bitbadges.io/collections/ADD_COLLECTION_ID_HERE?approvalId=APPROVAL_ID&password=PASSWORD"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Password Claim Link
-                  </a>
-                </div>
-                <div className="text-center">
-                  <a href="https://bitbadges.io/saveforlater?value=abc123" target="_blank" rel="noreferrer">
-                    Save for Later Link
-                  </a>
-                </div>
-              </>
-            )}
+            <ClaimHelpers />
           </DisplayCard>
           <DisplayCard
-            title={`Balance Assignment`}
+            title={`Host Off-Chain Balances`}
             md={12}
             xs={24}
             sm={24}
-            subtitle="If your collection uses self-hosted off-chain balances, you can update the balances dynamically according to interactions. For example, maybe when a user pays a subscription fee, you allocate them x1 of the subscription badge."
+            subtitle="Self-host the balances for your collection via your backend. The URL is set in the core collection details on-chain and is used to fetch the balances."
           >
-            <br />
-            <div className="flex-center">
-              <button
-                className="landing-button"
-                onClick={async () => {
-                  //TODO: Add your own logic checking
-                  //TODO: Update your self-hosted balances URL to include the new user balances
-                  const currBalances = await getBalancesIndexed();
-                  const currVitalikBalance =
-                    currBalances.balances[convertToCosmosAddress(vitalikAccount?.address ?? '')] ?? [];
-
-                  const newBalances = addBalances(
-                    [
-                      new Balance({
-                        amount: 1n,
-                        badgeIds: [{ start: 1n, end: 1n }],
-                        ownershipTimes: [{ start: 1n, end: GO_MAX_UINT_64 }]
-                      })
-                    ],
-                    currVitalikBalance
-                  );
-                  const addressToUpdate = vitalikAccount?.address ?? '';
-                  await setBalances(addressToUpdate, newBalances);
-
-                  const res = await getBalancesIndexed();
-                  console.log(res);
-                  const fetchedBalance = res.balances[convertToCosmosAddress(addressToUpdate)];
-                  alert(`Updated balances for ${addressToUpdate} to ${JSON.stringify(fetchedBalance)}`);
-                  setBalancesAssignmentResult(res.balances);
-
-                  //TODO: If your collection is indexed, you will need to refresh the cached values on the BitBadges API (note there are cooldowns though)
-                  // await BitBadgesApi.refreshMetadata(collectionId)
-                }}
-                style={{ width: 300 }}
-              >
-                {'Check Something and Update Balances'}
-              </button>
-            </div>{' '}
-            <DevMode obj={balancesAssignmentResult} override={devMode} />
+            <SelfHostBalances devMode={devMode} />
           </DisplayCard>
-          {devMode && (
-            <DisplayCard title={`Full Collection ${firstEthTxCollection?.collectionId}`} md={12} xs={24} sm={24}>
-              <DevMode obj={firstEthTxCollection} override={devMode} />
-            </DisplayCard>
-          )}
-          {devMode && (
-            <DisplayCard title={`Full Account`} md={12} xs={24} sm={24}>
-              <DevMode obj={vitalikAccount} override={devMode} />
-            </DisplayCard>
-          )}
+
+          <DisplayCard
+            title={`Secrets`}
+            subtitle={
+              'BitBadges offers a verifiable secrets feature to allow users to prove sensitive information to a verifier. These can be created and stored via BitBadges and accessed through the SIWBB flow, or you can provide a custom implementation (they are just message signatures).'
+            }
+            md={12}
+            xs={24}
+            sm={24}
+          >
+            <VerifySecrets devMode={devMode} />
+          </DisplayCard>
         </div>
       </div>
     </>

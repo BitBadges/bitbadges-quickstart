@@ -16,7 +16,7 @@ const EditerMarkdown = dynamic(
 
 export function DevMode({
   obj,
-  override,
+  toShow,
   subtitle,
   inheritBg,
   noBorder,
@@ -24,7 +24,7 @@ export function DevMode({
   noPadding
 }: {
   obj?: Object | string;
-  override?: boolean;
+  toShow?: boolean;
   subtitle?: string | ReactNode;
   inheritBg?: boolean;
   noBorder?: boolean;
@@ -45,7 +45,7 @@ export function DevMode({
 
   return (
     <>
-      {override && (
+      {toShow && (
         <DisplayCard
           title=""
           span={24}

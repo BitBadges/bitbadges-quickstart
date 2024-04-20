@@ -16,7 +16,7 @@ import { db } from './web2/db';
 const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
   const body = req.body;
   let { message, signature, options, username, password, siwbb, publicKey } = body;
-
+  console.log('signIn', message, signature, options, username, password, siwbb, publicKey);
   try {
     const params = constructChallengeObjectFromString(message, BigIntify);
     await BitBadgesApi.verifySignInGeneric({ message, signature, options, publicKey }); //Throws on error
@@ -43,7 +43,7 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
     //TODO: You now implement any additional checks or custom logic for your application, such as assigning sesssions, cookies, etc.
 
     //TODO: If you expect proof of secrets to be attached to the message, you can also verify them here.
-    //https://docs.bitbadges.io/for-developers/verifiable-secrets/creating-and-verifying-a-proof
+    //See src/components/secrets/secrets.tsx for an example of how to verify secrets proofs.
 
     //It is also important to prevent replay attacks or flash ownership attacks (https://blockin.gitbook.io/blockin/developer-docs/core-concepts).
     if (!params.expirationDate) {

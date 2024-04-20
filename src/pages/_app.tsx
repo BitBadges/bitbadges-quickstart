@@ -21,6 +21,10 @@ import { WagmiConfig } from 'wagmi';
 import { mainnet } from 'wagmi/chains';
 const { publicRuntimeConfig } = getConfig();
 
+require('dotenv').config();
+
+process.env.BBS_SIGNATURES_MODE = 'WASM';
+
 // 2. Create wagmiConfig
 const metadata = {
   name: 'BitBadges',

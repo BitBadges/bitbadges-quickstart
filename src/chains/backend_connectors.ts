@@ -1,4 +1,4 @@
-import { EIP712TypedData, iBalance } from 'bitbadgesjs-sdk';
+import { EIP712TypedData, iBalance, iSecretsProof } from 'bitbadgesjs-sdk';
 import { VerifyChallengeOptions } from 'blockin';
 
 const fetchFromApi = async (path: string, body?: object | string | undefined, method: string = 'post') => {
@@ -18,17 +18,20 @@ export const signIn = async (
     siwbb?: boolean;
   },
   options?: VerifyChallengeOptions,
+  secretsProofs?: iSecretsProof<bigint>[],
   publicKey?: string
 ): Promise<{
   success: true;
   errorMessage?: string;
 }> => {
+  console.log('signIn', message, sig, sessionDetails, options, secretsProofs, publicKey);
   return await fetchFromApi('../api/signIn', {
     ...sessionDetails,
     message: message,
     signature: sig,
     options,
-    publicKey
+    publicKey,
+    secretsProofs
   });
 };
 
@@ -45,7 +48,11 @@ export const signOut = async (): Promise<any> => {
 };
 
 export const getBalancesIndexed = async (): Promise<any> => {
-  return await fetchFromApi('../api/selfhost/balancesIndexed');
+  return await fetchFromApi('../api/selfhost/balancesIndexed', undefined, 'get');
+};
+
+export const getBalancesNonIndexed = async (address: string): Promise<any> => {
+  return await fetchFromApi('../api/selfhost/balancesNonIndexed?' + new URLSearchParams({ address }), undefined, 'get');
 };
 
 export const setBalances = async (address: string, balances: iBalance<bigint>[]): Promise<any> => {
