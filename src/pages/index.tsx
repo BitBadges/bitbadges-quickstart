@@ -22,6 +22,7 @@ import { getPrivateInfo, signInManual, signOut } from '../chains/backend_connect
 import { useChainContext } from '../chains/chain_contexts/ChainContext';
 import Header from '../components/Header';
 import { BroadcastTxPopupButton, SignTxInSiteButton } from '../components/transactions';
+import { notification } from 'antd';
 
 declare global {
   interface BigInt {
@@ -58,6 +59,12 @@ const Home: NextPage = () => {
   const vitalikBalances = useMemo(() => {
     return vitalikAccount?.collected.find((collected) => collected.collectionId === 16n)?.balances ?? [];
   }, [vitalikAccount]);
+
+  // API Authorization variables
+  const clientId = 'c29db971abaf5eee05715d9eaca15e11fa2666f45315340a1e82d88b1f4388ee'; //TODO: Add your client ID
+  const redirectUri = 'http://localhost:3002/api/apiauth'; //TODO: Add your redirect URI (this is the /apiauth endpoint by default)
+  const scope = '';  // 'Create Address Lists,Complete Claims' //TODO: Add your scopes or leave blank to allow user select
+  const state = ''; //Add optional state
 
   useEffect(() => {
     async function fetch() {
@@ -148,14 +155,19 @@ const Home: NextPage = () => {
     return params;
   }, [challengeParams]);
 
-  const verifyManually = async (message: string, signature: string, options: VerifyChallengeOptions, publicKey?: string) => {
+  const verifyManually = async (
+    message: string,
+    signature: string,
+    options: VerifyChallengeOptions,
+    publicKey?: string
+  ) => {
     try {
       await signInManual(message, signature, options, publicKey);
     } catch (e: any) {
       console.error(e);
       throw e;
     }
-  }
+  };
 
   if (!challengeParams) return <></>;
 
@@ -164,7 +176,7 @@ const Home: NextPage = () => {
       <Header setDevMode={setDevMode} devMode={devMode} />
       <div>
         <div className="px-8">
-          <DisplayCard title="Authentication" md={24} xs={24} sm={24}>
+          <DisplayCard title="Authentication" md={24} xs={24} sm={24} subtitle="Authentication is for authenticating users directly in your application. For BitBadges API authorization, see the API Authorization section below.">
             <br />
             <div className="flex-center">
               <Tabs
@@ -188,7 +200,7 @@ const Home: NextPage = () => {
               />
             </div>
             <br />
-            {signInMethodTab == 'manual' && <ManualDisplay  verifyManually={verifyManually} />}
+            {signInMethodTab == 'manual' && <ManualDisplay verifyManually={verifyManually} />}
             {signInMethodTab == 'web3' && (
               <>
                 <div className="flex-center">
@@ -271,11 +283,32 @@ const Home: NextPage = () => {
         </div>
         <div className="flex-center flex-wrap px-8" style={{ alignItems: 'normal' }}>
           <DisplayCard
+            title={'Claim Auto-Completion'}
+            md={12}
+            xs={24}
+            sm={24}
+            subtitle="Complete claims for your users either automatically or when they do something on your site. This can be used to distribute badges or other assets."
+          >
+            <div className='flex-center'>
+            <button
+              className="landing-button m-2"
+              style={{ width: 200 }}
+              onClick={async () => {
+                notification.info({
+                  message: 'Auto-Claim',
+                  description: 'See the /autoclaim endpoint'
+                });
+              }}
+            >
+              Auto-Claim
+            </button></div>
+          </DisplayCard>
+          <DisplayCard
             title={'Claim Distribution'}
             md={12}
             xs={24}
             sm={24}
-            subtitle="Check certain criteria or distribute important claim details to users. If the criteria is met, you can redirect them
+            subtitle="Distribute important claim details to users. If the criteria is met, you can redirect them
             to the claim link on the BitBadges site."
           >
             <ClaimHelpers />
@@ -301,12 +334,36 @@ const Home: NextPage = () => {
           >
             <VerifySecrets devMode={devMode} />
           </DisplayCard>
+          <DisplayCard
+            title={`API Authorization`}
+            subtitle={
+              `To access authorized API endpoints, you can use this flow to have the user sign in and then use the generated token to access the API. 
+              Note this is different from SIWBB for the fact that this is for authorization (not authentication). Authentication is for authenticating users on your own site. The API authorization is for the user authorizing you to do stuff with the BitBadges API on their behalf.`
+            }
+            md={12}
+            xs={24}
+            sm={24}
+          >
+            <div className='flex-center'>
+            <button
+              className="landing-button m-2"
+              style={{ width: 200 }}
+              onClick={async () => {
+
+                window.open(
+                  `https://bitbadges.io/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`,
+                  '_blank'
+                );
+              }}
+            >
+              Authorize URL
+            </button></div>
+          </DisplayCard>
         </div>
       </div>
     </>
   );
 };
-
 
 const SecretInfoButton = () => {
   return (
@@ -322,6 +379,5 @@ const SecretInfoButton = () => {
     </button>
   );
 };
-
 
 export default Home;

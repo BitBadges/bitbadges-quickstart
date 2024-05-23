@@ -4,7 +4,6 @@ import cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BitBadgesApi } from './bitbadges-api';
 
-
 //For self verification
 // import { getChainDriver } from "./selfverify/chainDriverHandlers";
 // import { verifyChallenge } from "./selfverify/verifyChallenge";
@@ -37,7 +36,7 @@ const signInManual = async (req: NextApiRequest, res: NextApiResponse) => {
         errorMessage: 'This sign-in does not have an expiration timestamp'
       });
     }
-  
+
     // Create the session cookie data
     const sessionData = {
       params: params,

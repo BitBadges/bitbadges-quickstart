@@ -20,7 +20,7 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
   // const state = req.query.state as string; (if applicable, state can be passed via the redirect from the original sign-in request)
 
   try {
-     //TODO: This step is critical. See BitBadges documentation for more details.
+    //TODO: This step is critical. See BitBadges documentation for more details.
     const verifyOptions: VerifyChallengeOptions = {
       expectedChallengeParams: {
         // domain: ''
@@ -29,7 +29,7 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
         // resources: [],
       }
     };
-    
+
     const authCodeRes = await BitBadgesApi.getAuthCode({
       code,
       options: verifyOptions,
@@ -55,7 +55,6 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
     //TODO: If you expect proof of secrets to be attached to the message, you can also verify them here.
     //See src/components/secrets/secrets.tsx for an example of how to verify secrets proofs.
     //It is also important to prevent replay attacks or flash ownership attacks (https://blockin.gitbook.io/blockin/developer-docs/core-concepts).
-
 
     if (!params.expirationDate) {
       return res.status(400).json({

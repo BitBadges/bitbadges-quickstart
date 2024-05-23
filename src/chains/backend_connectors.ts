@@ -27,7 +27,7 @@ export const signInManual = async (
     message: message,
     signature: sig,
     options,
-    publicKey,
+    publicKey
   });
 };
 
@@ -63,4 +63,3 @@ export const getBalancesNonIndexed = async (address: string): Promise<any> => {
 export const setBalances = async (address: string, balances: iBalance<bigint>[]): Promise<any> => {
   return await fetchFromApi('../api/selfhost/setBalances', { address, balances });
 };
-

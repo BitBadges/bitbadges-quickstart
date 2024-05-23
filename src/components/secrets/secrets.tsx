@@ -1,4 +1,10 @@
-import { BigIntify, NumberType, SecretsProof, iSecretsProof, verifySecretsProofSignatures } from 'bitbadgesjs-sdk';
+import {
+  BigIntify,
+  NumberType,
+  SecretsProof,
+  iSecretsProof,
+  verifySecretsPresentationSignatures
+} from 'bitbadgesjs-sdk';
 import { useState } from 'react';
 import { DevMode } from '../DevMode';
 import { Tabs } from '../display/Tabs';
@@ -84,7 +90,7 @@ export const VerifySecrets = ({ devMode }: { devMode?: boolean }) => {
   const verifyProof = async (proof: iSecretsProof<bigint>) => {
     if (!proof) return;
 
-    await verifySecretsProofSignatures(proof, true);
+    await verifySecretsPresentationSignatures(proof, true);
 
     //TODO: Once you are here, the proofs are well-formed from a cryptographic perspective.
     //In other words, proof.createdBy issued the secret and the secret is well-formed with data integrity

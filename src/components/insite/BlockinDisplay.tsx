@@ -58,12 +58,7 @@ export const BlockinDisplay = ({
       //Verify the pair on your backend and handle sessions
       //Replay attacks are handled via the issuedAtTimeWindow in verifyOptions
 
-      await verifyManually(
-        message,
-        signature,
-        verifyOptions,
-        publicKey
-      );
+      await verifyManually(message, signature, verifyOptions, publicKey);
 
       /**
        * At this point, the user has been verified by your backend and Blockin. Here, you will do anything needed

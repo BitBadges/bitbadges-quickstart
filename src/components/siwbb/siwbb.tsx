@@ -1,6 +1,6 @@
 import { signOut } from '@/chains/backend_connectors';
 import { useChainContext } from '@/chains/chain_contexts/ChainContext';
-import { CodeGenQueryParams, NumberType, generateBitBadgesAuthUrl } from 'bitbadgesjs-sdk';
+import { CodeGenQueryParams, NumberType } from 'bitbadgesjs-sdk';
 import { ChallengeParams, VerifyChallengeOptions } from 'blockin';
 import { SignInWithBitBadgesButton } from 'blockin/dist/ui';
 import { AddressDisplay } from '../address/AddressDisplay';
@@ -64,10 +64,6 @@ export const SiwbbDisplay = ({
         ) : (
           <>
             <br />
-
-            <button onClick={() => window.open(generateBitBadgesAuthUrl(popupParams).replace('https://bitbadges.io', 'http://localhost:3000'), '_blank')} className="blockin-button" style={buttonStyle}>
-              Sign In
-            </button>
             <SignInWithBitBadgesButton popupParams={popupParams} />
           </>
         )}

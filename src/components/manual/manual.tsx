@@ -7,12 +7,17 @@ import { Tabs } from '../display/Tabs';
 export const ManualDisplay = ({
   verifyManually
 }: {
-  verifyManually: (message: string, signature: string, options: VerifyChallengeOptions, publicKey?: string) => Promise<void>;
+  verifyManually: (
+    message: string,
+    signature: string,
+    options: VerifyChallengeOptions,
+    publicKey?: string
+  ) => Promise<void>;
 }) => {
   const chain = useChainContext();
 
   const [message, setMessage] = useState(
-    "http://localhost:3000 wants you to sign in with your Solana account:\n4ZssFcjJkZHFChMdkUj6oyX853EUTrrK4wRPKLVbEnWP\n\nBy signing in, you agree to the privacy policy and terms of service.\n\nURI: http://localhost:3000\nVersion: 1\nChain ID: 1\nNonce: *\nIssued At: 2024-05-10T12:53:15.503Z\nExpiration Time: 2029-05-09T12:53:15.503Z\nResources:\nAsset Ownership Requirements:\n- Requirement :\n    Chain: BitBadges\n    Collection ID: 1\n    Asset IDs: 9 to 9\n    Ownership Time: Authentication Time\n    Ownership Amount: x0\n\n"
+    'http://localhost:3000 wants you to sign in with your Solana account:\n4ZssFcjJkZHFChMdkUj6oyX853EUTrrK4wRPKLVbEnWP\n\nBy signing in, you agree to the privacy policy and terms of service.\n\nURI: http://localhost:3000\nVersion: 1\nChain ID: 1\nNonce: *\nIssued At: 2024-05-10T12:53:15.503Z\nExpiration Time: 2029-05-09T12:53:15.503Z\nResources:\nAsset Ownership Requirements:\n- Requirement :\n    Chain: BitBadges\n    Collection ID: 1\n    Asset IDs: 9 to 9\n    Ownership Time: Authentication Time\n    Ownership Amount: x0\n\n'
   );
   const [signature, setSignature] = useState(
     '08486f8da05f2f4308f0d63a6aa3faff255d7f5d0716a4f2a17fdd8f8f117238584bfa962c2aab5953554effac836c73c04bf5a1342a07b90ea461971ee58e02'
@@ -22,7 +27,12 @@ export const ManualDisplay = ({
 
   //This manually verifies a (message, signature) pair using the BitBadges API and your backend
   //Manual verification means no authentication code is cached by BitBadges
-  const manualVerify = async (message: string, signature: string, options: VerifyChallengeOptions, publicKey?: string) => {
+  const manualVerify = async (
+    message: string,
+    signature: string,
+    options: VerifyChallengeOptions,
+    publicKey?: string
+  ) => {
     try {
       const res = await verifyManually(message, signature, options, publicKey);
       console.log(res);
@@ -120,7 +130,6 @@ export const ManualDisplay = ({
           style={{ width: 200 }}
           onClick={async () => {
             if (tab == 'manual') {
-
               const publicKey = await chain.getPublicKey();
               await manualVerify(message, signature, {}, publicKey ?? '');
             } else {

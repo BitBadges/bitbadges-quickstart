@@ -9,7 +9,7 @@ const nextConfig = {
     BACKEND_PORT: process.env.BACKEND_PORT ? process.env.BACKEND_PORT : '',
     MAINNET: process.env.MAINNET === 'true' ? true : false,
     BITBADGES_API_KEY: process.env.BITBADGES_API_KEY,
-    WC_PROJECT_ID: process.env.WC_PROJECT_ID,
+    WC_PROJECT_ID: process.env.WC_PROJECT_ID
     // BITBADGES_API_URL: 'https://localhost:3001'
   },
   transpilePackages: [
