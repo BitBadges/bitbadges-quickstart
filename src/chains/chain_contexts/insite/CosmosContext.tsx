@@ -110,7 +110,7 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
     return txBody;
   };
 
-  const getPublicKey = async (_cosmosAddress: string) => {
+  const getPublicKey = async () => {
     const account = await window?.keplr?.getKey(chainId);
     if (!account) return '';
 

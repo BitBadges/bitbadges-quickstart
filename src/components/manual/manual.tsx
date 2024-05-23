@@ -1,52 +1,31 @@
-import { VerifyChallengeOptions } from 'blockin';
+import { signIn } from '@/chains/backend_connectors';
+import { useChainContext } from '@/chains/chain_contexts/ChainContext';
+import { VerifyChallengeOptions } from 'blockin/dist/types/verify.types';
 import { useState } from 'react';
 import { Tabs } from '../display/Tabs';
-import { BitBadgesApi } from '@/chains/api';
 
 export const ManualDisplay = ({
-  verifyOnBackend
+  verifyManually
 }: {
-  verifyOnBackend: (
-    message: string,
-    signature: string,
-    sessionDetails: { username?: string; password?: string; siwbb?: boolean },
-    options?: VerifyChallengeOptions
-  ) => Promise<void>;
+  verifyManually: (message: string, signature: string, options: VerifyChallengeOptions, publicKey?: string) => Promise<void>;
 }) => {
+  const chain = useChainContext();
+
   const [message, setMessage] = useState(
-    'http://localhost:3000 wants you to sign in with your Ethereum account:\n0xb246a3764d642BABbd6b075bca3e77E1cD563d78\n\nBy signing in, you agree to the privacy policy and terms of service.\n\nURI: http://localhost:3000\nVersion: 1\nChain ID: 1\nNonce: *\nIssued At: 2024-04-20T11:32:48.422Z\nExpiration Time: 2024-04-27T11:32:48.422Z\nResources:\nAsset Ownership Requirements:\n- Requirement :\n    Chain: BitBadges\n    Collection ID: 1\n    Asset IDs: 9 to 9\n    Ownership Time: Authentication Time\n    Ownership Amount: x0\n\n'
+    "http://localhost:3000 wants you to sign in with your Solana account:\n4ZssFcjJkZHFChMdkUj6oyX853EUTrrK4wRPKLVbEnWP\n\nBy signing in, you agree to the privacy policy and terms of service.\n\nURI: http://localhost:3000\nVersion: 1\nChain ID: 1\nNonce: *\nIssued At: 2024-05-10T12:53:15.503Z\nExpiration Time: 2029-05-09T12:53:15.503Z\nResources:\nAsset Ownership Requirements:\n- Requirement :\n    Chain: BitBadges\n    Collection ID: 1\n    Asset IDs: 9 to 9\n    Ownership Time: Authentication Time\n    Ownership Amount: x0\n\n"
   );
   const [signature, setSignature] = useState(
-    '0x2e0e92e73836dc26809e72d94777cbe1366016e91d7415d98dd90690e82d822662628e8f32866b32862a285781ae23ff48faf2cb1764a0d204e56780f1e37df21c'
+    '08486f8da05f2f4308f0d63a6aa3faff255d7f5d0716a4f2a17fdd8f8f117238584bfa962c2aab5953554effac836c73c04bf5a1342a07b90ea461971ee58e02'
   );
   const [qrCode, setQrCode] = useState('');
-
   const [tab, setTab] = useState('manual');
 
   //This manually verifies a (message, signature) pair using the BitBadges API and your backend
-  //If the pair is stored by BitBadges, you can also use the await BitBadgesApi.getAuthCode(...) route
-  const manualVerify = async (message: string, signature: string) => {
+  //Manual verification means no authentication code is cached by BitBadges
+  const manualVerify = async (message: string, signature: string, options: VerifyChallengeOptions, publicKey?: string) => {
     try {
-      //Alternative if you just have the signature AND the pair is cached / stored by BitBadges
-      //You can fetch the pair directly. The route also verifies it for you, so this is all done in one step.
-      //This is how BitBadges QR codes are implemented. BitBadges QR codes cannot package the message because it is too big, so
-      //the QR code is just the signature. Thus, when you scan, you only have the signature and need the message.
-
-      // const authCodeRes = await BitBadgesApi.getAuthCode({ signature, options: { issuedAtTimeWindowMs: 5 * 60 * 1000, expectedChallengeParams } });
-      // const verificationResponse2 = authCodeRes.verificationResponse;
-      // const message = authCodeRes.message;
-      // if (!verificationResponse2.success) {
-      //   throw new Error('Error verifying signature');
-      // }
-
-      await verifyOnBackend(
-        message,
-        signature,
-        {},
-        {
-          //Add options
-        }
-      );
+      const res = await verifyManually(message, signature, options, publicKey);
+      console.log(res);
 
       //TODO: Prevent replay attacks,add verify options, handle sessions, etc based on your use case
 
@@ -141,15 +120,11 @@ export const ManualDisplay = ({
           style={{ width: 200 }}
           onClick={async () => {
             if (tab == 'manual') {
-              await manualVerify(message, signature);
-            } else {
-              const fetchedAuthCode = await BitBadgesApi.getAuthCode({ id: qrCode, options: {} });
-              console.log(fetchedAuthCode.verificationResponse); //Checked by the API but you should also check it here
-              console.log(fetchedAuthCode.message);
-              console.log(fetchedAuthCode.signature);
 
-              const { message, signature } = fetchedAuthCode;
-              await manualVerify(message, signature);
+              const publicKey = await chain.getPublicKey();
+              await manualVerify(message, signature, {}, publicKey ?? '');
+            } else {
+              await signIn(qrCode);
             }
           }}
         >

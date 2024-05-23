@@ -20,7 +20,7 @@ export const AccountsProvider: React.FC<{ children: ReactNode }> = ({ children }
       newAccounts[account.cosmosAddress] = account;
     }
 
-    setAccounts(newAccounts);
+    setAccounts((accounts) => ({ ...accounts, ...newAccounts }));
   };
 
   return (

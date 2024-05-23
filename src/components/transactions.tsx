@@ -3,20 +3,23 @@
 
 import { useAccount } from '@/chains/chain_contexts/AccountsContext';
 import { useChainContext } from '@/chains/chain_contexts/ChainContext';
-import { useWeb2Context } from '@/chains/chain_contexts/web2/Web2Context';
 import { Spin, notification } from 'antd';
 import {
-  //All Msgs are exported from the SDK as proto types (Protocol Buffers). This includes all native Cosmos modules.
-  proto, //Ex: proto.cosmos.bank.v1beta1.MsgSend or proto.badges.MsgDeleteCollection
-
+  BETANET_CHAIN_DETAILS,
   // Native x/badges Msgs also have helper types exported from the SDK w/ NumberType conversions
   // You can use these or the native Proto types
   // If you use the helpers, you can use the .toProto() to get the proto converted object where necessary
   // MsgTransferBadges,
   // MsgCreateCollection,
-  MsgDeleteCollection
+  MsgDeleteCollection,
+  MsgTransferBadges,
+  NumberType,
+  TxContext,
+  UintRangeArray,
+  createTransactionPayload,
+  //All Msgs are exported from the SDK as proto types (Protocol Buffers). This includes all native Cosmos modules.
+  proto
 } from 'bitbadgesjs-sdk';
-import { BETANET_CHAIN_DETAILS, TxContext, createTransactionPayload } from 'bitbadgesjs-sdk';
 import { useEffect, useMemo, useState } from 'react';
 import { BitBadgesApi } from '../pages/api/bitbadges-api';
 
@@ -32,7 +35,6 @@ export const SignTxInSiteButton = ({
 }) => {
   const chain = useChainContext();
   const signedInAccount = useAccount(chain.address);
-  const web2Context = useWeb2Context();
 
   const txDetails: TxContext = useMemo(() => {
     return {
@@ -44,7 +46,7 @@ export const SignTxInSiteButton = ({
         accountAddress: signedInAccount?.cosmosAddress ?? '',
         sequence: Number(signedInAccount?.sequence ?? '0'),
         accountNumber: Number(signedInAccount?.accountNumber ?? '0'),
-        pubkey: signedInAccount?.publicKey ?? web2Context.publicKey
+        pubkey: signedInAccount?.publicKey ?? ''
       },
       //Customize your fee here
       //The simulation response will return the gas used
@@ -56,7 +58,7 @@ export const SignTxInSiteButton = ({
       },
       memo: ''
     };
-  }, [chain, signedInAccount, web2Context.publicKey]);
+  }, [chain, signedInAccount]);
 
   return (
     <>
@@ -73,7 +75,7 @@ export const SignTxInSiteButton = ({
           }
 
           if (!txDetails.sender.pubkey) {
-            const pubKey = await chain.getPublicKey(chain.cosmosAddress);
+            const pubKey = await chain.getPublicKey();
             txDetails.sender.pubkey = pubKey;
           }
 
@@ -146,6 +148,34 @@ export const BroadcastTxPopupButton = ({ signInMethodTab }: { signInMethodTab: s
         creator: chain.cosmosAddress,
         collectionId: '1'
       })
+    },
+    {
+      type: 'MsgTransferBadges',
+      msg: new MsgTransferBadges<NumberType>({
+        creator: chain.cosmosAddress,
+        collectionId: '1',
+        transfers: [
+          {
+            from: chain.cosmosAddress,
+            toAddresses: ['cosmos14d0y596ujj7s40n7nxu86qg4c835p3xa8vucja'],
+            balances: [
+              {
+                amount: 1n,
+                badgeIds: [{ start: 1n, end: 10n }],
+                ownershipTimes: UintRangeArray.FullRanges()
+              }
+            ]
+          }
+        ]
+      }).toProto()
+    },
+    {
+      type: 'MsgSend',
+      msg: new MsgSend({
+        fromAddress: chain.cosmosAddress,
+        toAddress: 'cosmos14d0y596ujj7s40n7nxu86qg4c835p3xa8vucja',
+        amount: [{ denom: 'badge', amount: '1' }]
+      })
     }
   ]);
   let x = false;
@@ -162,17 +192,45 @@ export const BroadcastTxPopupButton = ({ signInMethodTab }: { signInMethodTab: s
   // For end users, we pretty it up and do now allow edits
   const userMode = true;
 
-  // useEffect(() => {
-  //   setTxsInfo([
-  //     {
-  //       type: 'MsgDeleteCollection',
-  //       msg: new MsgDeleteCollection({
-  //         creator: chain.cosmosAddress,
-  //         collectionId: '1'
-  //       })
-  //     }
-  //   ]);
-  // }, [chain.cosmosAddress]);
+  useEffect(() => {
+    setTxsInfo([
+      {
+        type: 'MsgDeleteCollection',
+        msg: new MsgDeleteCollection({
+          creator: chain.cosmosAddress,
+          collectionId: '1'
+        })
+      },
+      {
+        type: 'MsgTransferBadges',
+        msg: new MsgTransferBadges<NumberType>({
+          creator: chain.cosmosAddress,
+          collectionId: '1',
+          transfers: [
+            {
+              from: chain.cosmosAddress,
+              toAddresses: ['cosmos14d0y596ujj7s40n7nxu86qg4c835p3xa8vucja'],
+              balances: [
+                {
+                  amount: 1n,
+                  badgeIds: [{ start: 1n, end: 10n }],
+                  ownershipTimes: UintRangeArray.FullRanges()
+                }
+              ]
+            }
+          ]
+        }).toProto()
+      },
+      {
+        type: 'MsgSend',
+        msg: new MsgSend({
+          fromAddress: chain.cosmosAddress,
+          toAddress: 'cosmos14d0y596ujj7s40n7nxu86qg4c835p3xa8vucja',
+          amount: [{ denom: 'badge', amount: '1' }]
+        })
+      }
+    ]);
+  }, [chain.cosmosAddress]);
 
   //https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
   const FRONTEND_URL = 'https://bitbadges.io';

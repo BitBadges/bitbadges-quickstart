@@ -13,7 +13,6 @@ import { BitcoinContextProvider } from '@/chains/chain_contexts/insite/BitcoinCo
 import { CosmosContextProvider } from '@/chains/chain_contexts/insite/CosmosContext';
 import { EthereumContextProvider } from '@/chains/chain_contexts/insite/EthereumContext';
 import { SolanaContextProvider } from '@/chains/chain_contexts/insite/SolanaContext';
-import { Web2ContextProvider } from '@/chains/chain_contexts/web2/Web2Context';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react';
 import getConfig from 'next/config';
 import type {} from 'redux-thunk/extend-redux';
@@ -62,16 +61,14 @@ const App = ({ Component, pageProps }: AppProps) => {
               <EthereumContextProvider>
                 <SolanaContextProvider>
                   <SiwbbContextProvider>
-                    <Web2ContextProvider>
-                      <BlockinChainContextProvider>
-                        <div className="">
-                          <div className="layout gradient-bg" style={{ minHeight: '100vh' }}>
-                            <Component {...pageProps} />
-                            <div style={{ minHeight: 100 }}></div>
-                          </div>
+                    <BlockinChainContextProvider>
+                      <div className="">
+                        <div className="layout gradient-bg" style={{ minHeight: '100vh' }}>
+                          <Component {...pageProps} />
+                          <div style={{ minHeight: 100 }}></div>
                         </div>
-                      </BlockinChainContextProvider>
-                    </Web2ContextProvider>
+                      </div>
+                    </BlockinChainContextProvider>
                   </SiwbbContextProvider>
                 </SolanaContextProvider>
               </EthereumContextProvider>

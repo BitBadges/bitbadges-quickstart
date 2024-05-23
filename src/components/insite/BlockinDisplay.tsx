@@ -2,7 +2,7 @@ import { signOut } from '@/chains/backend_connectors';
 import { useAccount } from '@/chains/chain_contexts/AccountsContext';
 import { SignChallengeResponse, useChainContext } from '@/chains/chain_contexts/ChainContext';
 import { Avatar, Typography, notification } from 'antd';
-import { NumberType, Numberify, SupportedChain, iSecretsProof } from 'bitbadgesjs-sdk';
+import { NumberType, Numberify, SupportedChain } from 'bitbadgesjs-sdk';
 import {
   ChallengeParams,
   SignAndVerifyChallengeResponse,
@@ -21,22 +21,20 @@ const { Text } = Typography;
 export const BlockinDisplay = ({
   hideLogo,
   hideLogin,
-  verifyOnBackend,
+  verifyManually,
   challengeParams,
   verifyOptions
 }: {
   hideLogo?: boolean;
   hideLogin?: boolean;
-  verifyOnBackend: (
+  verifyManually: (
     message: string,
     signature: string,
-    sessionDetails: { username?: string; password?: string; siwbb?: boolean },
-    options?: VerifyChallengeOptions,
-    secretsProofs?: iSecretsProof<bigint>[],
+    options: VerifyChallengeOptions,
     publicKey?: string
   ) => Promise<void>;
   challengeParams: ChallengeParams<NumberType>;
-  verifyOptions?: VerifyChallengeOptions;
+  verifyOptions: VerifyChallengeOptions;
 }) => {
   const { address, loggedIn, setLoggedInAddress, connect, disconnect, signChallenge, chain, setChain, connected } =
     useChainContext();
@@ -60,14 +58,10 @@ export const BlockinDisplay = ({
       //Verify the pair on your backend and handle sessions
       //Replay attacks are handled via the issuedAtTimeWindow in verifyOptions
 
-      await verifyOnBackend(
+      await verifyManually(
         message,
         signature,
-        {
-          //nothing here bc we are signing normally
-        },
         verifyOptions,
-        undefined,
         publicKey
       );
 

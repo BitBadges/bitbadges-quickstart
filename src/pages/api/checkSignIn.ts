@@ -1,3 +1,4 @@
+import { BlockinChallengeParams, getChainForAddress } from 'bitbadgesjs-sdk';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 // For all authentication attempts, we will check the session cookie to see if the user is signed in
@@ -11,19 +12,16 @@ const checkSignIn = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const details = JSON.parse(session);
+    const params = new BlockinChallengeParams(details.params);
 
     return res.status(200).json({
-      chain: details.chain,
-      address: details.address,
+      chain: getChainForAddress(params.address),
+      address: params.address,
       signedIn: true,
       message: 'Successfully signed in',
 
       //For siwbb, we return the flag
       siwbb: details.siwbb,
-
-      //For Web2, we also return the mapped username and public key because it is needed
-      username: details.username,
-      publicKey: details.publicKey
     });
   } catch (err) {
     return res.status(401).json({ signedIn: false, message: `${err}` });

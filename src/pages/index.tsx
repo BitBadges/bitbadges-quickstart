@@ -2,7 +2,6 @@ import { BitBadgesApi } from '@/chains/api';
 import { useAccount, useAccountsContext } from '@/chains/chain_contexts/AccountsContext';
 import { useCollection, useCollectionsContext } from '@/chains/chain_contexts/CollectionsContext';
 import { useSiwbbContext } from '@/chains/chain_contexts/siwbb/SIWBBContext';
-import { useWeb2Context } from '@/chains/chain_contexts/web2/Web2Context';
 import { DevMode } from '@/components/DevMode';
 import { AddressDisplay } from '@/components/address/AddressDisplay';
 import { BalanceDisplay } from '@/components/display/BalanceDisplay';
@@ -15,12 +14,11 @@ import { ManualDisplay } from '@/components/manual/manual';
 import { VerifySecrets } from '@/components/secrets/secrets';
 import { SelfHostBalances } from '@/components/selfHostBalances';
 import { SiwbbDisplay } from '@/components/siwbb/siwbb';
-import { Web2Display } from '@/components/web2/web2';
-import { BitBadgesCollection, BitBadgesUserInfo, NumberType, UintRange, iSecretsProof } from 'bitbadgesjs-sdk';
+import { BitBadgesCollection, BitBadgesUserInfo, NumberType, UintRange } from 'bitbadgesjs-sdk';
 import { ChallengeParams, VerifyChallengeOptions } from 'blockin';
 import { NextPage } from 'next/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getPrivateInfo, signIn, signOut } from '../chains/backend_connectors';
+import { getPrivateInfo, signInManual, signOut } from '../chains/backend_connectors';
 import { useChainContext } from '../chains/chain_contexts/ChainContext';
 import Header from '../components/Header';
 import { BroadcastTxPopupButton, SignTxInSiteButton } from '../components/transactions';
@@ -39,7 +37,6 @@ const Home: NextPage = () => {
   //Chain Contexts
   const chain = useChainContext();
   const siwbbContext = useSiwbbContext();
-  const web2Context = useWeb2Context();
 
   const [devMode, setDevMode] = useState(false);
 
@@ -53,7 +50,7 @@ const Home: NextPage = () => {
   const firstEthTxCollection = useCollection(16n);
 
   const [signInMethodTabSelected, setSignInMethodTab] = useState('web3');
-  const signInMethodTab = web2Context.active ? 'web2' : signInMethodTabSelected;
+  const signInMethodTab = signInMethodTabSelected;
 
   const [web3SignInTypeSelected, setWeb3SignInType] = useState('siwbb');
   const web3SignInType = chain.loggedIn ? (siwbbContext.active ? 'siwbb' : 'insite') : web3SignInTypeSelected; //Use the active one if logged in
@@ -151,34 +148,14 @@ const Home: NextPage = () => {
     return params;
   }, [challengeParams]);
 
-  const verifyOnBackend = async (
-    message: string,
-    signature: string,
-    sessionDetails: {
-      username?: string;
-      password?: string;
-      siwbb?: boolean;
-    },
-    verifyOptions?: VerifyChallengeOptions,
-    secretsProofs?: iSecretsProof<bigint>[],
-    publicKey?: string
-  ) => {
+  const verifyManually = async (message: string, signature: string, options: VerifyChallengeOptions, publicKey?: string) => {
     try {
-      const backendChecksRes = await signIn(
-        message,
-        signature,
-        sessionDetails,
-        verifyOptions,
-        secretsProofs,
-        publicKey
-      );
-      if (!backendChecksRes.success) throw new Error(backendChecksRes.errorMessage ?? 'Error');
+      await signInManual(message, signature, options, publicKey);
     } catch (e: any) {
-      console.log(e.errorMessage ?? e.message ?? e);
-      alert(e.errorMessage ?? e.message ?? e);
+      console.error(e);
       throw e;
     }
-  };
+  }
 
   if (!challengeParams) return <></>;
 
@@ -200,12 +177,7 @@ const Home: NextPage = () => {
                   {
                     key: 'web3',
                     content: 'Web3',
-                    disabled: chain.connected && chain.loggedIn && web2Context.active
-                  },
-                  {
-                    key: 'web2',
-                    content: 'Web2',
-                    disabled: chain.connected && chain.loggedIn && !web2Context.active
+                    disabled: chain.connected && chain.loggedIn
                   },
                   {
                     key: 'manual',
@@ -216,7 +188,7 @@ const Home: NextPage = () => {
               />
             </div>
             <br />
-            {signInMethodTab == 'manual' && <ManualDisplay verifyOnBackend={verifyOnBackend} />}
+            {signInMethodTab == 'manual' && <ManualDisplay  verifyManually={verifyManually} />}
             {signInMethodTab == 'web3' && (
               <>
                 <div className="flex-center">
@@ -240,20 +212,10 @@ const Home: NextPage = () => {
                 </div>
               </>
             )}
-            {signInMethodTab == 'web2' && (
-              <Web2Display
-                verifyOnBackend={verifyOnBackend}
-                challengeParams={challengeParams}
-                verifyOptions={{
-                  issuedAtTimeWindowMs: 5 * 60 * 1000, //5 minute "redeem" window
-                  expectedChallengeParams
-                }}
-              />
-            )}
             {signInMethodTab == 'web3' && web3SignInType == 'insite' && (
               <div className="flex-center flex-column">
                 <BlockinDisplay
-                  verifyOnBackend={verifyOnBackend}
+                  verifyManually={verifyManually}
                   challengeParams={challengeParams}
                   verifyOptions={{
                     issuedAtTimeWindowMs: 5 * 60 * 1000, //5 minute "redeem" window
@@ -264,10 +226,8 @@ const Home: NextPage = () => {
             )}
             {signInMethodTab == 'web3' && web3SignInType == 'siwbb' && (
               <SiwbbDisplay
-                verifyOnBackend={verifyOnBackend}
                 challengeParams={challengeParams}
                 verifyOptions={{ issuedAtTimeWindowMs: 5 * 60 * 1000, expectedChallengeParams }}
-                devMode={devMode}
               />
             )}
             <br />
@@ -347,6 +307,7 @@ const Home: NextPage = () => {
   );
 };
 
+
 const SecretInfoButton = () => {
   return (
     <button
@@ -361,5 +322,6 @@ const SecretInfoButton = () => {
     </button>
   );
 };
+
 
 export default Home;

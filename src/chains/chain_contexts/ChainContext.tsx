@@ -16,7 +16,6 @@ import { useCosmosContext } from './insite/CosmosContext';
 import { useEthereumContext } from './insite/EthereumContext';
 import { useSolanaContext } from './insite/SolanaContext';
 import { useSiwbbContext } from './siwbb/SIWBBContext';
-import { useWeb2Context } from './web2/Web2Context';
 
 export type SignChallengeResponse = {
   signature: string;
@@ -44,7 +43,7 @@ export type ChainSpecificContextType = {
   connect: () => Promise<any>;
   signChallenge: (challenge: string) => Promise<SignChallengeResponse>;
   signTxn: (context: TxContext, payload: TransactionPayload, simulate: boolean) => Promise<string>; //Returns broadcast post body
-  getPublicKey: (cosmosAddress: string) => Promise<string>;
+  getPublicKey: () => Promise<string>;
 };
 
 const ChainContext = createContext<ChainContextType>({
@@ -67,7 +66,6 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
   const solanaContext = useSolanaContext();
   const bitcoinContext = useBitcoinContext();
   const siwbbContext = useSiwbbContext();
-  const web2Context = useWeb2Context();
 
   //Handle setting chain by default based on last signed in cookie
   useEffect(() => {
@@ -82,19 +80,13 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     checkSignIn().then((res) => {
-      const { signedIn, username, address, chain, publicKey, siwbb } = res;
+      const { signedIn, address, chain, siwbb } = res;
 
       if (signedIn) {
         setLoggedInAddress(address);
-        //We have signed in with Web2 if username is returned
         //We have signed in with SIWBB if siwbb is returned
         //We have signed in with normal Web3 if neither is returned
-        if (username) {
-          web2Context.setUsername(username);
-          web2Context.setPublicKey(publicKey);
-          web2Context.setActive(true);
-          web2Context.setAddress(address);
-        } else if (siwbb) {
+        if (siwbb) {
           siwbbContext.setActive(true);
           siwbbContext.setAddress(address);
           siwbbContext.setChain(chain);
@@ -118,7 +110,7 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
   }
 
   const chainContext: ChainContextType = {
-    ...(web2Context.active ? web2Context : siwbbContext.active ? siwbbContext : currentChainContext),
+    ...(siwbbContext.active ? siwbbContext : currentChainContext),
     chain,
     setChain,
     cosmosAddress: '',

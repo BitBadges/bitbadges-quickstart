@@ -1,13 +1,4 @@
-import { getChainDriver } from '@/pages/api/selfverify/chainDriverHandlers';
-import { blsVerifyProof } from '@trevormil/bbs-signatures';
-import {
-  BigIntify,
-  NumberType,
-  SecretsProof,
-  convertToCosmosAddress,
-  getChainForAddress,
-  iSecretsProof
-} from 'bitbadgesjs-sdk';
+import { BigIntify, NumberType, SecretsProof, iSecretsProof, verifySecretsProofSignatures } from 'bitbadgesjs-sdk';
 import { useState } from 'react';
 import { DevMode } from '../DevMode';
 import { Tabs } from '../display/Tabs';
@@ -93,81 +84,12 @@ export const VerifySecrets = ({ devMode }: { devMode?: boolean }) => {
   const verifyProof = async (proof: iSecretsProof<bigint>) => {
     if (!proof) return;
 
-    if (proof.secretMessages.length === 0) {
-      throw new Error('No secret messages found');
-    }
+    await verifySecretsProofSignatures(proof, true);
 
-    if (proof.messageFormat === 'json') {
-      //Assert all secretMessages are JSON
-      proof.secretMessages.forEach((msg) => {
-        try {
-          JSON.parse(msg);
-        } catch (e) {
-          throw new Error('Message is not valid JSON like expected');
-        }
-      });
-    }
-
-    if (proof.scheme === 'bbs') {
-      //We verify bbs proof and proofOfIssuance here
-
-      //proofOfIssuance is used for BBS secrets to establish the link between the signer and the secret
-      //The actual secret is signed by a BBS key pair (not the creator's native key pair). This is done because BBS
-      //signatures offer uniuqe properties like selective disclosure.
-      //To establish the link between the actual creator and the BBS signer, we use the proofOfIssuance to basically say
-      //"I approve the issuance of secrets signed with BBS+ <BBS public key> as my own."
-
-      const { message, signature, publicKey, signer } = proof.proofOfIssuance;
-      await getChainDriver(getChainForAddress(signer)).verifySignature(signer, message, signature, publicKey);
-
-      if (convertToCosmosAddress(proof.proofOfIssuance.signer) !== convertToCosmosAddress(proof.createdBy)) {
-        throw new Error('Signer does not match creator');
-      }
-
-      //TODO: Make sure the proof of issuance message contents actually establish the link between the signer and the secret
-      //Make sure the signer is the same as the proof signer
-      //Note this may be different if you have a custom implementation
-      //For BitBadges, we do this with the following message: "message": "I approve the issuance of secrets signed with BBS+ a5159099a24a8993b5eb8e62d04f6309bbcf360ae03135d42a89b3d94cbc2bc678f68926373b9ded9b8b9a27348bc755177209bf2074caea9a007a6c121655cd4dda5a6618bfc9cb38052d32807c6d5288189913aa76f6d49844c3648d4e6167 as my own.\n\n",
-      const bbsSigner = proof.proofOfIssuance.message.split(' ')[9];
-      if (bbsSigner !== proof.dataIntegrityProof.signer) {
-        throw new Error('Proof signer does not match proof of issuance');
-      }
-
-      const isProofVerified = await blsVerifyProof({
-        proof: Uint8Array.from(Buffer.from(proof.dataIntegrityProof.signature, 'hex')),
-        publicKey: Uint8Array.from(Buffer.from(proof.dataIntegrityProof.signer, 'hex')),
-        messages: proof.secretMessages.map((message) => Uint8Array.from(Buffer.from(message, 'utf-8'))),
-        nonce: Uint8Array.from(Buffer.from('nonce', 'utf8'))
-      });
-
-      if (!isProofVerified.verified) {
-        throw new Error('Data integrity proof not verified');
-      }
-    } else {
-      //We verify as standard signature (proofOfIssuance is not necessary bc it is signed directly by creator not through BBS)
-      const message = proof.secretMessages[0];
-      const signature = proof.dataIntegrityProof.signature;
-      const signer = proof.dataIntegrityProof.signer;
-      const publicKey = proof.dataIntegrityProof.publicKey;
-
-      if (convertToCosmosAddress(signer) !== convertToCosmosAddress(proof.createdBy)) {
-        throw new Error('Signer does not match creator');
-      }
-
-      await getChainDriver(getChainForAddress(signer)).verifySignature(signer, message, signature, publicKey);
-    }
-
-    //TODO: Once you are here, the proofs are well-formed from a cryptographic and technical perspective.
-    //You should now check the metadata and other details to ensure the proof is valid.
-
-    //TODO: Verify any application-specific stuff
-    //TODO: Verify messages are well-fromed and corrrect
-
-    //Note this function only verifies the proof + signatures are well-formed (proofOfIssuance and dataIntegrityProof)
-    //You probably need to check the other accompanying details such as who created it, metadata, on-chain anchors / update history are correct as well.
-    //The secret messages should also be verified to be correct.
-
-    //TODO: You should also verify that the creator is who you want it to be. Secrets often gain their credibility from the creator, so this is important.
+    //TODO: Once you are here, the proofs are well-formed from a cryptographic perspective.
+    //In other words, proof.createdBy issued the secret and the secret is well-formed with data integrity
+    //TODO: However, we DO NOT know the expected contents of the secret. This is application-specific.
+    //This includes the expected creator, metadata, messages, etc.
   };
 
   return (

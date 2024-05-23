@@ -1,6 +1,6 @@
 import { OffChainBalancesMap, GO_MAX_UINT_64, Balance } from 'bitbadgesjs-sdk';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { db } from '../web2/db';
+import { db } from '../db';
 
 if (!db.get('balances')) {
   db.set('balances', {

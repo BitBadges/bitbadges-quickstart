@@ -1,6 +1,6 @@
 import { OffChainBalancesMap, convertToCosmosAddress } from 'bitbadgesjs-sdk';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { db } from '../web2/db';
+import { db } from '../db';
 
 const setBalances = async (req: NextApiRequest, res: NextApiResponse) => {
   try {

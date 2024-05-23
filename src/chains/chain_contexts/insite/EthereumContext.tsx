@@ -106,7 +106,7 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
     return txBody;
   };
 
-  const getPublicKey = async (_cosmosAddress: string) => {
+  const getPublicKey = async () => {
     try {
       const currAccount = account?.clone();
       if (currAccount && currAccount.publicKey) {
