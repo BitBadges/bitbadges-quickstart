@@ -16,7 +16,7 @@ const signInManual = async (req: NextApiRequest, res: NextApiResponse) => {
   let { message, signature, options, publicKey } = body;
   try {
     const params = constructChallengeObjectFromString(message, BigIntify);
-    await BitBadgesApi.verifySignInGeneric({ message, signature, options, publicKey }); //Throws on error
+    await BitBadgesApi.verifySIWBBRequest({ message, signature, options, publicKey }); //Throws on error
     // console.log(authRes.blockin.verificationResponse);
 
     // Alternative to using the BitBadgesApi is to self-verify directly with the Blockin library

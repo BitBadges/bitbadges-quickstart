@@ -79,23 +79,27 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
   }, [chain]);
 
   useEffect(() => {
-    checkSignIn().then((res) => {
-      const { signedIn, address, chain, siwbb } = res;
+    checkSignIn()
+      .then((res) => {
+        const { signedIn, address, chain, siwbb } = res;
 
-      if (signedIn) {
-        setLoggedInAddress(address);
-        //We have signed in with SIWBB if siwbb is returned
-        //We have signed in with normal Web3 if neither is returned
-        if (siwbb) {
-          siwbbContext.setActive(true);
-          siwbbContext.setAddress(address);
-          siwbbContext.setChain(chain);
+        if (signedIn) {
+          setLoggedInAddress(address);
+          //We have signed in with SIWBB if siwbb is returned
+          //We have signed in with normal Web3 if neither is returned
+          if (siwbb) {
+            siwbbContext.setActive(true);
+            siwbbContext.setAddress(address);
+            siwbbContext.setChain(chain);
+          } else {
+          }
         } else {
+          signOut();
         }
-      } else {
-        signOut();
-      }
-    });
+      })
+      .catch((e) => {
+        console.error(e);
+      });
   }, []);
 
   let currentChainContext: ChainSpecificContextType;

@@ -21,6 +21,7 @@ const Header = ({ devMode, setDevMode }: { devMode: boolean; setDevMode: (val: b
         </div>
         <LinkGroup
           links={[
+            { title: 'Developer Portal', href: 'https://bitbadges.io/developer' },
             { title: 'Documentation', href: 'https://docs.bitbadges.io' },
             { title: 'Github', href: 'https://github.com/bitbadges' },
             { title: 'Explorer', href: 'https://explorer.bitbadges.io' },

@@ -14,15 +14,16 @@ import { ManualDisplay } from '@/components/manual/manual';
 import { VerifySecrets } from '@/components/secrets/secrets';
 import { SelfHostBalances } from '@/components/selfHostBalances';
 import { SiwbbDisplay } from '@/components/siwbb/siwbb';
+import { notification } from 'antd';
 import { BitBadgesCollection, BitBadgesUserInfo, NumberType, UintRange } from 'bitbadgesjs-sdk';
 import { ChallengeParams, VerifyChallengeOptions } from 'blockin';
+import { useRouter } from 'next/router';
 import { NextPage } from 'next/types';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { getPrivateInfo, signInManual, signOut } from '../chains/backend_connectors';
 import { useChainContext } from '../chains/chain_contexts/ChainContext';
 import Header from '../components/Header';
 import { BroadcastTxPopupButton, SignTxInSiteButton } from '../components/transactions';
-import { notification } from 'antd';
 
 declare global {
   interface BigInt {
@@ -37,8 +38,10 @@ BigInt.prototype.toJSON = function () {
 const Home: NextPage = () => {
   //Chain Contexts
   const chain = useChainContext();
+  const router = useRouter();
   const siwbbContext = useSiwbbContext();
 
+  const [currTab, setCurrTab] = useState('Sign In with BitBadges');
   const [devMode, setDevMode] = useState(false);
 
   //Global State Contexts
@@ -61,9 +64,9 @@ const Home: NextPage = () => {
   }, [vitalikAccount]);
 
   // API Authorization variables
-  const clientId = 'c29db971abaf5eee05715d9eaca15e11fa2666f45315340a1e82d88b1f4388ee'; //TODO: Add your client ID
+  const clientId = 'd5770a809fdf354a35199ca76b10ff0c2d8c792a67c77876f32ff2bc0c7cacb7'; //TODO: Add your client ID
   const redirectUri = 'http://localhost:3002/api/apiauth'; //TODO: Add your redirect URI (this is the /apiauth endpoint by default)
-  const scope = '';  // 'Create Address Lists,Complete Claims' //TODO: Add your scopes or leave blank to allow user select
+  const scope = ''; // 'Create Address Lists,Complete Claims' //TODO: Add your scopes or leave blank to allow user select
   const state = ''; //Add optional state
 
   useEffect(() => {
@@ -171,99 +174,124 @@ const Home: NextPage = () => {
 
   if (!challengeParams) return <></>;
 
-  return (
-    <>
-      <Header setDevMode={setDevMode} devMode={devMode} />
-      <div>
-        <div className="px-8">
-          <DisplayCard title="Authentication" md={24} xs={24} sm={24} subtitle="Authentication is for authenticating users directly in your application. For BitBadges API authorization, see the API Authorization section below.">
-            <br />
-            <div className="flex-center">
-              <Tabs
-                tab={signInMethodTab}
-                setTab={async (tab) => {
-                  if (chain.loggedIn) await signOut();
-                  setSignInMethodTab(tab);
-                }}
-                tabInfo={[
-                  {
-                    key: 'web3',
-                    content: 'Web3',
-                    disabled: chain.connected && chain.loggedIn
-                  },
-                  {
-                    key: 'manual',
-                    content: 'Manual',
-                    disabled: chain.connected && chain.loggedIn
-                  }
-                ]}
-              />
-            </div>
-            <br />
-            {signInMethodTab == 'manual' && <ManualDisplay verifyManually={verifyManually} />}
-            {signInMethodTab == 'web3' && (
-              <>
-                <div className="flex-center">
-                  <Tabs
-                    type="underline"
-                    tab={web3SignInType}
-                    setTab={setWeb3SignInType}
-                    tabInfo={[
-                      {
-                        key: 'siwbb',
-                        content: 'Popup',
-                        disabled: chain.connected && chain.loggedIn
-                      },
-                      {
-                        key: 'insite',
-                        content: 'In-Site',
-                        disabled: chain.connected && chain.loggedIn
-                      }
-                    ]}
-                  />
-                </div>
-              </>
-            )}
-            {signInMethodTab == 'web3' && web3SignInType == 'insite' && (
-              <div className="flex-center flex-column">
-                <BlockinDisplay
-                  verifyManually={verifyManually}
-                  challengeParams={challengeParams}
-                  verifyOptions={{
-                    issuedAtTimeWindowMs: 5 * 60 * 1000, //5 minute "redeem" window
-                    expectedChallengeParams
-                  }}
+  const Tab = ({ label, onClick, active } = { label: '', onClick: () => {}, active: '' }) => {
+    return (
+      <li>
+        <a
+          onClick={onClick}
+          className={` ${active ? 'active inline-flex items-center px-4 py-3 text-white bg-blue-700 rounded-lg  w-full dark:bg-blue-600' : 
+          'inline-flex items-center px-4 py-3 text-gray-400 rounded-lg cursor-pointer bg-gray-50 w-full dark:bg-gray-800 dark:text-gray-500'}`}
+          aria-current="page"
+        >
+          {label}
+        </a>
+      </li>
+    );
+  };
+
+  const navTabs: { label: string; node: ReactNode }[] = [
+    {
+      label: 'Sign In with BitBadges',
+      node: (
+        <DisplayCard
+          title="Authentication"
+          md={24}
+          xs={24}
+          sm={24}
+          subtitle="Authentication is for authenticating users directly in your application. For BitBadges API authorization, see the API Authorization section below."
+        >
+          <br />
+          <div className="flex-center">
+            <Tabs
+              tab={signInMethodTab}
+              setTab={async (tab) => {
+                if (chain.loggedIn) await signOut();
+                setSignInMethodTab(tab);
+              }}
+              tabInfo={[
+                {
+                  key: 'web3',
+                  content: 'Web3',
+                  disabled: chain.connected && chain.loggedIn
+                },
+                {
+                  key: 'manual',
+                  content: 'Manual',
+                  disabled: chain.connected && chain.loggedIn
+                }
+              ]}
+            />
+          </div>
+          <br />
+          {signInMethodTab == 'manual' && <ManualDisplay verifyManually={verifyManually} />}
+          {signInMethodTab == 'web3' && (
+            <>
+              <div className="flex-center">
+                <Tabs
+                  type="underline"
+                  tab={web3SignInType}
+                  setTab={setWeb3SignInType}
+                  tabInfo={[
+                    {
+                      key: 'siwbb',
+                      content: 'Popup',
+                      disabled: chain.connected && chain.loggedIn
+                    },
+                    {
+                      key: 'insite',
+                      content: 'In-Site',
+                      disabled: chain.connected && chain.loggedIn
+                    }
+                  ]}
                 />
               </div>
-            )}
-            {signInMethodTab == 'web3' && web3SignInType == 'siwbb' && (
-              <SiwbbDisplay
+            </>
+          )}
+          {signInMethodTab == 'web3' && web3SignInType == 'insite' && (
+            <div className="flex-center flex-column">
+              <BlockinDisplay
+                verifyManually={verifyManually}
                 challengeParams={challengeParams}
-                verifyOptions={{ issuedAtTimeWindowMs: 5 * 60 * 1000, expectedChallengeParams }}
+                verifyOptions={{
+                  issuedAtTimeWindowMs: 5 * 60 * 1000, //5 minute "redeem" window
+                  expectedChallengeParams
+                }}
               />
-            )}
-            <br />
-            <br />
-            <br />
-            {signInMethodTab !== 'manual' && (
-              <>
-                <div className="flex-center flex-wrap">
-                  <SecretInfoButton />
-                  <SignTxInSiteButton signInMethodTab={signInMethodTab} web3SignInType={web3SignInType} />
-                  <BroadcastTxPopupButton signInMethodTab={signInMethodTab} />
-                </div>
-              </>
-            )}
-          </DisplayCard>
-        </div>
-        <div className="flex-center flex-wrap px-8" style={{ alignItems: 'normal' }}>
+            </div>
+          )}
+          {signInMethodTab == 'web3' && web3SignInType == 'siwbb' && (
+            <SiwbbDisplay
+              challengeParams={challengeParams}
+              verifyOptions={{ issuedAtTimeWindowMs: 5 * 60 * 1000, expectedChallengeParams }}
+            />
+          )}
+          <br />
+          <br />
+          <br />
+          {signInMethodTab !== 'manual' && (
+            <>
+              <div className="flex-center flex-wrap">
+                <SecretInfoButton />
+                <SignTxInSiteButton signInMethodTab={signInMethodTab} web3SignInType={web3SignInType} />
+                <BroadcastTxPopupButton signInMethodTab={signInMethodTab} />
+              </div>
+            </>
+          )}
+        </DisplayCard>
+      )
+    },
+    {
+      label: 'Fetch Balances',
+      node: (
+        <>
+          {' '}
           <DisplayCard
             title={
               <div className="flex-center">
                 <AddressDisplay addressOrUsername={vitalikAccount?.address ?? ''} fontSize={24} />
               </div>
             }
-            md={12}
+            md={24}
             xs={24}
             sm={24}
           >
@@ -276,90 +304,199 @@ const Home: NextPage = () => {
             </div>
             <DevMode obj={vitalikBalances} toShow={devMode} />
           </DisplayCard>
-          <DisplayCard title={`Collection ${exampleCollection?.collectionId}`} md={12} xs={24} sm={24}>
+        </>
+      )
+    },
+    {
+      label: 'Fetch Collections',
+      node: (
+        <>
+          <DisplayCard title={`Collection ${exampleCollection?.collectionId}`} md={24} xs={24} sm={24}>
             {exampleCollection && <MetadataDisplay collectionId={1n} />}
             <DevMode obj={exampleCollection?.getCollectionMetadata()} toShow={devMode} />
           </DisplayCard>
-        </div>
-        <div className="flex-center flex-wrap px-8" style={{ alignItems: 'normal' }}>
+        </>
+      )
+    },
+    {
+      label: 'API Authorization',
+      node: (
+        <>
+          {' '}
+          <DisplayCard
+            title={`API Authorization`}
+            subtitle={`To access authorized API endpoints, you can use this flow to have the user sign in and then use the generated token to access the API. 
+        Note this is different from SIWBB for the fact that this is for authorization (not authentication). Authentication is for authenticating users on your own site. The API authorization is for the user authorizing you to do stuff with the BitBadges API on their behalf.`}
+            md={24}
+            xs={24}
+            sm={24}
+          >
+            <div className="flex-center">
+              <button
+                className="landing-button m-2"
+                style={{ width: 200 }}
+                onClick={async () => {
+                  window.open(
+                    `https://bitbadges.io/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`,
+                    '_blank'
+                  );
+                }}
+              >
+                Authorize URL
+              </button>
+            </div>
+          </DisplayCard>{' '}
+        </>
+      )
+    },
+    {
+      label: 'Claim Distribution',
+      node: (
+        <>
+          <DisplayCard
+            title={'Claim Distribution'}
+            md={24}
+            xs={24}
+            sm={24}
+            subtitle="Distribute important claim details to users. If the criteria is met, you can redirect them
+      to the claim link on the BitBadges site."
+          >
+            <ClaimHelpers />
+          </DisplayCard>
+        </>
+      )
+    },
+    {
+      label: 'Claim Auto-Completion',
+      node: (
+        <>
           <DisplayCard
             title={'Claim Auto-Completion'}
-            md={12}
+            md={24}
             xs={24}
             sm={24}
             subtitle="Complete claims for your users either automatically or when they do something on your site. This can be used to distribute badges or other assets."
           >
-            <div className='flex-center'>
-            <button
-              className="landing-button m-2"
-              style={{ width: 200 }}
-              onClick={async () => {
-                notification.info({
-                  message: 'Auto-Claim',
-                  description: 'See the /autoclaim endpoint'
-                });
-              }}
-            >
-              Auto-Claim
-            </button></div>
+            <div className="flex-center">
+              <button
+                className="landing-button m-2"
+                style={{ width: 200 }}
+                onClick={async () => {
+                  notification.info({
+                    message: 'Auto-Claim',
+                    description: 'See the /autoclaim endpoint'
+                  });
+                }}
+              >
+                Auto-Claim
+              </button>
+            </div>
           </DisplayCard>
-          <DisplayCard
-            title={'Claim Distribution'}
-            md={12}
-            xs={24}
-            sm={24}
-            subtitle="Distribute important claim details to users. If the criteria is met, you can redirect them
-            to the claim link on the BitBadges site."
-          >
-            <ClaimHelpers />
-          </DisplayCard>
+        </>
+      )
+    },
+    {
+      label: 'Host Off-Chain Balances',
+      node: (
+        <>
+          {' '}
           <DisplayCard
             title={`Host Off-Chain Balances`}
-            md={12}
+            md={24}
             xs={24}
             sm={24}
             subtitle="Self-host the balances for your collection via your backend. The URL is set in the core collection details on-chain and is used to fetch the balances."
           >
             <SelfHostBalances devMode={devMode} />
           </DisplayCard>
-
+        </>
+      )
+    },
+    {
+      label: 'Secrets',
+      node: (
+        <>
+          {' '}
           <DisplayCard
             title={`Secrets`}
             subtitle={
               'BitBadges offers a verifiable secrets feature to allow users to prove sensitive information to a verifier. These can be created and stored via BitBadges and accessed through the SIWBB flow, or you can provide a custom implementation (they are just message signatures).'
             }
-            md={12}
+            md={24}
             xs={24}
             sm={24}
           >
             <VerifySecrets devMode={devMode} />
           </DisplayCard>
+        </>
+      )
+    },
+    {
+      label: 'Custom Plugins',
+      node: (
+        <>
           <DisplayCard
-            title={`API Authorization`}
-            subtitle={
-              `To access authorized API endpoints, you can use this flow to have the user sign in and then use the generated token to access the API. 
-              Note this is different from SIWBB for the fact that this is for authorization (not authentication). Authentication is for authenticating users on your own site. The API authorization is for the user authorizing you to do stuff with the BitBadges API on their behalf.`
-            }
-            md={12}
+            title={`Custom Plugins`}
+            subtitle={`To create a custom plugin, you need to setup a frontend (if needed) and a backend plugin handler. `}
+            md={24}
             xs={24}
             sm={24}
           >
-            <div className='flex-center'>
-            <button
-              className="landing-button m-2"
-              style={{ width: 200 }}
-              onClick={async () => {
-
-                window.open(
-                  `https://bitbadges.io/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`,
-                  '_blank'
-                );
-              }}
-            >
-              Authorize URL
-            </button></div>
+            <div className="flex-center">
+              <button
+                className="landing-button m-2"
+                style={{ width: 200 }}
+                onClick={async () => {
+                  router.push('/plugin-frontend');
+                }}
+              >
+                Frontend Example
+              </button>{' '}
+              <button
+                className="landing-button m-2"
+                style={{ width: 200 }}
+                onClick={async () => {
+                  notification.info({
+                    message: 'Backend Example',
+                    description: 'See the /plugin-backend endpoint'
+                  });
+                }}
+              >
+                Backend Example
+              </button>
+            </div>
           </DisplayCard>
+        </>
+      )
+    }
+  ];
+
+  return (
+    <>
+      <Header setDevMode={setDevMode} devMode={devMode} />
+
+      <div>
+        <div className="px-8">
+          <div className="md:flex">
+            <ul className="flex-column space-y space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400 md:me-4 mb-4 md:mb-0">
+              {navTabs.map((tab, index) => (
+                <Tab
+                  key={index}
+                  label={tab.label}
+                  onClick={() => {
+                    setCurrTab(tab.label);
+                  }}
+                  active={currTab === tab.label ? 'active' : ''}
+                />
+              ))}
+            </ul>
+            <div className="text-medium text-gray-500 dark:text-gray-400 w-full">
+              {navTabs.find((tab) => tab.label === currTab)?.node}
+            </div>
+          </div>
         </div>
+        <div className="flex-center flex-wrap px-8" style={{ alignItems: 'normal' }}></div>
+        <div className="flex-center flex-wrap px-8" style={{ alignItems: 'normal' }}></div>
       </div>
     </>
   );

@@ -76,7 +76,7 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
     //If we are within  ~1000 chars limit, we can have user sign the typed EIP712
     //Else, we hash the JSON and have user sign the hash
 
-    const normalMessage = payload.jsonToSign.length < 1000;
+    const normalMessage = false;
     let sig = '';
     if (normalMessage) {
       if (!simulate) {
@@ -89,13 +89,7 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
       }
     } else {
       if (!simulate) {
-        notification.warn({
-          message: 'Alternative Method',
-          description: `This transaction message is very large, so we must resort to an alternative method of signing (JSON). 
-          The transaction may be displayed in a different format than you are used to.`
-        });
-
-        const message = payload.jsonToSign;
+        const message = payload.humanReadableMessage;
         sig = await signMessage({
           message: message
         });

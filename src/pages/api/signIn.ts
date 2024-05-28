@@ -30,7 +30,7 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     };
 
-    const authCodeRes = await BitBadgesApi.getAuthCode({
+    const authCodeRes = await BitBadgesApi.getAndVerifySIWBBRequest({
       code,
       options: verifyOptions,
       clientId: CLIENT_ID,

@@ -82,7 +82,7 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
 
     let sig = '';
     if (!simulate) {
-      const message = payload.jsonToSign;
+      const message = payload.humanReadableMessage;
       const encodedMessage = new TextEncoder().encode(message);
       const signedMessage = await bitcoinProvider.signMessage(address, encodedMessage);
 
@@ -90,7 +90,8 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
       sig = Buffer.from(base64Sig, 'base64').toString('hex');
     }
 
-    return createTxBroadcastBody(context, payload, sig);
+    const txBody = createTxBroadcastBody(context, payload, sig);
+    return txBody;
   };
 
   const getPublicKey = async () => {

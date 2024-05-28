@@ -3,8 +3,8 @@ import { BitBadgesApi } from './bitbadges-api';
 
 const handleApiCallback = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    //Allow preflight requests (CORS)
-    if(req.method === 'OPTIONS') {
+    //TODO: This is just for development purposes. In production, you should handle with a more secure way.
+    if (req.method === 'OPTIONS') {
       res.setHeader('Access-Control-Allow-Origin', '*');
 
       return res.status(200).json({});
@@ -17,7 +17,7 @@ const handleApiCallback = async (req: NextApiRequest, res: NextApiResponse) => {
 
     //Check state (if applicable)
 
-    const doc = await BitBadgesApi.exchangeForAccessToken({
+    const doc = await BitBadgesApi.getOauthAccessToken({
       code: code as string,
       redirect_uri: 'http://localhost:3002/api/apiauth',
       client_id: process.env.CLIENT_ID as string,
@@ -28,7 +28,7 @@ const handleApiCallback = async (req: NextApiRequest, res: NextApiResponse) => {
     BitBadgesApi.setAccessToken(doc.accessToken);
 
     //TODO: Can also store the refresh token for future use
-    //  const newDoc = await BitBadgesApi.exchangeForAccessToken({
+    //  const newDoc = await BitBadgesApi.getOauthAccessToken({
     //     refresh_token: doc.refreshToken,
     //     redirect_uri: process.env.REDIRECT_URI as string,
     //     client_id: process.env.CLIENT_ID as string,

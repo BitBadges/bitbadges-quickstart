@@ -133,7 +133,7 @@ export const VerifySecrets = ({ devMode }: { devMode?: boolean }) => {
 
         <div className="flex-center">
           <button
-            className="blockin-button mt-8"
+            className="landing-button mt-8"
             onClick={async () => {
               window.open('https://bitbadges.io/secrets/create', '_blank');
             }}
@@ -141,7 +141,7 @@ export const VerifySecrets = ({ devMode }: { devMode?: boolean }) => {
             Create
           </button>
           <button
-            className="blockin-button mt-8"
+            className="landing-button mt-8"
             disabled={!secretProof}
             onClick={async () => {
               if (!secretProof) return;
