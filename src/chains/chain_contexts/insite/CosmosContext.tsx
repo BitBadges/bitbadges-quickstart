@@ -1,5 +1,4 @@
 import { BaseDefaultChainContext } from '@/chains/utils';
-import { verifyADR36Amino } from '@keplr-wallet/cosmos';
 import { AccountData, Window as KeplrWindow } from '@keplr-wallet/types';
 import {
   BitBadgesKeplrSuggestBetanetChainInfo,
@@ -53,23 +52,6 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
     let sig = await window.keplr?.signArbitrary('bitbadges_1-2', cosmosAddress, message);
 
     if (!sig) sig = { signature: '', pub_key: { type: '', value: '' } };
-
-    const signatureBuffer = Buffer.from(sig.signature, 'base64');
-    const uint8Signature = new Uint8Array(signatureBuffer); // Convert the buffer to an Uint8Array
-    const pubKeyValueBuffer = Buffer.from(sig.pub_key.value, 'base64'); // Decode the base64 encoded value
-    const pubKeyUint8Array = new Uint8Array(pubKeyValueBuffer); // Convert the buffer to an Uint8Array
-
-    const isRecovered = verifyADR36Amino(
-      'cosmos',
-      cosmosAddress,
-      message,
-      pubKeyUint8Array,
-      uint8Signature,
-      'secp256k1'
-    );
-    if (!isRecovered) {
-      throw new Error('Signature verification failed');
-    }
 
     return {
       message: message,

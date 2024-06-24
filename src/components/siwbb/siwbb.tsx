@@ -1,40 +1,35 @@
 import { signOut } from '@/chains/backend_connectors';
 import { useChainContext } from '@/chains/chain_contexts/ChainContext';
-import { CodeGenQueryParams, NumberType } from 'bitbadgesjs-sdk';
-import { ChallengeParams, VerifyChallengeOptions } from 'blockin';
-import { SignInWithBitBadgesButton } from 'blockin/dist/ui';
+import { CodeGenQueryParams, NumberType, generateBitBadgesAuthUrl } from 'bitbadgesjs-sdk';
+import { AssetConditionGroup } from 'blockin';
 import { AddressDisplay } from '../address/AddressDisplay';
 
-export const SiwbbDisplay = ({
-  challengeParams,
-  verifyOptions
-}: {
-  challengeParams: ChallengeParams<NumberType>;
-  verifyOptions?: VerifyChallengeOptions;
-}) => {
+const buttonStyle = {
+  width: 250,
+  backgroundColor: 'black',
+  fontSize: 14,
+  fontWeight: 600,
+  color: 'white'
+};
+
+
+export const SiwbbDisplay = ({ ownershipRequirements }: { ownershipRequirements: AssetConditionGroup<NumberType> }) => {
   const chain = useChainContext();
-  const buttonStyle = {
-    backgroundColor: 'black',
-    fontSize: 14,
-    fontWeight: 600,
-    color: 'white'
-  };
 
   //TODO: Customize your popup parameters. See the documentation for more details.
   const popupParams: CodeGenQueryParams = {
+    // You can also remove these and we will just display your apps metadata
     name: 'Website Sign In',
     description: 'To gain access to premium features, please sign in.',
     image: 'https://bitbadges-ipfs.infura-ipfs.io/ipfs/QmPfdaLWBUxH6ZrWmX1t7zf6zDiNdyZomafBqY5V5Lgwvj',
-    challengeParams: challengeParams,
-    allowAddressSelect: true,
-    autoGenerateNonce: false,
-    verifyOptions: verifyOptions,
+
+    ownershipRequirements: ownershipRequirements,
     expectVerifySuccess: true,
-    expectSecretsPresentations: false,
-    clientId: 'a0582508118a4cd336f088b6aaced919978d23a4e38a41769d92c734007d7e82', //TODO: Add your client ID here
-    // redirectUri: 'http://localhost:3002/api/signIn', //TODO: Add your redirect URI here (if applicable) or undefined (if not applicable)
+    expectAttestationsPresentations: false,
+    client_id: '96717e00431a5e5e32a7721ff777805ba5d060d83d1978a9ed3a8b94c78b5c4f', //TODO: Add your client ID here
+    redirect_uri: 'http://localhost:3002/api/signIn', //TODO: Add your redirect URI here (if applicable) or undefined (if not applicable and using QR codes)
     //state: '',
-    redirectUri: undefined,
+    //scope: '',
     otherSignIns: [] //['discord', 'twitter']
   };
 
@@ -54,7 +49,9 @@ export const SiwbbDisplay = ({
                 }}
                 style={buttonStyle}
               >
+                <div className="flex items-center justify-center hover:opacity-80 bg-gray-800 p-4 rounded-lg">
                 Sign Out
+                </div>
               </button>
             </div>
             <br />
@@ -64,7 +61,23 @@ export const SiwbbDisplay = ({
         ) : (
           <>
             <br />
-            <SignInWithBitBadgesButton popupParams={popupParams} />
+            <button
+              className="blockin-button"
+              onClick={() => {
+                const authUrl = generateBitBadgesAuthUrl(popupParams);
+                window.location.href = authUrl;
+              }}
+              style={buttonStyle}
+            >
+              <div className="flex items-center justify-center hover:opacity-80 bg-gray-800 p-4 rounded-lg">
+                    Sign In with{' '}
+                    <img
+                        src="https://bitbadges.io/images/bitbadgeslogotext.png"
+                        style={{ height: 20, marginLeft: 5 }}
+                        alt="BitBadges"
+                    />
+                </div>
+            </button>
           </>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { VerifyChallengeOptions } from 'blockin';
+import { VerifySIWBBOptions } from 'bitbadgesjs-sdk';
 import cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BitBadgesApi } from './bitbadges-api';
@@ -15,31 +15,27 @@ const REDIRECT_URI = process.env.REDIRECT_URI ?? '';
 //This example uses session cookies to store the user's session.
 //IMPORTANT: pre-requisite is that you have already verified the message and signature using the blockin library.
 const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
-  //Parse the code and state from the query parameters
   const code = req.query.code as string;
   // const state = req.query.state as string; (if applicable, state can be passed via the redirect from the original sign-in request)
 
   try {
-    //TODO: This step is critical. See BitBadges documentation for more details.
-    const verifyOptions: VerifyChallengeOptions = {
-      expectedChallengeParams: {
-        // domain: ''
-        // uri: ''
-        // nonce: '',
-        // resources: [],
-      }
+    //This step is critical. See BitBadges documentation for more details.
+    //You need to verify the sign in request is as intended and not tampered with.
+    const verifyOptions: VerifySIWBBOptions = {
+      // TODO: Configure
     };
 
-    const authCodeRes = await BitBadgesApi.getAndVerifySIWBBRequest({
+    const authCodeRes = await BitBadgesApi.exchangeSIWBBAuthorizationCode({
       code,
       options: verifyOptions,
-      clientId: CLIENT_ID,
-      clientSecret: CLIENT_SECRET,
-      redirectUri: REDIRECT_URI
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      redirect_uri: REDIRECT_URI,
+      grant_type: 'authorization_code'
     });
-    const blockinChallenge = authCodeRes.blockin;
+    const blockinChallenge = authCodeRes;
 
-    const { params, verificationResponse } = blockinChallenge;
+    const { verificationResponse } = blockinChallenge;
     if (!verificationResponse?.success) {
       return res
         .status(400)
@@ -56,17 +52,13 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
     //See src/components/secrets/secrets.tsx for an example of how to verify secrets proofs.
     //It is also important to prevent replay attacks or flash ownership attacks (https://blockin.gitbook.io/blockin/developer-docs/core-concepts).
 
-    if (!params.expirationDate) {
-      return res.status(400).json({
-        success: false,
-        errorMessage: 'This sign-in does not have an expiration timestamp'
-      });
-    }
-
+    //TODO: This is not a production-ready example. You should implement your own session management and security measures.
     // Create the session cookie data
     const sessionData = {
-      params: params,
-      siwbb: true
+      siwbb: true,
+      params: {
+        address: blockinChallenge.address,
+      }
     };
 
     // Set the session cookie
@@ -74,7 +66,6 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
       'Set-Cookie',
       cookie.serialize('session', JSON.stringify(sessionData), {
         httpOnly: true, // Make the cookie accessible only via HTTP (not JavaScript)
-        expires: new Date(params.expirationDate), //Uses the expiration date set in the challenge
         path: '/', // Set the cookie path to '/'
         sameSite: 'strict', // Specify the SameSite attribute for security
         secure: process.env.NODE_ENV === 'production' // Ensure the cookie is secure in production

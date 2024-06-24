@@ -17,7 +17,7 @@ const handleApiCallback = async (req: NextApiRequest, res: NextApiResponse) => {
 
     //Check state (if applicable)
 
-    const doc = await BitBadgesApi.getOauthAccessToken({
+    const doc = await BitBadgesApi.exchangeSIWBBAuthorizationCode({
       code: code as string,
       redirect_uri: 'http://localhost:3002/api/apiauth',
       client_id: process.env.CLIENT_ID as string,
@@ -25,7 +25,8 @@ const handleApiCallback = async (req: NextApiRequest, res: NextApiResponse) => {
       grant_type: 'authorization_code'
     });
 
-    BitBadgesApi.setAccessToken(doc.accessToken);
+    BitBadgesApi.setAccessToken(doc.access_token);
+    // const { access_token_expires_at, refresh_token, refresh_token_expires at } = doc;
 
     //TODO: Can also store the refresh token for future use
     //  const newDoc = await BitBadgesApi.getOauthAccessToken({

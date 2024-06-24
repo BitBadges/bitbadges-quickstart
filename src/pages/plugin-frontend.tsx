@@ -8,7 +8,6 @@ const FRONTEND_URL = 'https://bitbadges.io';
 const { Content } = Layout;
 
 function PluginTestScreen() {
-  
   const [customBody, setCustomBody] = useState<object>({
     testData: 'testData'
   });

@@ -1,15 +1,15 @@
 import {
   BigIntify,
   NumberType,
-  SecretsProof,
-  iSecretsProof,
-  verifySecretsPresentationSignatures
+  AttestationsProof,
+  iAttestationsProof,
+  verifyAttestationsPresentationSignatures
 } from 'bitbadgesjs-sdk';
 import { useState } from 'react';
 import { DevMode } from '../DevMode';
 import { Tabs } from '../display/Tabs';
 
-const standardExample: iSecretsProof<NumberType> = {
+const standardExample: iAttestationsProof<NumberType> = {
   createdBy: 'cosmos1zd5dsage58jfrgmsu377pk6w0q5zhc67fn4gsl',
   scheme: 'standard',
   dataIntegrityProof: {
@@ -18,7 +18,7 @@ const standardExample: iSecretsProof<NumberType> = {
       '877cca561369458ac00a1cbfbf2087dcbad32e881b170287b54ae8a94490e1f5ff1e4e1ef3b13c31b20c1e0bcc09b7f4665958ba7c68f1d11f7974a395445e0d',
     publicKey: 'NP8pWIQxnGVJgE6NsmyTafmXksOqfWx8bJRnf6YhDWQ='
   },
-  secretMessages: ['Test message'],
+  attestationMessages: ['Test message'],
   name: 'Standard Proof',
   description: 'This is a standard proof signed by a antive address',
   image: 'ipfs://QmbG3PyyQyZTzdTBANxb3sA8zC37VgXndJhndXSBf7Sr4o',
@@ -37,14 +37,15 @@ const standardExample: iSecretsProof<NumberType> = {
     signer: '',
     signature: '',
     publicKey: ''
-  }
+  },
+  createdAt: '1713623125359'
 };
 
-const bbsExample: iSecretsProof<NumberType> = {
+const bbsExample: iAttestationsProof<NumberType> = {
   createdBy: 'cosmos1zd5dsage58jfrgmsu377pk6w0q5zhc67fn4gsl',
   scheme: 'bbs',
   messageFormat: 'plaintext',
-  secretMessages: ['asdfasfdasdfadsf'],
+  attestationMessages: ['asdfasfdasdfadsf'],
   dataIntegrityProof: {
     signature:
       '0001018d260ab0a25d52e82454ad45a0198eb7dc3bd625f1dcbe582bd9a7ae8b7d602b4854795c06f3b518cabcaed61ceb1ad2a1f79282f51e44717899ce62158947717eba690d9beff229391cf312caa6177a820515294300684c59573c0e63b1856c865691ca4a3b63a321efb7c2b698fea16dcf4098ae68d30287c35348a13ea3eaf432ab615dfd50e5a13e50ea40496e7d000000749853d27c3af8550e7a8bcaab21af5856e313e6b2d2c59d3a50e485a01d7b6edaf6de44f9329204005aa9ec3ece237a250000000261311b5146edf02dfe1e71e92cf5d0a2a6b481f0e9b029d4c0adce33634391201e122a5c14ffaf6b1ababc4ae05bd33ad9688285a7f5099d507645999a91e7388484250a61e93fb5cefe4d3a982a66542e2d2c4f289edf993363a9244fe5d4b21a5646a966c1fb4893a5980906aa55b700000002593b2ca671b7e4b04a93e4a6564a80605cf208d2eef4957e80153ee9e403caea6aadf0250cef0428ba88bb604c0efae104a546c36b96ddcadeefaca7129ce6fc',
@@ -77,20 +78,21 @@ const bbsExample: iSecretsProof<NumberType> = {
       timestamp: '1713618192610'
     }
   ],
-  anchors: []
+  anchors: [],
+  createdAt: '1713618192610'
 };
 
 export const VerifySecrets = ({ devMode }: { devMode?: boolean }) => {
-  const [secretProof, setSecretProof] = useState<iSecretsProof<bigint> | null>(
-    new SecretsProof(bbsExample).convert(BigIntify)
+  const [secretProof, setSecretProof] = useState<iAttestationsProof<bigint> | null>(
+    new AttestationsProof(bbsExample).convert(BigIntify)
   );
 
   const [verified, setVerified] = useState<boolean | null>(null);
 
-  const verifyProof = async (proof: iSecretsProof<bigint>) => {
+  const verifyProof = async (proof: iAttestationsProof<bigint>) => {
     if (!proof) return;
 
-    await verifySecretsPresentationSignatures(proof, true);
+    await verifyAttestationsPresentationSignatures(proof, true);
 
     //TODO: Once you are here, the proofs are well-formed from a cryptographic perspective.
     //In other words, proof.createdBy issued the secret and the secret is well-formed with data integrity
@@ -107,8 +109,8 @@ export const VerifySecrets = ({ devMode }: { devMode?: boolean }) => {
           setTab={(tab) => {
             setSecretProof(
               tab === 'bbs'
-                ? new SecretsProof(bbsExample).convert(BigIntify)
-                : new SecretsProof(standardExample).convert(BigIntify)
+                ? new AttestationsProof(bbsExample).convert(BigIntify)
+                : new AttestationsProof(standardExample).convert(BigIntify)
             );
             setVerified(null);
           }}
