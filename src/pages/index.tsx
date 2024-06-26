@@ -155,7 +155,7 @@ const Home: NextPage = () => {
             xs={24}
             sm={24}
           >
-            <div className="text-center">{vitalikAccount?.balance?.amount.toString()} $BADGE</div>
+            <div className="text-center">{(BigInt(vitalikAccount?.balance?.amount ?? 0) / BigInt(1e9)).toString()} $BADGE</div>
             {firstEthTxCollection && <MetadataDisplay collectionId={16n} />}
             <br />
             <div className="flex-center">Collection {16} Balances</div>

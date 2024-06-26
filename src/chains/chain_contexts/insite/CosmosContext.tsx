@@ -49,7 +49,7 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
   };
 
   const signChallenge = async (message: string) => {
-    let sig = await window.keplr?.signArbitrary('bitbadges_1-2', cosmosAddress, message);
+    let sig = await window.keplr?.signArbitrary('bitbadges_1-1', cosmosAddress, message);
 
     if (!sig) sig = { signature: '', pub_key: { type: '', value: '' } };
 
