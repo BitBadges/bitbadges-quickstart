@@ -5,7 +5,7 @@ import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { BaseDefaultChainContext } from '@/chains/utils';
 import { notification } from 'antd';
 import { TransactionPayload, TxContext, convertToCosmosAddress, createTxBroadcastBody } from 'bitbadgesjs-sdk';
-import { ethers } from 'ethers';
+import { SigningKey, getBytes, hashMessage } from 'ethers';
 import { createContext, useContext } from 'react';
 import { useAccount as useWeb3Account } from 'wagmi';
 import { useAccount, useAccountsContext } from '../AccountsContext';
@@ -54,9 +54,9 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
       message: message
     });
 
-    const msgHash = ethers.utils.hashMessage(message);
-    const msgHashBytes = ethers.utils.arrayify(msgHash);
-    const pubKey = ethers.utils.recoverPublicKey(msgHashBytes, sign);
+    const msgHash = hashMessage(message);
+    const msgHashBytes = getBytes(msgHash);
+    const pubKey = SigningKey.recoverPublicKey(msgHashBytes, sign);
 
     const pubKeyHex = pubKey.substring(2);
     const compressedPublicKey = Secp256k1.compressPubkey(new Uint8Array(Buffer.from(pubKeyHex, 'hex')));
@@ -116,9 +116,9 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
 
       const sig = await signMessage({ message });
 
-      const msgHash = ethers.utils.hashMessage(message);
-      const msgHashBytes = ethers.utils.arrayify(msgHash);
-      const pubKey = ethers.utils.recoverPublicKey(msgHashBytes, sig);
+      const msgHash = hashMessage(message);
+      const msgHashBytes = getBytes(msgHash);
+      const pubKey = SigningKey.recoverPublicKey(msgHashBytes, sig);
 
       const pubKeyHex = pubKey.substring(2);
       const compressedPublicKey = Secp256k1.compressPubkey(new Uint8Array(Buffer.from(pubKeyHex, 'hex')));

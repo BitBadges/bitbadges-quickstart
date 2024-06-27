@@ -12,7 +12,6 @@ const buttonStyle = {
   color: 'white'
 };
 
-
 export const SiwbbDisplay = ({ ownershipRequirements }: { ownershipRequirements: AssetConditionGroup<NumberType> }) => {
   const chain = useChainContext();
 
@@ -50,7 +49,7 @@ export const SiwbbDisplay = ({ ownershipRequirements }: { ownershipRequirements:
                 style={buttonStyle}
               >
                 <div className="flex items-center justify-center hover:opacity-80 bg-gray-800 p-4 rounded-lg">
-                Sign Out
+                  Sign Out
                 </div>
               </button>
             </div>
@@ -70,13 +69,13 @@ export const SiwbbDisplay = ({ ownershipRequirements }: { ownershipRequirements:
               style={buttonStyle}
             >
               <div className="flex items-center justify-center hover:opacity-80 bg-gray-800 p-4 rounded-lg">
-                    Sign In with{' '}
-                    <img
-                        src="https://bitbadges.io/images/bitbadgeslogotext.png"
-                        style={{ height: 20, marginLeft: 5 }}
-                        alt="BitBadges"
-                    />
-                </div>
+                Sign In with{' '}
+                <img
+                  src="https://bitbadges.io/images/bitbadgeslogotext.png"
+                  style={{ height: 20, marginLeft: 5 }}
+                  alt="BitBadges"
+                />
+              </div>
             </button>
           </>
         )}

@@ -57,7 +57,7 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
     const sessionData = {
       siwbb: true,
       params: {
-        address: blockinChallenge.address,
+        address: blockinChallenge.address
       }
     };
 

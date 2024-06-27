@@ -1,17 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { BitBadgesApi } from './bitbadges-api';
+// import { BitBadgesApi } from './bitbadges-api';
 
-const handleApiCallback = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleAutoClaim = async (_req: NextApiRequest, res: NextApiResponse) => {
   try {
-    const claimId = ''; //TODO: Your claim ID here
-    const cosmosAddress = ''; //TODO: Your Cosmos address here
+    //TODO: See here for documentation: https://docs.bitbadges.io/for-developers/claim-builder/auto-complete-claims-w-bitbadges-api
 
-    const claimRes = await BitBadgesApi.completeClaim(claimId, cosmosAddress, req.body);
-    const { claimAttemptId } = claimRes;
-
-    //TODO: Handle the ID as needed. It may take a couple of seconds to be processed.
-    const status = await BitBadgesApi.getClaimAttemptStatus(claimAttemptId);
-    console.log(status);
+    // When creating your claim on the BitBadges site, go to the API Code tab, and you will see the API code for your claim.
+    // Your BitBadgesApi instance is setup in the bitbadges-api.ts file, so you can use it here to make the API call.
 
     return res.status(200).json({});
   } catch (err) {
@@ -19,4 +14,4 @@ const handleApiCallback = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default handleApiCallback;
+export default handleAutoClaim;
