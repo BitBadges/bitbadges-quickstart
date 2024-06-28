@@ -7,7 +7,6 @@ import { BalanceDisplay } from '@/components/display/BalanceDisplay';
 import { DisplayCard } from '@/components/display/DisplayCard';
 import { MetadataDisplay } from '@/components/display/MetadataDisplay';
 import { ClaimHelpers } from '@/components/distribute.tsx';
-import { VerifySecrets } from '@/components/secrets/secrets';
 import { SelfHostBalances } from '@/components/selfHostBalances';
 import { SiwbbDisplay } from '@/components/siwbb/siwbb';
 import { notification } from 'antd';
@@ -244,31 +243,12 @@ const Home: NextPage = () => {
       )
     },
     {
-      label: 'Secrets',
-      node: (
-        <>
-          {' '}
-          <DisplayCard
-            title={`Secrets`}
-            subtitle={
-              'BitBadges offers a verifiable secrets feature to allow users to prove sensitive information to a verifier. These can be created and stored via BitBadges and accessed through the SIWBB flow, or you can provide a custom implementation (they are just message signatures).'
-            }
-            md={24}
-            xs={24}
-            sm={24}
-          >
-            <VerifySecrets devMode={devMode} />
-          </DisplayCard>
-        </>
-      )
-    },
-    {
       label: 'Custom Plugins',
       node: (
         <>
           <DisplayCard
             title={`Custom Plugins`}
-            subtitle={`To create a custom plugin, you need to setup a frontend (if needed) and a backend plugin handler. `}
+            subtitle={`For custom plugins, we refer you to the plugin quickstart repository.`}
             md={24}
             xs={24}
             sm={24}
@@ -278,31 +258,10 @@ const Home: NextPage = () => {
                 className="landing-button m-2"
                 style={{ width: 200 }}
                 onClick={async () => {
-                  router.push('/plugin-frontend');
+                  window.open('https://docs.bitbadges.io/for-developers/claim-builder/plugins/creating-a-custom-plugin', '_blank');
                 }}
               >
-                Frontend Example
-              </button>{' '}
-              <button
-                className="landing-button m-2"
-                style={{ width: 200 }}
-                onClick={async () => {
-                  notification.info({
-                    message: 'Backend Example',
-                    description: 'See the /plugin-backend endpoint'
-                  });
-                }}
-              >
-                Backend Example
-              </button>
-              <button
-                className="landing-button m-2"
-                style={{ width: 200 }}
-                onClick={async () => {
-                  window.open('https://bitbadges.io/developer', '_blank');
-                }}
-              >
-                Developer Portal
+                Custom Plugin Docs
               </button>
             </div>
           </DisplayCard>
