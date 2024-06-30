@@ -1,7 +1,24 @@
+import { notification, Typography } from 'antd';
 import { useState } from 'react';
 
 export const ClaimHelpers = () => {
-  const [passwordIsVisible, setPasswordIsVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  const [fetchedCode, setFetchedCode] = useState('');
+
+  const fetchCode = async () => {
+    await fetch('/api/checkCriteria')
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setFetchedCode(data.code);
+      });
+
+    notification.success({
+      message: 'Code Fetched',
+      description: 'Code has been fetched successfully. See the /api/checkCriteria.ts file for more details.'
+    });
+  };
 
   return (
     <>
@@ -9,40 +26,35 @@ export const ClaimHelpers = () => {
       <div className="flex-center">
         <button
           className="landing-button"
-          onClick={() => setPasswordIsVisible(!passwordIsVisible)}
+          onClick={() => {
+            if (!visible) fetchCode();
+            setVisible(!visible);
+          }}
           style={{ width: 200 }}
         >
-          {passwordIsVisible ? 'Hide' : 'Check Something'}
+          {visible ? 'Hide' : 'Check Criteria'}
         </button>
       </div>
       <br />
-      {/* TODO: You will need to store the password and/or codes somewhere. */}
-      {passwordIsVisible && (
+      {visible && (
         <>
           <div className="text-center">
-            Password: abc123
-            <br />
-            Code: 123456
+            Code:{' '}
+            <Typography.Text className="primary-text" copyable>
+              {fetchedCode}
+            </Typography.Text>
           </div>
           <div className="text-center">
             <a
-              href="https://bitbadges.io/collections/ADD_COLLECTION_ID_HERE?approvalId=APPROVAL_ID&code=CODE"
+              href={`https://bitbadges.io/collections/ADD_COLLECTION_ID_HERE?claimId=CLAIM_ID&code=${fetchedCode}`} //You can also do this with a password=abc123 for the password plugin
               target="_blank"
               rel="noreferrer"
             >
-              Code Claim Link
-            </a>
-            <br />
-            <a
-              href="https://bitbadges.io/collections/ADD_COLLECTION_ID_HERE?approvalId=APPROVAL_ID&password=PASSWORD"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Password Claim Link
+              Claim Link
             </a>
           </div>
           <div className="text-center">
-            <a href="https://bitbadges.io/saveforlater?value=abc123" target="_blank" rel="noreferrer">
+            <a href={`https://bitbadges.io/saveforlater?value=${fetchedCode}`} target="_blank" rel="noreferrer">
               Save for Later Link
             </a>
           </div>

@@ -12,7 +12,6 @@ import { SiwbbDisplay } from '@/components/siwbb/siwbb';
 import { notification } from 'antd';
 import { BitBadgesCollection, BitBadgesUserInfo, NumberType, UintRange } from 'bitbadgesjs-sdk';
 import { AssetConditionGroup } from 'blockin';
-import { useRouter } from 'next/router';
 import { NextPage } from 'next/types';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { getPrivateInfo } from '../chains/backend_connectors';
@@ -31,8 +30,6 @@ BigInt.prototype.toJSON = function () {
 
 const Home: NextPage = () => {
   //Chain Contexts
-  const router = useRouter();
-
   const [currTab, setCurrTab] = useState('Sign In with BitBadges');
   const [devMode, setDevMode] = useState(false);
 
@@ -48,6 +45,8 @@ const Home: NextPage = () => {
   const vitalikBalances = useMemo(() => {
     return vitalikAccount?.collected.find((collected) => collected.collectionId === 16n)?.balances ?? [];
   }, [vitalikAccount]);
+
+  const [preferredDarkMode, setPreferredDarkMode] = useState(false);
 
   useEffect(() => {
     async function fetch() {
@@ -81,6 +80,11 @@ const Home: NextPage = () => {
       await vitalikAccount.fetchBadgeBalances(BitBadgesApi, 16n);
 
       setAccounts([vitalikAccount]);
+
+      await BitBadgesApi.getMaps({ mapIds: ['Dark Mode Protocol'] }).then((res) => {
+        const map = res.maps[0];
+        setPreferredDarkMode(!!map.values?.[vitalikAccount.cosmosAddress]);
+      });
     }
     fetch();
   }, []);
@@ -168,6 +172,7 @@ const Home: NextPage = () => {
         </>
       )
     },
+
     {
       label: 'Fetch Collections',
       node: (
@@ -180,16 +185,34 @@ const Home: NextPage = () => {
       )
     },
     {
-      label: 'Claim Distribution',
+      label: 'Fetch Map / Protocol Information',
       node: (
         <>
           <DisplayCard
-            title={'Claim Distribution'}
+            title={`Protocol Information`}
+            subtitle={`Fetch information from a map or protocol. This example fetches the Dark Mode Protocol map.`}
             md={24}
             xs={24}
             sm={24}
-            subtitle="Distribute important claim details to users. If the criteria is met, you can redirect them
-      to the claim link on the BitBadges site."
+          >
+            <div className="flex-center">
+              <AddressDisplay addressOrUsername={vitalikAccount?.address ?? ''} />
+            </div>
+            <div className="text-center">{preferredDarkMode ? 'Prefers Dark Mode' : 'Prefers Light Mode'}</div>
+          </DisplayCard>
+        </>
+      )
+    },
+    {
+      label: 'Claim Code Distribution',
+      node: (
+        <>
+          <DisplayCard
+            title={'Claim Code Distribution'}
+            md={24}
+            xs={24}
+            sm={24}
+            subtitle="Distribute important claim details to users. If the criteria is met, you can redirect them to the claim link on the BitBadges site. This example uses codes, but it can be any criteria."
           >
             <ClaimHelpers />
           </DisplayCard>
@@ -258,7 +281,10 @@ const Home: NextPage = () => {
                 className="landing-button m-2"
                 style={{ width: 200 }}
                 onClick={async () => {
-                  window.open('https://docs.bitbadges.io/for-developers/claim-builder/plugins/creating-a-custom-plugin', '_blank');
+                  window.open(
+                    'https://docs.bitbadges.io/for-developers/claim-builder/plugins/creating-a-custom-plugin',
+                    '_blank'
+                  );
                 }}
               >
                 Custom Plugin Docs

@@ -2,7 +2,7 @@
 
 Welcome to the BitBadges Quickstart Repo!
 
-This site gets you started with developing on top of BitBadges. To run it locally, visit the GitHub source code. To see a live version, visit the live quickstart site. Some tools can function without running the site locally, whereas others may require running the site locally. The code for this site was forked from the official BitBadges Frontend repository and pruned. Feel free to use that repository as a reference or copy code from it. There may be a lot of useful components or patterns in there, not all of which are used in this quickstart.
+This site gets you started with developing on top of BitBadges. The code for this site was forked from the official BitBadges Frontend repository and pruned. Feel free to use that repository as a reference or copy code from it. There may be a lot of useful components or patterns in there, not all of which are used in this quickstart.
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). It is a starting point, not a production-ready site. You will need to implement your own logic for many parts of the site.
 
@@ -45,39 +45,6 @@ Feel free to reach out to the BitBadges team for help and support. You can reach
 ## Tracking Observations
 
 It would also be great if you could track your experiences with the repo and provide feedback. What was easy to understand? What was difficult? What was missing? What would you like to see in the future? This will help us improve the quickstart repo and make it more useful for other developers in the future.
-
-# Authentication
-
-This site implements multiple ways to authenticate with BitBadges. You will not need all of them.
-Reference the Blockin documentation for more information [here](https://blockin.gitbook.io/blockin/developer-docs/getting-started).
-
-The site by default uses cookies for sessions and short redeem windows for signatures to prevent replay attacks. You can customize this to your needs and gate whatever you want behind authentication (i.e. checking session cookies or whatever you choose).
-
-You will need to handle sessions in your preferred manner, prevent common attacks, and implement any custom logic for your specific requirements. If you do not need instant authentication, consider outsourcing the frontend by letting BitBadges handle the signature and cache it for you to fetch later via the API (see [here](https://blockin.gitbook.io/blockin/developer-docs/getting-started/sign-in-with-bitbadges)).
-
-All verification logic (i.e. checking signatures, ownership, etc) is handled by the BitBadges API by default. If you want to handle this yourself, reference the Blockin documentation for more information [here](https://blockin.gitbook.io/blockin/developer-docs). The boilerplate code for this is in the pages/api/selfverify folder, but you can further customize this to your needs. This might be useful for offline verification, or if you want to add additional logic to the verification process.
-
-## Web3 Authentication
-
-Since you are building a Web3 dApp, you will probably need to handle digital Web3 authentication one way or the other. You can either outsource this to a Sign in with BitBadges (SIWBB) popup or implement your own Web3 authentication in-site. See [here](https://blockin.gitbook.io/blockin/developer-docs/getting-started/user-signatures#which-one-to-use) for deciding which option to pick. These are typically not used together for optimal user experience.
-
-These should be decoupled in the codebase. Anything labeled "in-site" is for in-site Web3 authentication, and anything labeled "SIWBB" is for Sign in with BitBadges.
-
-For Ethereum connection (if you choose to use), the default code uses WalletConnect. To use this, you will need to provide your WalletConnect info in the .env file.
-
-## Web2 Authentication
-
-We also support a basic implementation of a [hybrid dApp](https://blockin.gitbook.io/blockin/developer-docs/getting-started/user-signatures#which-one-to-use) that uses Web2 authentication. This allows you to use standard (username, password) authentication and map everything behind the scenes to a Web3 address. Wherever signatures are required, you manage the mnemonic / private key and handle the signature for the user. This app by default maps usernames to addresses, but you could also do the reverse (i.e. addresses to custom in-app usernames).
-
-Whenever a new user creates an account, a new mnemonic is generated for them and stored in the database. You simply use the mnemonic to sign for the user.
-
-Note that in order to broadcast transactions, addresses need to be registered (i.e. sent any amount of $BADGE) on the BitBadges blockchain. This is also a pre-requisite because gas fees need to be paid. This is not handled natively.
-
-The Web2 authentication currently is a very simple implementation. You will need to implement your own logic for handling user sessions, password resets, etc. There are also many add-ons you can implement, like 2FA, email verification, Sign In with XYZ Company, etc. You also have design decisions to make, like being able to migrate to a self-hosted solution? Allow payment in $BADGE for premium features?
-
-## Manual Authentication
-
-Lastly, there is manual authentication. This may be used for more specific use cases, like in-person events. Maybe you want to authenticate users based on a QR code or a physical badge. For example, you could set a QR code scanner to keyboard mode and have it type in the QR code value (i.e. signature) for you to verify. NFC is also a possibility. The QR codes being signatures is how the BitBadges QR code system works on the official frontend for authentication codes.
 
 # BitBadges SDK
 
