@@ -1,3 +1,4 @@
+import { CoolButton } from '@/pages';
 import { notification, Typography } from 'antd';
 import { useState } from 'react';
 
@@ -24,16 +25,14 @@ export const ClaimHelpers = () => {
     <>
       <br />
       <div className="flex-center">
-        <button
-          className="landing-button"
+        <CoolButton
           onClick={() => {
             if (!visible) fetchCode();
             setVisible(!visible);
           }}
-          style={{ width: 200 }}
         >
           {visible ? 'Hide' : 'Check Criteria'}
-        </button>
+        </CoolButton>
       </div>
       <br />
       {visible && (

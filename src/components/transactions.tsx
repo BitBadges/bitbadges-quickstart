@@ -2,6 +2,7 @@
 //This is only applicable if you have users connect wallets to your site
 
 import { useChainContext } from '@/chains/chain_contexts/ChainContext';
+import { CoolButton } from '@/pages';
 import { Spin, notification } from 'antd';
 import {
   // Native x/badges Msgs also have helper types exported from the SDK w/ NumberType conversions
@@ -150,9 +151,8 @@ export const BroadcastTxPopupButton = ({}: {}) => {
 
   return (
     <>
-      <button
-        className="landing-button m-2"
-        style={{ width: 240 }}
+      <CoolButton
+        className="m-2"
         disabled={!chain.address || !chain.loggedIn || loading}
         onClick={async () => {
           const url = `https://bitbadges.io/dev/broadcast?txsInfo=${encodeURIComponent(JSON.stringify(txsInfo))}&autoPopulateCreator=${autoPopulateCreator}&userMode=${userMode}`;
@@ -177,7 +177,7 @@ export const BroadcastTxPopupButton = ({}: {}) => {
         }}
       >
         Sign Transaction (Popup) {loading && <Spin />}
-      </button>
+      </CoolButton>
     </>
   );
 };

@@ -13,7 +13,7 @@ import { notification } from 'antd';
 import { BitBadgesCollection, BitBadgesUserInfo, NumberType, UintRange } from 'bitbadgesjs-sdk';
 import { AssetConditionGroup } from 'blockin';
 import { NextPage } from 'next/types';
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { ButtonHTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react';
 import { getPrivateInfo } from '../chains/backend_connectors';
 import Header from '../components/Header';
 import { BroadcastTxPopupButton } from '../components/transactions';
@@ -231,9 +231,8 @@ const Home: NextPage = () => {
             subtitle="Complete claims for your users either automatically or when they do something on your site. This can be used to distribute badges or other assets."
           >
             <div className="flex-center">
-              <button
-                className="landing-button m-2"
-                style={{ width: 200 }}
+              <CoolButton
+                className="m-2"
                 onClick={async () => {
                   notification.info({
                     message: 'Auto-Claim',
@@ -242,14 +241,14 @@ const Home: NextPage = () => {
                 }}
               >
                 Auto-Claim
-              </button>
+              </CoolButton>
             </div>
           </DisplayCard>
         </>
       )
     },
     {
-      label: 'Host Off-Chain Balances',
+      label: 'Self-Host Balances',
       node: (
         <>
           {' '}
@@ -270,16 +269,15 @@ const Home: NextPage = () => {
       node: (
         <>
           <DisplayCard
-            title={`Custom Plugins`}
-            subtitle={`For custom plugins, we refer you to the plugin quickstart repository.`}
+            title={`Custom Claim Plugins`}
+            subtitle={`For custom plugins, we refer you to the plugin quickstart repository and documentation.`}
             md={24}
             xs={24}
             sm={24}
           >
             <div className="flex-center">
-              <button
-                className="landing-button m-2"
-                style={{ width: 200 }}
+              <CoolButton
+                className="mt-4"
                 onClick={async () => {
                   window.open(
                     'https://docs.bitbadges.io/for-developers/claim-builder/plugins/creating-a-custom-plugin',
@@ -288,7 +286,7 @@ const Home: NextPage = () => {
                 }}
               >
                 Custom Plugin Docs
-              </button>
+              </CoolButton>
             </div>
           </DisplayCard>
         </>
@@ -329,15 +327,28 @@ const Home: NextPage = () => {
 
 const SecretInfoButton = () => {
   return (
-    <button
-      className="landing-button m-2"
-      style={{ width: 200 }}
+    <CoolButton
+      className=" m-2"
       onClick={async () => {
         const res = await getPrivateInfo();
         alert(res.message);
       }}
     >
       Get Private User Info
+    </CoolButton>
+  );
+};
+
+export const CoolButton = ({
+  children,
+  ...props
+}: { children: React.ReactNode } & ButtonHTMLAttributes<HTMLButtonElement>) => {
+  return (
+    <button
+      {...props}
+      className={`cool-button group group-hover:from-pink-600 group-hover:to-blue-500 ${props?.className}`}
+    >
+      <span className="cool-button-inner group flex-center">{children}</span>
     </button>
   );
 };

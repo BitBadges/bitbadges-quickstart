@@ -6,9 +6,12 @@ const Header = ({ devMode, setDevMode }: { devMode: boolean; setDevMode: (val: b
   return (
     <>
       <header className="primary-text">
-        <h1 className="banner primary-text">BitBadges Dev Quickstart</h1>
+        <h1 className="banner primary-text">BitBadges Development Quickstart</h1>
         <br />
-        <div className="secondary-text text-center px-10">Please read the README before you edit this template.</div>
+        <div className="secondary-text text-center px-10">
+          Please read the README before you edit this template. This quickstarter helps you get started with common
+          BitBadges development flows. It is a starting point and can be customized to fit your needs (see docs).
+        </div>
         <br />
         <div className="flex-center">
           <div className="m-2">{'Dark Mode'}</div>

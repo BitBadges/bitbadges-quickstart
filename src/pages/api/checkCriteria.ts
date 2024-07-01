@@ -6,7 +6,7 @@ if (!db.get('claim-count')) {
   db.set('claim-count', 0);
 }
 
-const seedCode = '123456'; //TODO: Add yours from the claim
+const seedCode = '123456'; //TODO: Add yours from the claim. This can be obtained from the batch copy component on the codes modal / distribution component in the official site.
 const totalNumCodes = 10000; //TODO: Add yours from the claim
 
 const { SHA256 } = CryptoJS;

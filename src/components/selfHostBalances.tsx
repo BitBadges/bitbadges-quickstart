@@ -5,6 +5,7 @@ import { DevMode } from './DevMode';
 import { AddressDisplay } from './address/AddressDisplay';
 import { Tabs } from './display/Tabs';
 import { useAccount } from '@/chains/chain_contexts/AccountsContext';
+import { CoolButton } from '@/pages';
 
 export const SelfHostBalances = ({ devMode }: { devMode: boolean }) => {
   const [balancesAssignmentResult, setBalancesAssignmentResult] = useState('');
@@ -19,7 +20,6 @@ export const SelfHostBalances = ({ devMode }: { devMode: boolean }) => {
         <Tabs
           tab={balancesTab}
           setTab={setBalancesTab}
-          type="underline"
           tabInfo={[
             {
               key: 'indexed',
@@ -40,19 +40,16 @@ export const SelfHostBalances = ({ devMode }: { devMode: boolean }) => {
       {balancesTab === 'indexed' && (
         <>
           <div className="flex-center">
-            <button
-              className="landing-button"
+            <CoolButton
               onClick={async () => {
                 const res = await getBalancesIndexed();
                 setBalancesAssignmentResult(res.balances);
-                alert(`Fetched balances: ${JSON.stringify(res.balances)}`);
+                alert(`Fetched balances: ${JSON.stringify(res.balances, null, 2)}`);
               }}
-              style={{ width: 200 }}
             >
               {'Fetch Balances'}
-            </button>
-            <button
-              className="landing-button"
+            </CoolButton>
+            <CoolButton
               onClick={async () => {
                 //TODO: Add your own logic checking
                 //TODO: Update your self-hosted balances URL to include the new user balances
@@ -75,16 +72,15 @@ export const SelfHostBalances = ({ devMode }: { devMode: boolean }) => {
 
                 const res = await getBalancesIndexed();
                 const fetchedBalance = res.balances[convertToCosmosAddress(addressToUpdate)];
-                alert(`Updated balances for ${addressToUpdate} to ${JSON.stringify(fetchedBalance)}`);
+                alert(`Updated balances for ${addressToUpdate} to ${JSON.stringify(fetchedBalance, null, 2)}`);
                 setBalancesAssignmentResult(res.balances);
 
                 //TODO: If your collection is indexed, you will need to refresh the cached values on the BitBadges API (note there are cooldowns though)
                 // await BitBadgesApi.refreshMetadata(collectionId)
               }}
-              style={{ width: 300 }}
             >
               {'Check Something and Update Balances'}
-            </button>
+            </CoolButton>
           </div>
           <DevMode obj={balancesAssignmentResult} toShow={devMode} />
         </>
@@ -92,21 +88,20 @@ export const SelfHostBalances = ({ devMode }: { devMode: boolean }) => {
 
       {balancesTab === 'non-indexed' && (
         <>
-          <div className="flex-center flex-column">
+          <div className="flex-center flex-column text-center">
             <div>
               Fetching balances for <AddressDisplay addressOrUsername={vitalikAccount?.address ?? ''} fontSize={16} />
             </div>
-            <button
-              className="landing-button mt-8"
+            <CoolButton
+              className="mt-8"
               onClick={async () => {
                 const res = await getBalancesNonIndexed(vitalikAccount?.address ?? '');
-                alert(`Fetched balances: ${JSON.stringify(res.balances)}`);
+                alert(`Fetched balances: ${JSON.stringify(res.balances, null, 2)}`);
                 setNonIndexedBalancesAssignmentResult(res.balances);
               }}
-              style={{ width: 200 }}
             >
               {'Fetch Balances'}
-            </button>
+            </CoolButton>
           </div>
 
           <DevMode obj={nonIndexedBalancesAssignmentResult} toShow={devMode} />
