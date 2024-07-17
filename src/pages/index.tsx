@@ -195,10 +195,13 @@ const Home: NextPage = () => {
             xs={24}
             sm={24}
           >
-            <div className="flex-center">
+            <div className="flex-center mt-2">
               <AddressDisplay addressOrUsername={vitalikAccount?.address ?? ''} />
             </div>
-            <div className="text-center">{preferredDarkMode ? 'Prefers Dark Mode' : 'Prefers Light Mode'}</div>
+
+            <div className="mt-4 font-bold text-center">
+              {preferredDarkMode ? 'Prefers Dark Mode' : 'Prefers Light Mode'}✅
+            </div>
           </DisplayCard>
         </>
       )
@@ -330,8 +333,12 @@ const SecretInfoButton = () => {
     <CoolButton
       className=" m-2"
       onClick={async () => {
-        const res = await getPrivateInfo();
-        alert(res.message);
+        try {
+          const res = await getPrivateInfo();
+          alert(res.message);
+        } catch (e) {
+          alert('Error fetching private user info');
+        }
       }}
     >
       Get Private User Info

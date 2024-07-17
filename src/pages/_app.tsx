@@ -13,11 +13,13 @@ import { BitcoinContextProvider } from '@/chains/chain_contexts/insite/BitcoinCo
 import { CosmosContextProvider } from '@/chains/chain_contexts/insite/CosmosContext';
 import { EthereumContextProvider } from '@/chains/chain_contexts/insite/EthereumContext';
 import { SolanaContextProvider } from '@/chains/chain_contexts/insite/SolanaContext';
-import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react';
+import { createWeb3Modal } from '@web3modal/wagmi/react';
 import getConfig from 'next/config';
 import type {} from 'redux-thunk/extend-redux';
-import { WagmiConfig } from 'wagmi';
-import { mainnet } from 'wagmi/chains';
+import { WagmiProvider } from 'wagmi';
+import { defaultWagmiConfig } from '@web3modal/wagmi';
+import { mainnet } from 'viem/chains';
+
 const { publicRuntimeConfig } = getConfig();
 
 require('dotenv').config();
@@ -27,17 +29,20 @@ process.env.BBS_SIGNATURES_MODE = 'WASM';
 // 2. Create wagmiConfig
 const metadata = {
   name: 'BitBadges',
-  description: 'BitBadges Quickstar',
+  description: 'BitBadges Quickstarter',
   url: 'http://localhost:3000',
   icons: ['https://avatars.githubusercontent.com/u/86890740']
 };
 
-const chains = [mainnet];
+const chains = [mainnet] as const;
 const projectId = publicRuntimeConfig.WC_PROJECT_ID;
-const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
-
+export const wagmiConfig = defaultWagmiConfig({
+  chains,
+  projectId,
+  metadata
+});
 // 3. Create modal
-createWeb3Modal({ wagmiConfig, projectId, chains });
+createWeb3Modal({ wagmiConfig, projectId });
 
 const App = ({ Component, pageProps }: AppProps) => {
   useEffect(() => {
@@ -53,7 +58,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   }, []);
 
   return (
-    <WagmiConfig config={wagmiConfig}>
+    <WagmiProvider config={wagmiConfig}>
       <AccountsProvider>
         <CollectionsProvider>
           <BitcoinContextProvider>
@@ -76,7 +81,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           </BitcoinContextProvider>
         </CollectionsProvider>
       </AccountsProvider>
-    </WagmiConfig>
+    </WagmiProvider>
   );
 };
 
