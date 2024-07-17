@@ -1,8 +1,8 @@
 import { getBadgeIdsString } from '@/utils/badgeIds';
 import { getTimeRangesString } from '@/utils/dates';
-import { Balance } from 'bitbadgesjs-sdk';
+import { iBalance } from 'bitbadgesjs-sdk';
 
-export const BalanceDisplay = ({ balances }: { balances: Balance<bigint>[] }) => {
+export const BalanceDisplay = ({ balances }: { balances: iBalance<bigint>[] }) => {
   return (
     <>
       <table className="w-100 text-center">

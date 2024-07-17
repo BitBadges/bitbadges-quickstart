@@ -88,10 +88,6 @@ Or, you can use the [broadcast helper tool](https://docs.bitbadges.io/for-develo
 
 Out of the box, we really only provide an Address UI component, but if you need more, you can reference the official BitBadges Frontend repository. It has a lot of useful components and patterns that you can copy from. Some might be a bit messy and over-engineered for the frontend, but you can use them as a reference or copy them directly.
 
-# Self-Hosting
-
-In the pages/api/selfhost folder, you will see examples of how to host metadata and balances yourself. You will just need to host it in a manner that is queryable from the BitBadges API, accounting for CORS and such. The on-chain URL will be the URL of your self-hosted values.
-
 # Distribution / Balance Assgnment
 
 You may also use this starter as a way to distribute codes / passwords or update the allocated off-chain balances based on some criteria or interaction. For example, you may want to give a claim code only to users who subscribe. Or, you assign and update your off-chain balances if the user has completed a certain task.

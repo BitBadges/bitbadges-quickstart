@@ -11,18 +11,15 @@
     "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
   },
   "dependencies": {
+    "@cosmjs/crypto": "^0.32.4",
     "@keplr-wallet/types": "^0.12.98",
     "@reduxjs/toolkit": "^1.9.6",
     "@trevormil/bbs-signatures": "^1.0.1",
     "@uiw/react-md-editor": "^4.0.4",
-    "@web3modal/wagmi": "^3.5.7",
+    "@web3modal/wagmi": "^5.0.6",
     "antd": "^4.24.15",
     "better-sqlite3": "^9.4.0",
-    "bitbadgesjs-sdk": "^0.3.71",
-    "blockin-btc-driver": "^1.1.1",
-    "blockin-cosmos-driver": "^1.1.2",
-    "blockin-eth-driver": "^1.1.1",
-    "blockin-sol-driver": "^1.1.2",
+    "bitbadgesjs-sdk": "^0.3.129",
     "discord.js": "^14.12.1",
     "dotenv": "^16.4.1",
     "ethers": "^6.13.1",
@@ -36,8 +33,8 @@
     "react-dom": "^18",
     "react-redux": "^8.1.3",
     "redux-thunk": "^2.4.2",
-    "viem": "^1.14.0",
-    "wagmi": "^1.4.2"
+    "viem": "^2.17.4",
+    "wagmi": "^2.10.11"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
@@ -53,6 +50,6 @@
     "postcss": "^8",
     "prettier": "^3.2.5",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "5.3.3"
   }
 }

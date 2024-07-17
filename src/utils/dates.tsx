@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import { UintRange } from 'bitbadgesjs-sdk';
+import { UintRange, iUintRange } from 'bitbadgesjs-sdk';
 
 export const GO_MAX_UINT_64 = 18446744073709551615n;
 
@@ -31,7 +31,7 @@ export function getTimeRangesElement(
 }
 
 export function getTimeRangesString(
-  validFrom?: UintRange<bigint>[],
+  validFrom?: iUintRange<bigint>[],
   prefix = '',
   includeTime = false,
   futureOnly = false,
