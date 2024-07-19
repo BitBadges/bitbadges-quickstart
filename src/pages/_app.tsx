@@ -19,12 +19,15 @@ import type {} from 'redux-thunk/extend-redux';
 import { WagmiProvider } from 'wagmi';
 import { defaultWagmiConfig } from '@web3modal/wagmi';
 import { mainnet } from 'viem/chains';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const { publicRuntimeConfig } = getConfig();
 
 require('dotenv').config();
 
 process.env.BBS_SIGNATURES_MODE = 'WASM';
+
+const queryClient = new QueryClient();
 
 // 2. Create wagmiConfig
 const metadata = {
@@ -59,28 +62,31 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   return (
     <WagmiProvider config={wagmiConfig}>
-      <AccountsProvider>
-        <CollectionsProvider>
-          <BitcoinContextProvider>
-            <CosmosContextProvider>
-              <EthereumContextProvider>
-                <SolanaContextProvider>
-                  <SiwbbContextProvider>
-                    <BlockinChainContextProvider>
-                      <div className="">
-                        <div className="layout gradient-bg" style={{ minHeight: '100vh' }}>
-                          <Component {...pageProps} />
-                          <div style={{ minHeight: 100 }}></div>
+      {' '}
+      <QueryClientProvider client={queryClient}>
+        <AccountsProvider>
+          <CollectionsProvider>
+            <BitcoinContextProvider>
+              <CosmosContextProvider>
+                <EthereumContextProvider>
+                  <SolanaContextProvider>
+                    <SiwbbContextProvider>
+                      <BlockinChainContextProvider>
+                        <div className="">
+                          <div className="layout gradient-bg" style={{ minHeight: '100vh' }}>
+                            <Component {...pageProps} />
+                            <div style={{ minHeight: 100 }}></div>
+                          </div>
                         </div>
-                      </div>
-                    </BlockinChainContextProvider>
-                  </SiwbbContextProvider>
-                </SolanaContextProvider>
-              </EthereumContextProvider>
-            </CosmosContextProvider>
-          </BitcoinContextProvider>
-        </CollectionsProvider>
-      </AccountsProvider>
+                      </BlockinChainContextProvider>
+                    </SiwbbContextProvider>
+                  </SolanaContextProvider>
+                </EthereumContextProvider>
+              </CosmosContextProvider>
+            </BitcoinContextProvider>
+          </CollectionsProvider>
+        </AccountsProvider>
+      </QueryClientProvider>
     </WagmiProvider>
   );
 };
