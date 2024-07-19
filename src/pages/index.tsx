@@ -10,7 +10,13 @@ import { ClaimHelpers } from '@/components/distribute.tsx';
 import { SelfHostBalances } from '@/components/selfHostBalances';
 import { SiwbbDisplay } from '@/components/siwbb/siwbb';
 import { notification } from 'antd';
-import { BitBadgesCollection, BitBadgesUserInfo, NumberType, UintRange } from 'bitbadgesjs-sdk';
+import {
+  BitBadgesCollection,
+  BitBadgesUserInfo,
+  GetSearchSuccessResponse,
+  NumberType,
+  UintRange
+} from 'bitbadgesjs-sdk';
 import { AssetConditionGroup } from 'blockin';
 import { NextPage } from 'next/types';
 import { ButtonHTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react';
@@ -31,7 +37,7 @@ BigInt.prototype.toJSON = function () {
 const Home: NextPage = () => {
   //Chain Contexts
   const [currTab, setCurrTab] = useState('Sign In with BitBadges');
-  const [devMode, setDevMode] = useState(false);
+  const [devMode, setDevMode] = useState(true);
 
   //Global State Contexts
   const { setCollections } = useCollectionsContext();
@@ -47,6 +53,8 @@ const Home: NextPage = () => {
   }, [vitalikAccount]);
 
   const [preferredDarkMode, setPreferredDarkMode] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const [searchResult, setSearchResult] = useState<GetSearchSuccessResponse<bigint>>();
 
   useEffect(() => {
     async function fetch() {
@@ -112,8 +120,7 @@ const Home: NextPage = () => {
               ? 'active inline-flex items-center px-4 py-3 text-white bg-blue-700 rounded-lg  w-full dark:bg-blue-600'
               : 'inline-flex items-center px-4 py-3 text-gray-400 rounded-lg cursor-pointer bg-gray-50 w-full dark:bg-gray-800 dark:text-gray-500'
           }`}
-          aria-current="page"
-        >
+          aria-current="page">
           {label}
         </a>
       </li>
@@ -129,8 +136,7 @@ const Home: NextPage = () => {
           md={24}
           xs={24}
           sm={24}
-          subtitle="Authentication is for authenticating users directly in your application. For BitBadges API authorization, see the API Authorization section below."
-        >
+          subtitle="Authentication is for authenticating users directly in your application. For BitBadges API authorization, see the API Authorization section below.">
           <br />
 
           <SiwbbDisplay ownershipRequirements={ownershipRequirements} />
@@ -141,6 +147,101 @@ const Home: NextPage = () => {
             <BroadcastTxPopupButton />
           </div>
         </DisplayCard>
+      )
+    },
+
+    {
+      label: 'BitBadges Claims',
+      node: (
+        <>
+          <DisplayCard
+            title={'BitBadges Claims'}
+            md={24}
+            xs={24}
+            sm={24}
+            subtitle="You have a few options for gating BitBadges claims">
+            <div className="mt-4">
+              <div className="primary-text font-bold font-xl">1. All In-Site</div>
+              <div className="secondary-text">
+                Most claims can be completely implemented on the BitBadges site with custom plugins and no extra code
+                required. Users will claim on the claim page. If you want to gate claims with unsupported custom
+                criteria, see the steps below. You could also consider creating your own custom plugin.
+              </div>{' '}
+              <div className="flex-center">
+                <CoolButton
+                  className="mt-4"
+                  onClick={async () => {
+                    window.open('https://bitbadges.io/claims/directory', '_blank');
+                  }}>
+                  Custom Plugins
+                </CoolButton>
+                <CoolButton
+                  className="mt-4"
+                  onClick={async () => {
+                    window.open(
+                      'https://docs.bitbadges.io/for-developers/claim-builder/plugins/creating-a-custom-plugin',
+                      '_blank'
+                    );
+                  }}>
+                  Create a Custom Plugin
+                </CoolButton>
+              </div>
+            </div>{' '}
+            <div className="mt-4">
+              <div className="primary-text font-bold font-xl">2. Auto-Claiming</div>
+              <div className="secondary-text">
+                Setup the claim and auto-claim on behalf of users. This can be done through the BitBadges API or through
+                Zapier. The claim creation process will walk you through this.
+              </div>
+            </div>
+            <div className="flex-center">
+              <CoolButton
+                className="m-2"
+                onClick={async () => {
+                  notification.info({
+                    message: 'Auto-Claim',
+                    description: 'See the /autoclaim endpoint'
+                  });
+                }}>
+                Auto-Claim
+              </CoolButton>
+              <CoolButton
+                className="m-2"
+                onClick={async () => {
+                  window.open('https://zapier.com/apps/bitbadges', '_blank');
+                }}>
+                Zapier
+              </CoolButton>
+            </div>
+            <div className="mt-4">
+              <div className="primary-text font-bold font-xl">3. In-Site + Custom Criteria</div>
+              <div className="secondary-text">
+                Setup the claim only with in-site plugins on the BitBadges site. For implementing custom criteria,
+                consdier using generic ones like codes, passwords, or emails. You then gate such information to users
+                how you would like using a custom implementation (e.g. payments, private database checks, etc). Claiming
+                will be done by users on the BitBadges site by providing the required information.
+              </div>
+            </div>
+            <ClaimHelpers />
+          </DisplayCard>
+        </>
+      )
+    },
+
+    {
+      label: 'Self-Host Balances',
+      node: (
+        <>
+          {' '}
+          <DisplayCard
+            title={`Host Off-Chain Balances`}
+            md={24}
+            xs={24}
+            sm={24}
+            subtitle="Self-host the balances for your collection via your backend. The URL is set in the core collection details on-chain and is used to fetch the balances. You have complete control over the responses.">
+            <SelfHostBalances devMode={devMode} />
+          </DisplayCard>
+        </>
       )
     },
     {
@@ -156,8 +257,7 @@ const Home: NextPage = () => {
             }
             md={24}
             xs={24}
-            sm={24}
-          >
+            sm={24}>
             <div className="text-center">
               {(BigInt(vitalikAccount?.balance?.amount ?? 0) / BigInt(1e9)).toString()} $BADGE
             </div>
@@ -185,6 +285,45 @@ const Home: NextPage = () => {
       )
     },
     {
+      label: 'Search Users',
+      node: (
+        <>
+          <DisplayCard
+            title={`Search Users`}
+            subtitle={
+              'Search addresses or usernames to find BitBadges users. Note that name resolution is only BitBadges usernames, not other services like ENS, etc. Those have to be implemented on your own.'
+            }
+            md={24}
+            xs={24}
+            sm={24}>
+            <div className="flex-center flex-column">
+              <input
+                className="input dark my-2 rounded-md p-2 inherit-width  bg-gray-200 dark:bg-gray-800 color:black dark:text-white"
+                placeholder="Search for a user"
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              <CoolButton
+                className="my-2"
+                onClick={async () => {
+                  const res = await BitBadgesApi.getSearchResults(searchInput);
+                  setSearchResult(res);
+                  setAccounts(res.accounts);
+                  console.log(res);
+                }}>
+                Search Users
+              </CoolButton>
+              <br />
+              <div className="flex-center flex-column">
+                {searchResult?.accounts.map((account) => (
+                  <AddressDisplay key={account.address} addressOrUsername={account.address} />
+                ))}
+              </div>
+            </div>
+          </DisplayCard>
+        </>
+      )
+    },
+    {
       label: 'Fetch Map / Protocol Information',
       node: (
         <>
@@ -193,103 +332,13 @@ const Home: NextPage = () => {
             subtitle={`Fetch information from a map or protocol. This example fetches the Dark Mode Protocol map.`}
             md={24}
             xs={24}
-            sm={24}
-          >
+            sm={24}>
             <div className="flex-center mt-2">
               <AddressDisplay addressOrUsername={vitalikAccount?.address ?? ''} />
             </div>
 
             <div className="mt-4 font-bold text-center">
               {preferredDarkMode ? 'Prefers Dark Mode' : 'Prefers Light Mode'}✅
-            </div>
-          </DisplayCard>
-        </>
-      )
-    },
-    {
-      label: 'Claim Code Distribution',
-      node: (
-        <>
-          <DisplayCard
-            title={'Claim Code Distribution'}
-            md={24}
-            xs={24}
-            sm={24}
-            subtitle="Distribute important claim details to users. If the criteria is met, you can redirect them to the claim link on the BitBadges site. This example uses codes, but it can be any criteria."
-          >
-            <ClaimHelpers />
-          </DisplayCard>
-        </>
-      )
-    },
-    {
-      label: 'Claim Auto-Completion',
-      node: (
-        <>
-          <DisplayCard
-            title={'Claim Auto-Completion'}
-            md={24}
-            xs={24}
-            sm={24}
-            subtitle="Complete claims for your users either automatically or when they do something on your site. This can be used to distribute badges or other assets."
-          >
-            <div className="flex-center">
-              <CoolButton
-                className="m-2"
-                onClick={async () => {
-                  notification.info({
-                    message: 'Auto-Claim',
-                    description: 'See the /autoclaim endpoint'
-                  });
-                }}
-              >
-                Auto-Claim
-              </CoolButton>
-            </div>
-          </DisplayCard>
-        </>
-      )
-    },
-    {
-      label: 'Self-Host Balances',
-      node: (
-        <>
-          {' '}
-          <DisplayCard
-            title={`Host Off-Chain Balances`}
-            md={24}
-            xs={24}
-            sm={24}
-            subtitle="Self-host the balances for your collection via your backend. The URL is set in the core collection details on-chain and is used to fetch the balances."
-          >
-            <SelfHostBalances devMode={devMode} />
-          </DisplayCard>
-        </>
-      )
-    },
-    {
-      label: 'Custom Plugins',
-      node: (
-        <>
-          <DisplayCard
-            title={`Custom Claim Plugins`}
-            subtitle={`For custom plugins, we refer you to the plugin quickstart repository and documentation.`}
-            md={24}
-            xs={24}
-            sm={24}
-          >
-            <div className="flex-center">
-              <CoolButton
-                className="mt-4"
-                onClick={async () => {
-                  window.open(
-                    'https://docs.bitbadges.io/for-developers/claim-builder/plugins/creating-a-custom-plugin',
-                    '_blank'
-                  );
-                }}
-              >
-                Custom Plugin Docs
-              </CoolButton>
             </div>
           </DisplayCard>
         </>
@@ -337,10 +386,9 @@ const SecretInfoButton = () => {
           const res = await getPrivateInfo();
           alert(res.message);
         } catch (e) {
-          alert('Error fetching private user info');
+          alert('Error fetching private user info: not authenticated');
         }
-      }}
-    >
+      }}>
       Get Private User Info
     </CoolButton>
   );
@@ -353,8 +401,7 @@ export const CoolButton = ({
   return (
     <button
       {...props}
-      className={`cool-button group group-hover:from-pink-600 group-hover:to-blue-500 ${props?.className}`}
-    >
+      className={`cool-button group group-hover:from-pink-600 group-hover:to-blue-500 ${props?.className}`}>
       <span className="cool-button-inner group flex-center">{children}</span>
     </button>
   );

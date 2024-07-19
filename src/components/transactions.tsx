@@ -95,26 +95,6 @@ export const BroadcastTxPopupButton = ({}: {}) => {
         })
       },
       {
-        type: 'MsgTransferBadges',
-        msg: new MsgTransferBadges<NumberType>({
-          creator: chain.cosmosAddress,
-          collectionId: '1',
-          transfers: [
-            {
-              from: chain.cosmosAddress,
-              toAddresses: ['cosmos14d0y596ujj7s40n7nxu86qg4c835p3xa8vucja'],
-              balances: [
-                {
-                  amount: 1n,
-                  badgeIds: [{ start: 1n, end: 10n }],
-                  ownershipTimes: UintRangeArray.FullRanges()
-                }
-              ]
-            }
-          ]
-        }).toProto()
-      },
-      {
         type: 'MsgSend',
         msg: new MsgSend({
           fromAddress: chain.cosmosAddress,
@@ -153,15 +133,11 @@ export const BroadcastTxPopupButton = ({}: {}) => {
     <>
       <CoolButton
         className="m-2"
-        disabled={!chain.address || !chain.loggedIn || loading}
+        disabled={loading}
         onClick={async () => {
           const url = `https://bitbadges.io/dev/broadcast?txsInfo=${encodeURIComponent(JSON.stringify(txsInfo))}&autoPopulateCreator=${autoPopulateCreator}&userMode=${userMode}`;
 
-          const openedWindow = window.open(
-            url,
-            '_blank',
-            'location=yes,height=570,width=520,scrollbars=yes,status=yes'
-          );
+          const openedWindow = window.open(url, '_blank');
 
           setLoading(true);
           // You can further customize the child window as needed
@@ -174,9 +150,8 @@ export const BroadcastTxPopupButton = ({}: {}) => {
               setLoading(false);
             }
           }, 1000);
-        }}
-      >
-        Sign Transaction (Popup) {loading && <Spin />}
+        }}>
+        Sign Transaction {loading && <Spin />}
       </CoolButton>
     </>
   );

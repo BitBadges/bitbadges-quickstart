@@ -18,9 +18,10 @@ export const SiwbbDisplay = ({ ownershipRequirements }: { ownershipRequirements:
   //TODO: Customize your popup parameters. See the documentation for more details.
   const popupParams: CodeGenQueryParams = {
     // You can also remove these and we will just display your apps metadata
-    name: 'Website Sign In',
-    description: 'To gain access to premium features, please sign in.',
-    image: 'https://bitbadges-ipfs.infura-ipfs.io/ipfs/QmPfdaLWBUxH6ZrWmX1t7zf6zDiNdyZomafBqY5V5Lgwvj',
+  
+    // name: 'Website Sign In',
+    // description: 'To gain access to premium features, please sign in.',
+    // image: 'https://bitbadges-ipfs.infura-ipfs.io/ipfs/QmPfdaLWBUxH6ZrWmX1t7zf6zDiNdyZomafBqY5V5Lgwvj',
 
     ownershipRequirements: ownershipRequirements,
     expectVerifySuccess: true,
@@ -46,8 +47,7 @@ export const SiwbbDisplay = ({ ownershipRequirements }: { ownershipRequirements:
                   chain.setLoggedInAddress('');
                   signOut();
                 }}
-                style={buttonStyle}
-              >
+                style={buttonStyle}>
                 <div className="flex items-center justify-center hover:opacity-80 bg-gray-800 p-4 rounded-lg">
                   Sign Out
                 </div>
@@ -66,8 +66,7 @@ export const SiwbbDisplay = ({ ownershipRequirements }: { ownershipRequirements:
                 const authUrl = generateBitBadgesAuthUrl(popupParams);
                 window.location.href = authUrl;
               }}
-              style={buttonStyle}
-            >
+              style={buttonStyle}>
               <div className="flex items-center justify-center hover:opacity-80 bg-gray-800 p-4 rounded-lg">
                 Sign In with{' '}
                 <img

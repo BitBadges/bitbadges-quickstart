@@ -18,7 +18,8 @@ export const MetadataDisplay = ({ collectionId }: { collectionId: bigint }) => {
               src={collectionMetadata?.image.replace('ipfs://', 'https://bitbadges-ipfs.infura-ipfs.io/ipfs/')}
               size={120}
               shape="square"
-              className="rounded-lg"
+              className="rounded-lg cursor-pointer hover:scale-110"
+              onClick={() => window.open(`https://bitbadges.io/collections/${collectionId}`)}
             />
           </div>
         </div>
@@ -29,7 +30,8 @@ export const MetadataDisplay = ({ collectionId }: { collectionId: bigint }) => {
               src={badgeIdOneMetadata?.image.replace('ipfs://', 'https://bitbadges-ipfs.infura-ipfs.io/ipfs/')}
               size={120}
               shape="square"
-              className="rounded-lg"
+              className="rounded-lg cursor-pointer hover:scale-110"
+              onClick={() => window.open(`https://bitbadges.io/collections/${collectionId}/1`)}
             />
           </div>
         </div>

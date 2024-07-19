@@ -29,9 +29,8 @@ export const ClaimHelpers = () => {
           onClick={() => {
             if (!visible) fetchCode();
             setVisible(!visible);
-          }}
-        >
-          {visible ? 'Hide' : 'Check Criteria'}
+          }}>
+          {visible ? 'Hide' : 'Check Criteria and Distribute Info'}
         </CoolButton>
       </div>
       <br />
@@ -47,8 +46,7 @@ export const ClaimHelpers = () => {
             <a
               href={`https://bitbadges.io/collections/ADD_COLLECTION_ID_HERE?claimId=CLAIM_ID&code=${fetchedCode}`} //You can also do this with a password=abc123 for the password plugin
               target="_blank"
-              rel="noreferrer"
-            >
+              rel="noreferrer">
               Claim Link
             </a>
           </div>

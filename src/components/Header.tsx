@@ -6,7 +6,8 @@ const Header = ({ devMode, setDevMode }: { devMode: boolean; setDevMode: (val: b
   return (
     <>
       <header className="primary-text">
-        <h1 className="banner primary-text">BitBadges Development Quickstart</h1>
+        
+        <h1 className="banner primary-text py-2"> Dev Quickstarter</h1>
         <br />
         <div className="secondary-text text-center px-10">
           Please read the README before you edit this template. This quickstarter helps you get started with common

@@ -1,7 +1,6 @@
 import { useAccount } from '@/chains/chain_contexts/AccountsContext';
 import { Spin, Tooltip, Typography } from 'antd';
 import { BitBadgesUserInfo, getAbbreviatedAddress, isAddressValid } from 'bitbadgesjs-sdk';
-import { useRouter } from 'next/router';
 
 const MINT_ACCOUNT = BitBadgesUserInfo.MintAccount();
 const { Text } = Typography;
@@ -21,7 +20,6 @@ export function Address({
   hidePortfolioLink?: boolean;
   doNotShowName?: boolean;
 }) {
-  const router = useRouter();
   const userInfo = useAccount(addressOrUsername);
 
   const addressName = !doNotShowName ? userInfo?.username : '';
@@ -45,8 +43,7 @@ export function Address({
                   className="primary-text"
                   style={{
                     textAlign: 'center'
-                  }}
-                >
+                  }}>
                   This is a special escrow address used when badges are first created. Badges can only be transferred
                   from this address, not to it.
                 </div>
@@ -55,8 +52,7 @@ export function Address({
                   className="primary-text"
                   style={{
                     textAlign: 'center'
-                  }}
-                >
+                  }}>
                   This represents all possible user addresses.
                 </div>
               ) : (
@@ -64,8 +60,7 @@ export function Address({
                   className="primary-text"
                   style={{
                     textAlign: 'center'
-                  }}
-                >
+                  }}>
                   {`${chain} Address`}
                   {resolvedName ? (
                     <>
@@ -86,8 +81,7 @@ export function Address({
         }
         overlayStyle={{
           minWidth: 320
-        }}
-      >
+        }}>
         {displayAddress}
       </Tooltip>
     ) : (
@@ -105,15 +99,14 @@ export function Address({
           paddingLeft: 5,
           fontSize: fontSize
         }}
-        className="whitespace-nowrap"
-      >
+        className="whitespace-nowrap">
         <Text
           className={'primary-text ' + (!showLink ? '' : ' link-button-nav')}
           onClick={
             !showLink
               ? undefined
               : () => {
-                  router.push(`/account/${address}`);
+                  window.open(`https://bitbadges.io/account/${address}`);
                 }
           }
           copyable={{
@@ -123,8 +116,7 @@ export function Address({
           style={{
             color: invalidAddress ? 'red' : fontColor,
             display: 'inline-flex'
-          }}
-        >
+          }}>
           <b>{userInfo ? <>{innerContent}</> : !invalidAddress ? <Spin /> : <>{displayAddress}</>}</b>
         </Text>
       </div>
