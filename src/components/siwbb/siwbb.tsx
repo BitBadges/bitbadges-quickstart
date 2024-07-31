@@ -18,7 +18,7 @@ export const SiwbbDisplay = ({ ownershipRequirements }: { ownershipRequirements:
   //TODO: Customize your popup parameters. See the documentation for more details.
   const popupParams: CodeGenQueryParams = {
     // You can also remove these and we will just display your apps metadata
-  
+
     // name: 'Website Sign In',
     // description: 'To gain access to premium features, please sign in.',
     // image: 'https://bitbadges-ipfs.infura-ipfs.io/ipfs/QmPfdaLWBUxH6ZrWmX1t7zf6zDiNdyZomafBqY5V5Lgwvj',
@@ -26,7 +26,7 @@ export const SiwbbDisplay = ({ ownershipRequirements }: { ownershipRequirements:
     ownershipRequirements: ownershipRequirements,
     expectVerifySuccess: true,
     expectAttestationsPresentations: false,
-    client_id: '96717e00431a5e5e32a7721ff777805ba5d060d83d1978a9ed3a8b94c78b5c4f', //TODO: Add your client ID here
+    client_id: 'example-client-id', //TODO: Add your client ID here
     redirect_uri: 'http://localhost:3002/api/signIn', //TODO: Add your redirect URI here (if applicable) or undefined (if not applicable and using QR codes)
     //state: '',
     //scope: '',
