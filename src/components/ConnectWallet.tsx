@@ -30,7 +30,7 @@ export const GatedInfoButton = () => {
   );
 };
 
-export const BlockinDisplay = ({ hideLogo }: { hideLogo?: boolean }) => {
+export const ConnectDisplay = ({ hideLogo }: { hideLogo?: boolean }) => {
   const { address, setChain, connected } = useChainContext();
 
   const chainContext = useChainContext();

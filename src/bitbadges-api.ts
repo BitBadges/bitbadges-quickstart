@@ -1,4 +1,4 @@
-import { BigIntify, BitBadgesAPI, BlockinAndGroup, BlockinAssetConditionGroup, UintRangeArray } from 'bitbadgesjs-sdk';
+import { BigIntify, BitBadgesAPI, SiwbbAndGroup, SiwbbAssetConditionGroup, UintRangeArray } from 'bitbadgesjs-sdk';
 import getConfig from 'next/config';
 
 export type DesiredNumberType = bigint;
@@ -16,7 +16,7 @@ export const BitBadgesApi = new BitBadgesAPI({
   apiKey: API_KEY
 });
 
-export const ownershipRequirementsToCheck: BlockinAssetConditionGroup<bigint> | undefined = new BlockinAndGroup({
+export const ownershipRequirementsToCheck: SiwbbAssetConditionGroup<bigint> | undefined = new SiwbbAndGroup({
   $and: [
     {
       assets: [

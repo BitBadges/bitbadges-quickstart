@@ -1,4 +1,4 @@
-import { BlockinDisplay, GatedInfoButton } from '@/components/ConnectWallet';
+import { ConnectDisplay, GatedInfoButton } from '@/components/ConnectWallet';
 import { StyledButton } from '@/components/display/StyledButton';
 import { TabDisplay } from '@/components/display/TabDisplay';
 import { UserQueryInfo } from '@/components/QueryUserInfo';
@@ -27,7 +27,7 @@ const Home: NextPage = () => {
         <>
           <div className="flex-center flex-wrap" style={{ alignItems: 'normal' }}>
             <Col md={24} xs={24} sm={24}>
-              <BlockinDisplay />
+              <ConnectDisplay />
               <br />
               <br />
               <div className="flex-center flex-wrap">

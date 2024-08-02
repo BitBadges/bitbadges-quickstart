@@ -4,7 +4,7 @@ import '../styles/antd-override-styles.css';
 
 import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
-import { ChainContextProvider as BlockinChainContextProvider } from '../global/contexts/ChainContext';
+import { ChainContextProvider } from '../global/contexts/ChainContext';
 
 import { AccountsProvider } from '@/global/contexts/AccountsContext';
 import { CollectionsProvider } from '@/global/contexts/CollectionsContext';
@@ -83,14 +83,14 @@ const App = ({ Component, pageProps }: AppProps) => {
                   <CosmosContextProvider>
                     <EthereumContextProvider>
                       <SolanaContextProvider>
-                        <BlockinChainContextProvider>
+                        <ChainContextProvider>
                           <div className="">
                             <div className="layout gradient-bg" style={{ minHeight: '100vh' }}>
                               <Component {...pageProps} />
                               <div style={{ minHeight: 100 }}></div>
                             </div>
                           </div>
-                        </BlockinChainContextProvider>
+                        </ChainContextProvider>
                       </SolanaContextProvider>
                     </EthereumContextProvider>
                   </CosmosContextProvider>

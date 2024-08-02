@@ -13,7 +13,7 @@ const Header = () => {
   return (
     <>
       <header className="primary-text">
-        <h1 className="banner primary-text py-2 pt-10"> Multi-Chain App Quickstarter</h1>
+        <h1 className="banner primary-text text-center py-2 pt-10"> Multi-Chain App Quickstarter</h1>
         <div className="mb-4 flex-center flex-wrap">
           <Image
             className="mx-2"
@@ -59,17 +59,22 @@ const Header = () => {
             point and should be customized to fit your needs. Please read the README and see docs for more information.
           </div>
         </div>
-        <div className="flex-center">
-          <div className="m-2">{'Dark Mode'}</div>
-          <DarkModeSwitcher />
-
-          <div className="m-2">{'Dev Mode'}</div>
-          <div className="flex-center flex items-center justify-center text-xs font-medium text-yellow-500">
-            <Switch checked={devMode} onChange={() => setDevMode(!devMode)} className="dark-mode-switcher" />
+        <div className="flex-center flex-wrap">
+          <div className="flex">
+            <div className="m-2">{'Dark Mode'}</div>
+            <DarkModeSwitcher />
           </div>
-          <div className="m-2">{'In-Site Wallets'}</div>
-          <div className="flex-center flex items-center justify-center text-xs font-medium text-yellow-500">
-            <Switch checked={walletMode} onChange={() => setWalletMode(!walletMode)} className="dark-mode-switcher" />
+          <div className="flex">
+            <div className="m-2">{'Dev Mode'}</div>
+            <div className="flex-center flex items-center justify-center text-xs font-medium text-yellow-500">
+              <Switch checked={devMode} onChange={() => setDevMode(!devMode)} className="dark-mode-switcher" />
+            </div>
+          </div>
+          <div className="flex">
+            <div className="m-2">{'In-Site Wallets'}</div>
+            <div className="flex-center flex items-center justify-center text-xs font-medium text-yellow-500">
+              <Switch checked={walletMode} onChange={() => setWalletMode(!walletMode)} className="dark-mode-switcher" />
+            </div>
           </div>
         </div>
         <LinkGroup

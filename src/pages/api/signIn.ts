@@ -11,15 +11,9 @@ const REDIRECT_URI = process.env.REDIRECT_URI ?? '';
 //This example uses session cookies to store the user's session.
 const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
   const code = req.query.code as string;
-  // const state = req.query.state as string; // (if applicable, state can be passed via the redirect from the original sign-in request)
+  // const state = req.query.state as string; // (state can be passed via the redirect from the original sign-in request)
 
   try {
-    //TODO: You need to verify the sign in request is as intended and not tampered with. This step is critical if you have requested custom non-vanilla
-    //      options (ownership requirements, other socials sign ins, and so on).
-    //
-    //      You can either use the verifyOptions and let BitBadges check the request for you, or you can implement your own verification.
-    //      In other words, you nee to verify that the user did not maliciously tamper with the request.
-
     // Exchange the user's authorization code for a token. For in-person verification, the authorization code is their BitBadges QR code value.
     const verifyOptions: VerifySIWBBOptions = {
       // Its important to note that ownership requirements must be specified here (even if specified on the frontend).
