@@ -1,8 +1,7 @@
-import { BaseDefaultChainContext } from '@/chains/utils';
 import { notification } from 'antd';
 import { TransactionPayload, TxContext, createTxBroadcastBody } from 'bitbadgesjs-sdk';
 import { createContext, useContext, useState } from 'react';
-import { ChainSpecificContextType } from '../ChainContext';
+import { ChainSpecificContextType, BaseDefaultChainContext } from '../utils';
 
 export type BitcoinContextType = ChainSpecificContextType & {};
 export const BitcoinContext = createContext<BitcoinContextType>({
@@ -30,7 +29,11 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
     }
   };
 
-  const connect = async () => {
+  const autoConnect = async () => {
+    await connect(true);
+  };
+
+  const connect = async (auto = false) => {
     if (!address) {
       try {
         const provider = getProvider(); // see "Detecting the Provider"
@@ -51,6 +54,7 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
         setAddress(address);
         setPubKey(base64PublicKey);
       } catch (e) {
+        if (auto) return;
         console.log(e);
         notification.error({
           message: 'Error connecting to wallet',
@@ -69,7 +73,7 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
     return btoa(binString);
   }
 
-  const signChallenge = async (message: string) => {
+  const signMessage = async (message: string) => {
     const encodedMessage = new TextEncoder().encode(message);
     const provider = getProvider();
     const { signature } = await provider.signMessage(address, encodedMessage);
@@ -77,7 +81,7 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
     return { message: message, signature: bytesToBase64(signature) };
   };
 
-  const signTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
+  const signBitBadgesTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
     const bitcoinProvider = getProvider();
 
     let sig = '';
@@ -101,8 +105,9 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
   const bitcoinContext: BitcoinContextType = {
     connect,
     disconnect,
-    signChallenge,
-    signTxn,
+    signMessage,
+    signBitBadgesTxn,
+    autoConnect,
     address,
     getPublicKey
   };

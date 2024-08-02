@@ -1,4 +1,4 @@
-import { BaseDefaultChainContext } from '@/chains/utils';
+import { BaseDefaultChainContext } from '../utils';
 import { AccountData, Window as KeplrWindow } from '@keplr-wallet/types';
 import {
   BitBadgesKeplrSuggestBetanetChainInfo,
@@ -9,7 +9,8 @@ import {
 import Long from 'long';
 import { createContext, useContext, useState } from 'react';
 import { CHAIN_DETAILS } from '../../../../constants';
-import { ChainSpecificContextType } from '../ChainContext';
+import { ChainSpecificContextType } from '../utils';
+import { notification } from 'antd';
 
 declare global {
   interface Window extends KeplrWindow {}
@@ -31,24 +32,36 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
   const [address, setAddress] = useState<string>('');
   const cosmosAddress = address;
 
-  const connect = async () => {
-    const { keplr } = window;
-    if (!keplr || !window || !window.getOfflineSigner) {
-      alert('Please install Keplr to continue with Cosmos');
-      return;
-    }
+  const autoConnect = async () => {
+    await connect(true);
+  };
 
-    await keplr.experimentalSuggestChain(BitBadgesKeplrSuggestBetanetChainInfo);
-    const offlineSigner = window.getOfflineSigner(chainId);
-    const account: AccountData = (await offlineSigner.getAccounts())[0];
-    setAddress(account.address);
+  const connect = async (auto = false) => {
+    try {
+      const { keplr } = window;
+      if (!keplr || !window || !window.getOfflineSigner) {
+        throw new Error('Please install Keplr to continue with Cosmos');
+      }
+
+      await keplr.experimentalSuggestChain(BitBadgesKeplrSuggestBetanetChainInfo);
+      const offlineSigner = window.getOfflineSigner(chainId);
+      const account: AccountData = (await offlineSigner.getAccounts())[0];
+      setAddress(account.address);
+    } catch (e) {
+      if (auto) return;
+      console.error(e);
+      notification.error({
+        message: 'Error connecting to wallet',
+        description: 'Make sure you have Keplr installed and are logged in.'
+      });
+    }
   };
 
   const disconnect = async () => {
     setAddress('');
   };
 
-  const signChallenge = async (message: string) => {
+  const signMessage = async (message: string) => {
     let sig = await window.keplr?.signArbitrary('bitbadges_1-1', cosmosAddress, message);
 
     if (!sig) sig = { signature: '', pub_key: { type: '', value: '' } };
@@ -60,7 +73,7 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
     };
   };
 
-  const signTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
+  const signBitBadgesTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
     const { sender } = context;
     await window.keplr?.enable(chainId);
 
@@ -102,8 +115,9 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
   const cosmosContext: CosmosContextType = {
     connect,
     disconnect,
-    signChallenge,
-    signTxn,
+    autoConnect,
+    signMessage,
+    signBitBadgesTxn,
     address,
     getPublicKey
   };

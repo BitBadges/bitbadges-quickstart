@@ -1,14 +1,14 @@
 import { Secp256k1 } from '@cosmjs/crypto';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 
-import { BaseDefaultChainContext } from '@/chains/utils';
+import { BaseDefaultChainContext } from '../utils';
 import { notification } from 'antd';
 import { TransactionPayload, TxContext, convertToCosmosAddress, createTxBroadcastBody } from 'bitbadgesjs-sdk';
 import { SigningKey, getBytes, hashMessage } from 'ethers';
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useDisconnect, useSignMessage, useAccount as useWeb3Account } from 'wagmi';
 import { useAccount, useAccountsContext } from '../AccountsContext';
-import { ChainSpecificContextType } from '../ChainContext';
+import { ChainSpecificContextType } from '../utils';
 
 export type EthereumContextType = ChainSpecificContextType & {};
 
@@ -24,12 +24,18 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
   const { open } = useWeb3Modal();
   const { setAccounts } = useAccountsContext();
   const web3AccountContext = useWeb3Account();
-  const address = web3AccountContext.address || '';
+  const [address, setAddress] = useState<string>('');
   const cosmosAddress = convertToCosmosAddress(address);
   const account = useAccount(cosmosAddress);
   const { signMessageAsync } = useSignMessage();
 
+  useEffect(() => {
+    setAddress(web3AccountContext.address || '');
+  }, [web3AccountContext]);
+
   const { disconnect: disconnectWeb3 } = useDisconnect();
+
+  const autoConnect = async () => {};
 
   const connect = async () => {
     if (!address) {
@@ -49,7 +55,7 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
     await disconnectWeb3();
   };
 
-  const signChallenge = async (message: string) => {
+  const signMessage = async (message: string) => {
     if (!account) throw new Error('Account not found.');
 
     const sign = await signMessageAsync({
@@ -73,7 +79,7 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
     };
   };
 
-  const signTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
+  const signBitBadgesTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
     if (!account) throw new Error('Account not found.');
     //If we are within  ~1000 chars limit, we can have user sign the typed EIP712
     //Else, we hash the JSON and have user sign the hash
@@ -138,8 +144,9 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
   const ethereumContext: EthereumContextType = {
     connect,
     disconnect,
-    signChallenge,
-    signTxn,
+    autoConnect,
+    signMessage,
+    signBitBadgesTxn,
     address,
     getPublicKey
   };

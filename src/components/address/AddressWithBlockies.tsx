@@ -1,4 +1,4 @@
-import { useAccount } from '@/chains/chain_contexts/AccountsContext';
+import { useAccount } from '@/global/contexts/AccountsContext';
 import { Avatar, Tooltip } from 'antd';
 import { SupportedChain, getChainForAddress } from 'bitbadgesjs-sdk';
 import { getChainLogo } from '../../../constants';
@@ -9,22 +9,16 @@ export function AddressWithBlockies({
   addressOrUsername,
   fontSize = 16,
   fontColor,
-  hideTooltip,
-  hidePortfolioLink,
-  doNotShowName
+  hidePortfolioLink
 }: {
   addressOrUsername: string;
   fontSize?: number;
   fontColor?: string;
   hidePortfolioLink?: boolean;
-  hideTooltip?: boolean;
-  doNotShowName?: boolean;
 }) {
   const fetchedAccount = useAccount(addressOrUsername);
-
   const userInfo = fetchedAccount;
   const address = userInfo?.address || addressOrUsername || '';
-
   const chainLogo = getChainLogo(getChainForAddress(address));
 
   return (
@@ -36,8 +30,7 @@ export function AddressWithBlockies({
               ? `This address is for a ${getChainForAddress(address)} user`
               : `Unknown`
           }
-          placement="bottom"
-        >
+          placement="bottom">
           <Avatar src={chainLogo} style={{ marginRight: 8 }} size={fontSize} />
         </Tooltip>
       )}
@@ -52,8 +45,6 @@ export function AddressWithBlockies({
         addressOrUsername={addressOrUsername}
         fontColor={fontColor}
         hidePortfolioLink={hidePortfolioLink}
-        hideTooltip={hideTooltip}
-        doNotShowName={doNotShowName}
       />
     </div>
   );

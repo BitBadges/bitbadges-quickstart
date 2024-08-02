@@ -1,4 +1,4 @@
-import { BlockinChallengeParams, getChainForAddress } from 'bitbadgesjs-sdk';
+import { getChainForAddress } from 'bitbadgesjs-sdk';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 // For all authentication attempts, we will check the session cookie to see if the user is signed in
@@ -12,11 +12,9 @@ const checkSignIn = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const details = JSON.parse(session);
-    const params = new BlockinChallengeParams(details.params);
-
     return res.status(200).json({
-      chain: getChainForAddress(params.address),
-      address: params.address,
+      chain: getChainForAddress(details.address),
+      address: details.address,
       signedIn: true,
       message: 'Successfully signed in',
 

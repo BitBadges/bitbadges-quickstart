@@ -1,19 +1,8 @@
-//Signs a transaction in-site.
-//This is only applicable if you have users connect wallets to your site
-
-import { useChainContext } from '@/chains/chain_contexts/ChainContext';
-import { CoolButton } from '@/pages';
+import { StyledButton } from '@/components/display/StyledButton';
+import { useChainContext } from '@/global/contexts/ChainContext';
 import { Spin, notification } from 'antd';
 import {
-  // Native x/badges Msgs also have helper types exported from the SDK w/ NumberType conversions
-  // You can use these or the native Proto types
-  // If you use the helpers, you can use the .toProto() to get the proto converted object where necessary
-  // MsgTransferBadges,
-  // MsgCreateCollection,
   MsgDeleteCollection,
-  MsgTransferBadges,
-  NumberType,
-  UintRangeArray,
   //All Msgs are exported from the SDK as proto types (Protocol Buffers). This includes all native Cosmos modules.
   proto
 } from 'bitbadgesjs-sdk';
@@ -43,26 +32,6 @@ export const BroadcastTxPopupButton = ({}: {}) => {
       })
     },
     {
-      type: 'MsgTransferBadges',
-      msg: new MsgTransferBadges<NumberType>({
-        creator: chain.cosmosAddress,
-        collectionId: '1',
-        transfers: [
-          {
-            from: chain.cosmosAddress,
-            toAddresses: ['cosmos14d0y596ujj7s40n7nxu86qg4c835p3xa8vucja'],
-            balances: [
-              {
-                amount: 1n,
-                badgeIds: [{ start: 1n, end: 10n }],
-                ownershipTimes: UintRangeArray.FullRanges()
-              }
-            ]
-          }
-        ]
-      }).toProto()
-    },
-    {
       type: 'MsgSend',
       msg: new MsgSend({
         fromAddress: chain.cosmosAddress,
@@ -71,8 +40,6 @@ export const BroadcastTxPopupButton = ({}: {}) => {
       })
     }
   ]);
-  let x = false;
-  if (x) console.log(setTxsInfo); //For TypeScript to not complain about unused variable
 
   //The creator and other fields may need to be dynamic based on the user's address
   //Options:
@@ -80,6 +47,7 @@ export const BroadcastTxPopupButton = ({}: {}) => {
   //  2. Set autoPopulateCreator to true and BitBadges will auto-populate the creator field with the user's selected address.
   //     Note this does not work for all fields, just ones where signer must == creator.
   const autoPopulateCreator = true;
+
   // userMode is used to tell BitBadges how to display the transaction signing UI
   // For developers, we allow editing
   // For end users, we pretty it up and do now allow edits
@@ -123,7 +91,6 @@ export const BroadcastTxPopupButton = ({}: {}) => {
   useEffect(() => {
     window.addEventListener('message', handleChildWindowMessage);
 
-    // Cleanup the listener when the component unmounts
     return () => {
       window.removeEventListener('message', handleChildWindowMessage);
     };
@@ -131,9 +98,9 @@ export const BroadcastTxPopupButton = ({}: {}) => {
 
   return (
     <>
-      <CoolButton
-        className="m-2"
-        disabled={loading}
+      <StyledButton
+        className="text-xs"
+        disabled={loading || !chain.connected}
         onClick={async () => {
           const url = `https://bitbadges.io/dev/broadcast?txsInfo=${encodeURIComponent(JSON.stringify(txsInfo))}&autoPopulateCreator=${autoPopulateCreator}&userMode=${userMode}`;
 
@@ -151,8 +118,8 @@ export const BroadcastTxPopupButton = ({}: {}) => {
             }
           }, 1000);
         }}>
-        Sign Transaction {loading && <Spin />}
-      </CoolButton>
+        Sign BitBadges Txn (Outsourced) {loading && <Spin />}
+      </StyledButton>
     </>
   );
 };

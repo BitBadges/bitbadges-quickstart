@@ -3,28 +3,24 @@ import cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BitBadgesApi } from './bitbadges-api';
 
-//For self verification
-// import { getChainDriver } from "./selfverify/chainDriverHandlers";
-// import { verifyChallenge } from "./selfverify/verifyChallenge";
-
 const CLIENT_ID = process.env.CLIENT_ID ?? '';
 const CLIENT_SECRET = process.env.CLIENT_SECRET ?? '';
 const REDIRECT_URI = process.env.REDIRECT_URI ?? '';
 
 //This will sign the user in to your backend. This is just an example and should be replaced with your own logic.
 //This example uses session cookies to store the user's session.
-//IMPORTANT: pre-requisite is that you have already verified the message and signature using the blockin library.
 const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
   const code = req.query.code as string;
-  // const state = req.query.state as string; (if applicable, state can be passed via the redirect from the original sign-in request)
+  // const state = req.query.state as string; // (if applicable, state can be passed via the redirect from the original sign-in request)
 
   try {
-    //This step is critical. See BitBadges documentation for more details.
-    //You need to verify the sign in request is as intended and not tampered with.
-    const verifyOptions: VerifySIWBBOptions = {
-      // TODO: Configure
-    };
+    //TODO: You need to verify the sign in request is as intended and not tampered with. This step is critical if you have requested custom non-vanilla
+    //      options (ownership requirements, other socials sign ins, and so on).
+    //
+    //      You can either use the verifyOptions and let BitBadges check the request for you, or you can implement your own verification.
+    //      In other words, you nee to verify that the user did not maliciously tamper with the request.
 
+    const verifyOptions: VerifySIWBBOptions = {};
     const authCodeRes = await BitBadgesApi.exchangeSIWBBAuthorizationCode({
       code,
       options: verifyOptions,
@@ -42,23 +38,24 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
         .json({ success: false, errorMessage: 'Did not pass verification: ' + verificationResponse?.errorMessage });
     }
 
-    // Alternative to using the BitBadgesApi is to self-verify directly with the Blockin library
+    //----------------------------------------------CUSTOM LOGIC AND VERIFICATIOn-------------------------------------------------------
 
-    //If you reach here, the Blockin message is verified (pre-requisite). This means you now know the signature is valid and any assets specified are owned by the user.
-    //We have also checked that the message parameters match what is expected and were not altered by the user (via options.expectedChallengeParams).
+    //TODO: See https://docs.bitbadges.io/for-developers/authenticating-with-bitbadges/overview for more details on how to handle
+    // You can now implement any additional checks or custom logic for your application (verifying attestations, protocols, etc.) on your end.
+    // It is also important to prevent against common attacks like flash ownership attacks.
 
-    //TODO: You now implement any additional checks or custom logic for your application, such as assigning sesssions, cookies, etc.
-    //TODO: If you expect proof of secrets to be attached to the message, you can also verify them here.
-    //See src/components/secrets/secrets.tsx for an example of how to verify secrets proofs.
-    //It is also important to prevent replay attacks or flash ownership attacks (https://blockin.gitbook.io/blockin/developer-docs/core-concepts).
+    // If you requested BitBadges API scopes, you can now access the access token and refresh token (see docs for more details)
+    // All future requests must specify the access token in the Authorization header (Bearer token)
+    // https://docs.bitbadges.io/for-developers/authenticating-with-bitbadges/verification
+    //
+    // const { access_token, access_token_expires_at, refresh_token, refresh_token_expires at } = doc;
 
-    //TODO: This is not a production-ready example. You should implement your own session management and security measures.
-    // Create the session cookie data
+    //----------------------------------------------SET SESSIONS-------------------------------------------------------
+
+    // Finally, once ypu are satisfied with the verification, you can create a session for the user.
+    //TODO: This is not a production-ready example. You should implement your own session management and security measures
     const sessionData = {
-      siwbb: true,
-      params: {
-        address: blockinChallenge.address
-      }
+      address: blockinChallenge.address
     };
 
     // Set the session cookie
@@ -72,7 +69,6 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
       })
     );
 
-    //Once the code reaches here, you should considered the user authenticated.
     return res.redirect('/'); //Redirect to the home page
   } catch (err: any) {
     console.log(err);

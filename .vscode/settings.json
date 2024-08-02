@@ -5,6 +5,8 @@
     "titleBar.activeForeground": "#F7FBF7"
   },
 
-  "editor.codeActionsOnSave": { "source.fixAll": true },
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
   "editor.formatOnSave": true
 }

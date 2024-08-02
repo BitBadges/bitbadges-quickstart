@@ -20,6 +20,13 @@ export const BalanceDisplay = ({ balances }: { balances: iBalance<bigint>[] }) =
             </tr>
           );
         })}
+        {balances.length === 0 && (
+          <tr>
+            <td className="secondary-text" colSpan={3}>
+              No balances found
+            </td>
+          </tr>
+        )}
       </table>
     </>
   );

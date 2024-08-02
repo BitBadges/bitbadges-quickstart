@@ -1,5 +1,5 @@
-import { useAccount } from '@/chains/chain_contexts/AccountsContext';
-import { Spin, Tooltip, Typography } from 'antd';
+import { useAccount } from '@/global/contexts/AccountsContext';
+import { Spin, Typography } from 'antd';
 import { BitBadgesUserInfo, getAbbreviatedAddress, isAddressValid } from 'bitbadgesjs-sdk';
 
 const MINT_ACCOUNT = BitBadgesUserInfo.MintAccount();
@@ -9,84 +9,23 @@ export function Address({
   addressOrUsername,
   fontSize = 16,
   fontColor,
-  hideTooltip,
-  hidePortfolioLink,
-  doNotShowName
+  hidePortfolioLink
 }: {
   addressOrUsername: string;
   fontSize?: number | string;
   fontColor?: string;
-  hideTooltip?: boolean;
   hidePortfolioLink?: boolean;
-  doNotShowName?: boolean;
 }) {
   const userInfo = useAccount(addressOrUsername);
 
-  const addressName = !doNotShowName ? userInfo?.username : '';
-  const resolvedName = !doNotShowName ? userInfo?.resolvedName : '';
+  const addressName = userInfo?.username;
+  const resolvedName = userInfo?.resolvedName;
   let address = userInfo?.address || addressOrUsername || '';
-  let chain = userInfo?.chain;
 
   const isValidAddress = isAddressValid(address) || address == 'All';
   const displayAddress = addressName ? addressName : resolvedName ? resolvedName : getAbbreviatedAddress(address);
 
-  const innerContent =
-    !hideTooltip && userInfo ? (
-      <Tooltip
-        placement="bottom"
-        color="black"
-        title={
-          <>
-            <div className="dark">
-              {address === MINT_ACCOUNT.address ? (
-                <div
-                  className="primary-text"
-                  style={{
-                    textAlign: 'center'
-                  }}>
-                  This is a special escrow address used when badges are first created. Badges can only be transferred
-                  from this address, not to it.
-                </div>
-              ) : address == 'All' ? (
-                <div
-                  className="primary-text"
-                  style={{
-                    textAlign: 'center'
-                  }}>
-                  This represents all possible user addresses.
-                </div>
-              ) : (
-                <div
-                  className="primary-text"
-                  style={{
-                    textAlign: 'center'
-                  }}>
-                  {`${chain} Address`}
-                  {resolvedName ? (
-                    <>
-                      <br />
-                      {`${resolvedName}`}
-                    </>
-                  ) : (
-                    ''
-                  )}
-
-                  <br />
-                  <br />
-                  {`${address}`}
-                </div>
-              )}
-            </div>
-          </>
-        }
-        overlayStyle={{
-          minWidth: 320
-        }}>
-        {displayAddress}
-      </Tooltip>
-    ) : (
-      displayAddress
-    );
+  const innerContent = displayAddress;
 
   const showLink = !hidePortfolioLink && address && address !== MINT_ACCOUNT.address && address != 'All';
   const invalidAddress = !isValidAddress;

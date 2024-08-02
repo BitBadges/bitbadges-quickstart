@@ -47,8 +47,7 @@ export function DisplayCard({
         ...style,
         minHeight: 100,
         padding: noPadding ? 0 : 6
-      }}
-    >
+      }}>
       <div
         className="primary-text card-bg rounded-lg"
         style={{
@@ -56,8 +55,7 @@ export function DisplayCard({
           background: inheritBg ? 'inherit' : undefined,
           height: '100%',
           padding: 14
-        }}
-      >
+        }}>
         {title && (
           <Row className="full-width flex-center" style={{ alignItems: 'normal', textAlign: 'center' }}>
             <Text strong style={{ fontSize: 22 }} className="primary-text full-width">

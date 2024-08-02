@@ -1,9 +1,9 @@
-import { BaseDefaultChainContext } from '@/chains/utils';
+import { BaseDefaultChainContext } from '../utils';
 import { notification } from 'antd';
 import { TransactionPayload, TxContext, convertToCosmosAddress, createTxBroadcastBody } from 'bitbadgesjs-sdk';
 import { createContext, useContext, useState } from 'react';
 import { useAccount } from '../AccountsContext';
-import { ChainSpecificContextType } from '../ChainContext';
+import { ChainSpecificContextType } from '../utils';
 
 const bs58 = require('bs58');
 
@@ -36,7 +36,11 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
     }
   };
 
-  const connect = async () => {
+  const autoConnect = async () => {
+    await connect(true);
+  };
+
+  const connect = async (auto = false) => {
     if (!address) {
       try {
         const provider = getProvider(); // see "Detecting the Provider"
@@ -51,6 +55,7 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
         const publicKeyToSet = Buffer.from(solanaPublicKeyBuffer).toString('base64');
         setPubKey(publicKeyToSet);
       } catch (e) {
+        if (auto) return;
         console.error(e);
         notification.error({
           message: 'Error connecting to wallet',
@@ -65,7 +70,7 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
     await getProvider()?.request({ method: 'disconnect' });
   };
 
-  const signChallenge = async (message: string) => {
+  const signMessage = async (message: string) => {
     const encodedMessage = new TextEncoder().encode(message);
     const provider = getProvider();
     const signedMessage = await provider.request({
@@ -79,15 +84,11 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
     return { message: message, signature: signedMessage.signature.toString('hex') };
   };
 
-  const signTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
+  const signBitBadgesTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
     if (!account) throw new Error('Account not found.');
 
     let sig = '';
     if (!simulate) {
-      //Phantom has a weird error where messages must be < ~1000 bytes
-      //If we are within limit, we can have user sign the JSON
-      //Else, we hash the JSON and have user sign the hash
-
       const normalMessage = false;
       let message = payload.jsonToSign;
       let encodedMessage = new TextEncoder().encode(message);
@@ -117,9 +118,10 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
 
   const solanaContext: SolanaContextType = {
     connect,
+    autoConnect,
     disconnect,
-    signChallenge,
-    signTxn,
+    signMessage,
+    signBitBadgesTxn,
     address,
     getPublicKey
   };

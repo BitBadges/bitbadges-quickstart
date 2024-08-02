@@ -1,6 +1,6 @@
-import { CoolButton } from '@/pages';
 import { notification, Typography } from 'antd';
 import { useState } from 'react';
+import { StyledButton } from './display/StyledButton';
 
 export const ClaimHelpers = () => {
   const [visible, setVisible] = useState(false);
@@ -25,13 +25,13 @@ export const ClaimHelpers = () => {
     <>
       <br />
       <div className="flex-center">
-        <CoolButton
+        <StyledButton
           onClick={() => {
             if (!visible) fetchCode();
             setVisible(!visible);
           }}>
           {visible ? 'Hide' : 'Check Criteria and Distribute Info'}
-        </CoolButton>
+        </StyledButton>
       </div>
       <br />
       {visible && (
