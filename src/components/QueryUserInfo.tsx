@@ -1,4 +1,4 @@
-import { BitBadgesApi } from '@/global/api';
+import { BitBadgesApi } from '@/bitbadges-api';
 import { useAccount, useAccountsContext } from '@/global/contexts/AccountsContext';
 import { useCollectionsContext } from '@/global/contexts/CollectionsContext';
 import { Avatar, Tooltip } from 'antd';

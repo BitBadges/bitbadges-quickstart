@@ -1,4 +1,4 @@
-import { BitBadgesApi } from '@/global/api';
+import { BitBadgesApi } from '@/bitbadges-api';
 import { useAccount } from '@/global/contexts/AccountsContext';
 import { JsonBodyInputSchema, MapWithValues } from 'bitbadgesjs-sdk';
 import { useEffect, useState } from 'react';

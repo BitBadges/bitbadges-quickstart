@@ -1,4 +1,4 @@
-import { BitBadgesApi } from '@/global/api';
+import { BitBadgesApi } from '@/bitbadges-api';
 import { useAccountsContext } from '@/global/contexts/AccountsContext';
 import { GetSearchSuccessResponse } from 'bitbadgesjs-sdk';
 import { debounce } from 'lodash';

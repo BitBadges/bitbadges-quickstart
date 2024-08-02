@@ -1,6 +1,6 @@
 import { BitBadgesUserInfo, SupportedChain, convertToCosmosAddress, getChainForAddress } from 'bitbadgesjs-sdk';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { BitBadgesApi } from '../api';
+import { BitBadgesApi } from '@/bitbadges-api';
 import { checkSignIn, signOut } from '../backend_connectors';
 import { BaseDefaultChainContext, ChainContextType, ChainSpecificContextType } from './utils';
 import { useAccountsContext } from './AccountsContext';

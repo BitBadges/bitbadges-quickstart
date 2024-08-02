@@ -1,7 +1,7 @@
 import { VerifySIWBBOptions } from 'bitbadgesjs-sdk';
 import cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { BitBadgesApi } from './bitbadges-api';
+import { BitBadgesApi } from '../../bitbadges-api';
 
 const CLIENT_ID = process.env.CLIENT_ID ?? '';
 const CLIENT_SECRET = process.env.CLIENT_SECRET ?? '';
