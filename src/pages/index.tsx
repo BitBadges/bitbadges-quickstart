@@ -106,11 +106,6 @@ const Home: NextPage = () => {
       description:
         'Search for public information on BitBadges or other platforms like balances, protocols, and more. BitBadges is useful because everything is consolidated to a single interface for any chain.',
       node: <UserQueryInfo />
-    },
-    {
-      label: 'Payments',
-      description: '',
-      node: <></>
     }
   ];
 

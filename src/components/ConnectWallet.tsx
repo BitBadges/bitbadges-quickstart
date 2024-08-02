@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { BITCOIN_LOGO, COSMOS_LOGO, ETH_LOGO, SOLANA_LOGO } from '../../constants';
 import { AddressDisplay } from './address/AddressDisplay';
 import { AltTabs } from './display/AltTabs';
+import { ownershipRequirementsToCheck } from '@/bitbadges-api';
 
 export const GatedInfoButton = () => {
   const chain = useChainContext();
@@ -51,18 +52,23 @@ export const BlockinDisplay = ({ hideLogo }: { hideLogo?: boolean }) => {
   const clientId = getConfig().publicRuntimeConfig.CLIENT_ID;
   const redirectUri = getConfig().publicRuntimeConfig.REDIRECT_URI;
 
-  //TODO: Customize your popup parameters. See the SIWBB documentation for more details (https://docs.bitbadges.io/for-developers/authenticating-with-bitbadges/overview)
+  //TODO: Customize your popup parameters. See the SIWBB documentation for more details (https://docs.bitbadges.io/for-developers/authenticating-with-bitbadges/authentication-url-+-parameters)
   const popupParams: CodeGenQueryParams = {
     client_id: clientId || 'example-client-id',
-    redirect_uri: redirectUri //Leave undefined if not applicable and using QR codes
+    redirect_uri: redirectUri, //Leave undefined if not applicable and using QR codes
 
     // state?: string;
     // scope?: string;
-    // expectAttestationsPresentations?: boolean;
     // otherSignIns?: ('discord' | 'twitter' | 'github' | 'google')[];
 
-    // ownershipRequirements?: AssetConditionGroup<NumberType>;
-    // expectVerifySuccess?: boolean;
+    // If you are expecting the user to provide an attestation, set this to true
+    // expectAttestationsPresentations?: boolean;
+
+    // This parameter is ONLY for display purposes to the user.
+    // It is not cached with the request and needs to be specified server-side as well to actually check them.
+    //
+    // You may also choose to not display requirements to the user and handle everything behind the scenes, depending on your use case.
+    ownershipRequirements: ownershipRequirementsToCheck
   };
 
   const { walletMode } = useWalletModeContext();

@@ -1,7 +1,7 @@
 import { VerifySIWBBOptions } from 'bitbadgesjs-sdk';
 import cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { BitBadgesApi } from '../../bitbadges-api';
+import { BitBadgesApi, ownershipRequirementsToCheck } from '../../bitbadges-api';
 
 const CLIENT_ID = process.env.CLIENT_ID ?? '';
 const CLIENT_SECRET = process.env.CLIENT_SECRET ?? '';
@@ -21,7 +21,12 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
     //      In other words, you nee to verify that the user did not maliciously tamper with the request.
 
     // Exchange the user's authorization code for a token. For in-person verification, the authorization code is their BitBadges QR code value.
-    const verifyOptions: VerifySIWBBOptions = {};
+    const verifyOptions: VerifySIWBBOptions = {
+      // Its important to note that ownership requirements must be specified here (even if specified on the frontend).
+      // The frontend one id for display purposes, but this is the real one that we use.
+      // We do not cache the requirements with the request.
+      ownershipRequirements: ownershipRequirementsToCheck
+    };
     const authCodeRes = await BitBadgesApi.exchangeSIWBBAuthorizationCode({
       code,
       options: verifyOptions,
@@ -38,10 +43,10 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
         .json({ success: false, errorMessage: 'Did not pass verification: ' + verificationResponse?.errorMessage });
     }
 
-    //----------------------------------------------CUSTOM LOGIC AND VERIFICATIOn-------------------------------------------------------
+    //----------------------------------------------CUSTOM LOGIC AND VERIFICATION-------------------------------------------------------
 
     //TODO: See https://docs.bitbadges.io/for-developers/authenticating-with-bitbadges/overview for more details on how to handle
-    // You can now implement any additional checks or custom logic for your application (verifying attestations, protocols, etc.) on your end.
+    // You can now implement any additional checks or custom logic for your application (verifying attestations content, querying information like protocols, etc.) on your end.
 
     // If you requested BitBadges API scopes, you can now access the access token and refresh token (see docs for more details)
     // All future requests must specify the access token in the Authorization header (Bearer token)

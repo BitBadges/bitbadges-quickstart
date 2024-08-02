@@ -1,4 +1,4 @@
-import { BigIntify, BitBadgesAPI } from 'bitbadgesjs-sdk';
+import { BigIntify, BitBadgesAPI, BlockinAndGroup, BlockinAssetConditionGroup, UintRangeArray } from 'bitbadgesjs-sdk';
 import getConfig from 'next/config';
 
 export type DesiredNumberType = bigint;
@@ -14,4 +14,20 @@ export const BitBadgesApi = new BitBadgesAPI({
   apiUrl: BACKEND_URL,
   convertFunction: BigIntify,
   apiKey: API_KEY
+});
+
+export const ownershipRequirementsToCheck: BlockinAssetConditionGroup<bigint> | undefined = new BlockinAndGroup({
+  $and: [
+    {
+      assets: [
+        {
+          chain: 'BitBadges',
+          collectionId: 1n,
+          assetIds: [{ start: 9n, end: 9n }],
+          ownershipTimes: UintRangeArray.FullRanges(),
+          mustOwnAmounts: { start: 0n, end: 0n }
+        }
+      ]
+    }
+  ]
 });
