@@ -20,6 +20,7 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
     //      You can either use the verifyOptions and let BitBadges check the request for you, or you can implement your own verification.
     //      In other words, you nee to verify that the user did not maliciously tamper with the request.
 
+    // Exchange the user's authorization code for a token. For in-person verification, the authorization code is their BitBadges QR code value.
     const verifyOptions: VerifySIWBBOptions = {};
     const authCodeRes = await BitBadgesApi.exchangeSIWBBAuthorizationCode({
       code,
@@ -29,9 +30,8 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
       redirect_uri: REDIRECT_URI,
       grant_type: 'authorization_code'
     });
-    const blockinChallenge = authCodeRes;
 
-    const { verificationResponse } = blockinChallenge;
+    const { verificationResponse } = authCodeRes;
     if (!verificationResponse?.success) {
       return res
         .status(400)
@@ -42,7 +42,6 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
 
     //TODO: See https://docs.bitbadges.io/for-developers/authenticating-with-bitbadges/overview for more details on how to handle
     // You can now implement any additional checks or custom logic for your application (verifying attestations, protocols, etc.) on your end.
-    // It is also important to prevent against common attacks like flash ownership attacks.
 
     // If you requested BitBadges API scopes, you can now access the access token and refresh token (see docs for more details)
     // All future requests must specify the access token in the Authorization header (Bearer token)
@@ -50,12 +49,14 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
     //
     // const { access_token, access_token_expires_at, refresh_token, refresh_token_expires at } = doc;
 
+    // TODO: It is also necessary to prevent against common attacks like flash ownership attacks or replay attacks depending on your use case.
+
     //----------------------------------------------SET SESSIONS-------------------------------------------------------
 
     // Finally, once ypu are satisfied with the verification, you can create a session for the user.
     //TODO: This is not a production-ready example. You should implement your own session management and security measures
     const sessionData = {
-      address: blockinChallenge.address
+      address: authCodeRes.address
     };
 
     // Set the session cookie

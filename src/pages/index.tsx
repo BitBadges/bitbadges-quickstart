@@ -26,7 +26,7 @@ const Home: NextPage = () => {
       node: (
         <>
           <div className="flex-center flex-wrap" style={{ alignItems: 'normal' }}>
-            <Col md={12} xs={24} sm={24}>
+            <Col md={24} xs={24} sm={24}>
               <BlockinDisplay />
               <br />
               <br />
@@ -92,12 +92,19 @@ const Home: NextPage = () => {
               </div>
             </Col>
           </div>
+          <br />
+          <br />
+          <div className="text-xs text-center  secondary-text">
+            Tip: Combine this step with queries (e.g. badge ownership) to further gate content or use other information
+            to customize experiences out of the box (e.g. dark mode protocols).
+          </div>
         </>
       )
     },
     {
-      label: 'Query Information',
-      description: 'Search for public information like balances, protocols, and more.',
+      label: 'Queries',
+      description:
+        'Search for public information on BitBadges or other platforms like balances, protocols, and more. BitBadges is useful because everything is consolidated to a single interface for any chain.',
       node: <UserQueryInfo />
     },
     {

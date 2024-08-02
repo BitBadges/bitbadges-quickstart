@@ -55,6 +55,14 @@ export const BlockinDisplay = ({ hideLogo }: { hideLogo?: boolean }) => {
   const popupParams: CodeGenQueryParams = {
     client_id: clientId || 'example-client-id',
     redirect_uri: redirectUri //Leave undefined if not applicable and using QR codes
+
+    // state?: string;
+    // scope?: string;
+    // expectAttestationsPresentations?: boolean;
+    // otherSignIns?: ('discord' | 'twitter' | 'github' | 'google')[];
+
+    // ownershipRequirements?: AssetConditionGroup<NumberType>;
+    // expectVerifySuccess?: boolean;
   };
 
   const { walletMode } = useWalletModeContext();

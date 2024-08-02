@@ -1,5 +1,5 @@
 import { useCollection } from '@/global/contexts/CollectionsContext';
-import { Avatar } from 'antd';
+import { Avatar, Tooltip } from 'antd';
 
 export const BadgeMetadataDisplay = ({ badgeId, collectionId }: { badgeId: bigint; collectionId: bigint }) => {
   const collection = useCollection(collectionId);
@@ -7,14 +7,15 @@ export const BadgeMetadataDisplay = ({ badgeId, collectionId }: { badgeId: bigin
 
   return (
     <div className="">
-      <Avatar
-        src={badgeIdOneMetadata?.image.replace('ipfs://', 'https://bitbadges-ipfs.infura-ipfs.io/ipfs/')}
-        size={50}
-        shape="square"
-        className="rounded-lg cursor-pointer hover:scale-110"
-        onClick={() => window.open(`https://bitbadges.io/collections/${collectionId}/1`)}
-      />
-      <div className="fon-bold text-center">ID {badgeId.toString()}</div>
+      <Tooltip title={badgeIdOneMetadata?.name} placement="bottom">
+        <Avatar
+          src={badgeIdOneMetadata?.image.replace('ipfs://', 'https://bitbadges-ipfs.infura-ipfs.io/ipfs/')}
+          size={100}
+          shape="square"
+          className="rounded-lg cursor-pointer hover:scale-110 "
+          onClick={() => window.open(`https://bitbadges.io/collections/${collectionId}/1`)}
+        />
+      </Tooltip>
     </div>
   );
 };

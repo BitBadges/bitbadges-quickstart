@@ -13,8 +13,8 @@ const getPrivateInfo = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(200).json({
       message:
         'The secret is: super secret password. This is only available to authenticated users. Currently authenticated user is: ' +
-        +getChainForAddress(sessionDetails.address) +
-        ' ' +
+        getChainForAddress(sessionDetails.address) +
+        ' address ' +
         sessionDetails.address
     });
   } catch (err) {
