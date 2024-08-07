@@ -12,6 +12,7 @@ import { ReactNode } from 'react';
 import { BroadcastTxPopupButton } from '../components/BitBadgesTxnPopup';
 import Header from '../components/Header';
 import { useWalletModeContext } from '@/global/contexts/WalletModeContext';
+import getConfig from 'next/config';
 
 const Home: NextPage = () => {
   const chainContext = useChainContext();
@@ -55,7 +56,7 @@ const Home: NextPage = () => {
                             throw new Error('No signed in account');
                           }
 
-                          if (signedInAccount.accountNumber <= 0) {
+                          if (!signedInAccount.accountNumber || signedInAccount.accountNumber <= 0) {
                             notification.error({
                               message: 'Account has not been registered',
                               description:
@@ -69,14 +70,16 @@ const Home: NextPage = () => {
                             gas: `40000000`
                           });
 
-                          const getPublicKey = async () => {
-                            const account = await window?.keplr?.getKey('bitbadges-1');
-                            if (!account) return '';
-
-                            return Buffer.from(account.pubKey).toString('base64');
-                          };
-
                           if (chainContext.chain === SupportedChain.COSMOS) {
+                            const getPublicKey = async () => {
+                              const account = await window?.keplr?.getKey(
+                                getConfig().publicRuntimeConfig.TESTNET_MODE ? 'bitbadges-2' : 'bitbadges-1'
+                              );
+                              if (!account) return '';
+
+                              return Buffer.from(account.pubKey).toString('base64');
+                            };
+
                             txContext.sender.publicKey = await getPublicKey();
                           }
 

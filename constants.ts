@@ -1,10 +1,11 @@
-import { BETANET_CHAIN_DETAILS, SupportedChain } from 'bitbadgesjs-sdk';
+import { BETANET_CHAIN_DETAILS, SupportedChain, TESTNET_CHAIN_DETAILS } from 'bitbadgesjs-sdk';
 import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
 export const HOSTNAME = publicRuntimeConfig.HOSTNAME;
 export const BACKEND_PORT = publicRuntimeConfig.BACKEND_PORT;
-export const CHAIN_DETAILS = BETANET_CHAIN_DETAILS;
+
+export const CHAIN_DETAILS = publicRuntimeConfig.TESTNET_MODE ? TESTNET_CHAIN_DETAILS : BETANET_CHAIN_DETAILS;
 
 export const NODE_PORT = '1317';
 export const NODE_API_URL = `${HOSTNAME !== 'localhost' ? 'https://node.' + HOSTNAME + '/api' : 'http://localhost:1317'}`;

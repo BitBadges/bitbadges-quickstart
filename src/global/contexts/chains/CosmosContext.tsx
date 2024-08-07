@@ -1,16 +1,17 @@
-import { BaseDefaultChainContext } from '../utils';
 import { AccountData, Window as KeplrWindow } from '@keplr-wallet/types';
+import { notification } from 'antd';
 import {
   BitBadgesKeplrSuggestBetanetChainInfo,
+  BitBadgesKeplrSuggestTestnetChainInfo,
   TransactionPayload,
   TxContext,
   createTxBroadcastBody
 } from 'bitbadgesjs-sdk';
 import Long from 'long';
+import getConfig from 'next/config';
 import { createContext, useContext, useState } from 'react';
 import { CHAIN_DETAILS } from '../../../../constants';
-import { ChainSpecificContextType } from '../utils';
-import { notification } from 'antd';
+import { BaseDefaultChainContext, ChainSpecificContextType } from '../utils';
 
 declare global {
   interface Window extends KeplrWindow {}
@@ -25,6 +26,10 @@ export const CosmosContext = createContext<CosmosContextType>({
 type Props = {
   children?: React.ReactNode;
 };
+
+const SuggestChainInfo = getConfig().publicRuntimeConfig.TESTNET_MODE
+  ? BitBadgesKeplrSuggestTestnetChainInfo
+  : BitBadgesKeplrSuggestBetanetChainInfo;
 
 export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
   const chainId = CHAIN_DETAILS.cosmosChainId;
@@ -43,7 +48,7 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
         throw new Error('Please install Keplr to continue with Cosmos');
       }
 
-      await keplr.experimentalSuggestChain(BitBadgesKeplrSuggestBetanetChainInfo);
+      await keplr.experimentalSuggestChain(SuggestChainInfo);
       const offlineSigner = window.getOfflineSigner(chainId);
       const account: AccountData = (await offlineSigner.getAccounts())[0];
       setAddress(account.address);
@@ -62,8 +67,7 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
   };
 
   const signMessage = async (message: string) => {
-    let sig = await window.keplr?.signArbitrary('bitbadges_1-1', cosmosAddress, message);
-
+    let sig = await window.keplr?.signArbitrary(chainId, cosmosAddress, message);
     if (!sig) sig = { signature: '', pub_key: { type: '', value: '' } };
 
     return {

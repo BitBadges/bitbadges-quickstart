@@ -5,14 +5,14 @@ const nextConfig = {
   reactStrictMode: true,
   publicRuntimeConfig: {
     // Will be available on both server and client
-    // HOSTNAME: 'bitbadges.io',
     HOSTNAME: 'localhost',
     BACKEND_PORT: process.env.BACKEND_PORT ? process.env.BACKEND_PORT : '',
-    MAINNET: process.env.MAINNET === 'true' ? true : false,
+    TESTNET_MODE: process.env.TESTNET_MODE === 'true',
+
     BITBADGES_API_KEY: process.env.BITBADGES_API_KEY,
     WC_PROJECT_ID: process.env.WC_PROJECT_ID,
     CLIENT_ID: process.env.CLIENT_ID,
-    REDIRECT_URI: process.env.REDIRECT_URI,
+    REDIRECT_URI: process.env.REDIRECT_URI
     // BITBADGES_API_URL: 'https://localhost:3001'
   },
   transpilePackages: [

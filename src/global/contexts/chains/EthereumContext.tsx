@@ -1,10 +1,9 @@
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 
 import { notification } from 'antd';
-import { TransactionPayload, TxContext, convertToCosmosAddress, createTxBroadcastBody } from 'bitbadgesjs-sdk';
+import { TransactionPayload, TxContext, createTxBroadcastBody } from 'bitbadgesjs-sdk';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDisconnect, useSignMessage, useAccount as useWeb3Account } from 'wagmi';
-import { useAccount } from '../AccountsContext';
 import { BaseDefaultChainContext, ChainSpecificContextType } from '../utils';
 
 export type EthereumContextType = ChainSpecificContextType & {};
@@ -21,8 +20,6 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
   const { open } = useWeb3Modal();
   const web3AccountContext = useWeb3Account();
   const [address, setAddress] = useState<string>('');
-  const cosmosAddress = convertToCosmosAddress(address);
-  const account = useAccount(cosmosAddress);
   const { signMessageAsync } = useSignMessage();
 
   useEffect(() => {
@@ -31,8 +28,7 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
 
   const { disconnect: disconnectWeb3 } = useDisconnect();
 
-  const autoConnect = async () => {};
-
+  const autoConnect = async () => {}; // Should already auto connect
   const connect = async () => {
     if (!address) {
       try {
@@ -48,12 +44,10 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
   };
 
   const disconnect = async () => {
-    await disconnectWeb3();
+    disconnectWeb3();
   };
 
   const signMessage = async (message: string) => {
-    if (!account) throw new Error('Account not found.');
-
     const sign = await signMessageAsync({
       message: message
     });
@@ -70,18 +64,15 @@ export const EthereumContextProvider: React.FC<Props> = ({ children }) => {
     messages: any[],
     simulate: boolean
   ) => {
-    if (!account) throw new Error('Account not found.');
-
+    const message = payload.txnString;
     let sig = '';
     if (!simulate) {
-      const message = payload.txnString;
       sig = await signMessageAsync({
         message: message
       });
     }
 
-    const txBody = createTxBroadcastBody(context, messages, sig);
-    return txBody;
+    return createTxBroadcastBody(context, messages, sig);
   };
 
   const ethereumContext: EthereumContextType = {
