@@ -5,15 +5,16 @@ const { publicRuntimeConfig } = getConfig();
 export const HOSTNAME = publicRuntimeConfig.HOSTNAME;
 export const BACKEND_PORT = publicRuntimeConfig.BACKEND_PORT;
 
+export const TESTNET = publicRuntimeConfig.TESTNET;
 export const CHAIN_DETAILS = publicRuntimeConfig.TESTNET_MODE ? TESTNET_CHAIN_DETAILS : BETANET_CHAIN_DETAILS;
 
 export const NODE_PORT = '1317';
-export const NODE_API_URL = `${HOSTNAME !== 'localhost' ? 'https://node.' + HOSTNAME + '/api' : 'http://localhost:1317'}`;
+export const NODE_API_URL = `${HOSTNAME !== 'localhost' ? (TESTNET ? 'http://138.197.10.8:1317' : 'https://node.bitbadges.io' + '/api') : 'http://localhost:1317'}`;
 export const RPC_PORT = '26657';
-export const RPC_URL = `${HOSTNAME !== 'localhost' ? 'https://node.' + HOSTNAME + '/rpc' : 'http://localhost:26657'}`;
-export const BACKEND_URL = `https://${HOSTNAME !== 'localhost' ? 'api.' + HOSTNAME : HOSTNAME}${BACKEND_PORT}`;
+export const RPC_URL = `${HOSTNAME !== 'localhost' ? (TESTNET ? 'http://138.197.10.8:26657' : 'https://node.bitbadges.io' + '/rpc') : 'http://localhost:26657'}`;
+
+export const BACKEND_URL = `https://${HOSTNAME !== 'localhost' ? 'api.' + HOSTNAME : HOSTNAME}${BACKEND_PORT}${TESTNET && HOSTNAME !== 'localhost' ? '/testnet' : ''}`;
 export const WEBSITE_HOSTNAME = `https://${HOSTNAME}`;
-export const EXPLORER_URL = `https://explorer.${HOSTNAME}`;
 
 export const ETH_LOGO = '/images/ethereum-logo.png';
 export const COSMOS_LOGO = '/images/cosmos-logo.png';
