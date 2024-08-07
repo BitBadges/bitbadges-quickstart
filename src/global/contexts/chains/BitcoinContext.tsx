@@ -1,7 +1,7 @@
 import { notification } from 'antd';
 import { TransactionPayload, TxContext, createTxBroadcastBody } from 'bitbadgesjs-sdk';
 import { createContext, useContext, useState } from 'react';
-import { ChainSpecificContextType, BaseDefaultChainContext } from '../utils';
+import { BaseDefaultChainContext, ChainSpecificContextType } from '../utils';
 
 export type BitcoinContextType = ChainSpecificContextType & {};
 export const BitcoinContext = createContext<BitcoinContextType>({
@@ -13,7 +13,6 @@ type Props = {
 };
 
 export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
-  const [pubKey, setPubKey] = useState<string>('');
   const [address, setAddress] = useState<string>('');
 
   //See Phantom docs for more info
@@ -48,11 +47,7 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
           throw new Error('Invalid account type');
         }
 
-        const publicKey = accounts[0].publicKey; //Hex public key
-        const base64PublicKey = Buffer.from(publicKey, 'hex').toString('base64');
-
         setAddress(address);
-        setPubKey(base64PublicKey);
       } catch (e) {
         if (auto) return;
         console.log(e);
@@ -81,12 +76,17 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
     return { message: message, signature: bytesToBase64(signature) };
   };
 
-  const signBitBadgesTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
+  const signBitBadgesTxn = async (
+    context: TxContext,
+    payload: TransactionPayload,
+    messages: any[],
+    simulate: boolean
+  ) => {
     const bitcoinProvider = getProvider();
 
     let sig = '';
     if (!simulate) {
-      const message = payload.humanReadableMessage;
+      const message = payload.txnString;
       const encodedMessage = new TextEncoder().encode(message);
       const signedMessage = await bitcoinProvider.signMessage(address, encodedMessage);
 
@@ -94,12 +94,8 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
       sig = Buffer.from(base64Sig, 'base64').toString('hex');
     }
 
-    const txBody = createTxBroadcastBody(context, payload, sig);
+    const txBody = createTxBroadcastBody(context, messages, sig);
     return txBody;
-  };
-
-  const getPublicKey = async () => {
-    return pubKey;
   };
 
   const bitcoinContext: BitcoinContextType = {
@@ -108,8 +104,7 @@ export const BitcoinContextProvider: React.FC<Props> = ({ children }) => {
     signMessage,
     signBitBadgesTxn,
     autoConnect,
-    address,
-    getPublicKey
+    address
   };
 
   return <BitcoinContext.Provider value={bitcoinContext}>{children}</BitcoinContext.Provider>;

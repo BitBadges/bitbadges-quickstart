@@ -6,7 +6,7 @@ import { useAccount } from '@/global/contexts/AccountsContext';
 import { useChainContext } from '@/global/contexts/ChainContext';
 import { getBitBadgesTxContextFromAccount } from '@/global/contexts/utils';
 import { Col, notification } from 'antd';
-import { createTransactionPayload, proto } from 'bitbadgesjs-sdk';
+import { createTransactionPayload, proto, SupportedChain } from 'bitbadgesjs-sdk';
 import { NextPage } from 'next/types';
 import { ReactNode } from 'react';
 import { BroadcastTxPopupButton } from '../components/BitBadgesTxnPopup';
@@ -69,15 +69,29 @@ const Home: NextPage = () => {
                             gas: `40000000`
                           });
 
+                          const getPublicKey = async () => {
+                            const account = await window?.keplr?.getKey('bitbadges-1');
+                            if (!account) return '';
+
+                            return Buffer.from(account.pubKey).toString('base64');
+                          };
+
+                          if (chainContext.chain === SupportedChain.COSMOS) {
+                            txContext.sender.publicKey = await getPublicKey();
+                          }
+
+                          const protoMsgs = [
+                            new proto.cosmos.bank.v1beta1.MsgSend({
+                              fromAddress: signedInAccount?.cosmosAddress ?? '',
+                              toAddress: 'cosmos1zd5dsage58jfrgmsu377pk6w0q5zhc67fn4gsl',
+                              amount: [{ denom: 'ubadge', amount: '1' }]
+                            })
+                          ];
+
                           await chainContext.signBitBadgesTxn(
                             txContext,
-                            createTransactionPayload(txContext, [
-                              new proto.cosmos.bank.v1beta1.MsgSend({
-                                fromAddress: signedInAccount?.cosmosAddress ?? '',
-                                toAddress: 'cosmos1zd5dsage58jfrgmsu377pk6w0q5zhc67fn4gsl',
-                                amount: [{ denom: 'ubadge', amount: '1' }]
-                              })
-                            ]),
+                            createTransactionPayload(txContext, protoMsgs),
+                            protoMsgs,
                             false
                           );
                         } catch (e) {

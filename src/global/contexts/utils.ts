@@ -1,12 +1,4 @@
-import {
-  BitBadgesUserInfo,
-  Fee,
-  getChainForAddress,
-  MAINNET_CHAIN_DETAILS,
-  SupportedChain,
-  TransactionPayload,
-  TxContext
-} from 'bitbadgesjs-sdk';
+import { BitBadgesUserInfo, Fee, SupportedChain, TransactionPayload, TxContext } from 'bitbadgesjs-sdk';
 import { Dispatch, SetStateAction } from 'react';
 
 export const BaseDefaultChainContext: ChainContextType = {
@@ -23,9 +15,6 @@ export const BaseDefaultChainContext: ChainContextType = {
     return { message: '', signature: '' };
   },
   signBitBadgesTxn: async () => {
-    return '';
-  },
-  getPublicKey: async () => {
     return '';
   },
   chain: SupportedChain.UNKNOWN,
@@ -59,21 +48,22 @@ export type ChainSpecificContextType = {
   autoConnect: () => Promise<any>;
   connect: () => Promise<any>;
   signMessage: (message: string) => Promise<SignMessageResponse>;
-  signBitBadgesTxn: (context: TxContext, payload: TransactionPayload, simulate: boolean) => Promise<string>;
-  getPublicKey: () => Promise<string>;
+  signBitBadgesTxn: (
+    context: TxContext,
+    payload: TransactionPayload,
+    messages: any[],
+    simulate: boolean
+  ) => Promise<string>;
 };
 
 export const getBitBadgesTxContextFromAccount = (account: BitBadgesUserInfo<bigint>, fee: Fee) => {
   const txContext: TxContext = {
-    chain: {
-      ...MAINNET_CHAIN_DETAILS,
-      chain: getChainForAddress(account?.address ?? '')
-    },
+    testnet: false,
     sender: {
-      accountAddress: account?.cosmosAddress ?? '',
+      address: account?.address ?? '',
       sequence: Number(account?.sequence ?? '0') >= 0 ? Number(account?.sequence ?? '0') : 0,
       accountNumber: Number(account?.accountNumber ?? '0'),
-      pubkey: account?.publicKey ?? ''
+      publicKey: account?.publicKey ?? ''
     },
     fee: fee,
     memo: ''

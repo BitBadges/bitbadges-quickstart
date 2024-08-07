@@ -1,11 +1,8 @@
-import { BaseDefaultChainContext } from '../utils';
 import { notification } from 'antd';
 import { TransactionPayload, TxContext, convertToCosmosAddress, createTxBroadcastBody } from 'bitbadgesjs-sdk';
 import { createContext, useContext, useState } from 'react';
 import { useAccount } from '../AccountsContext';
-import { ChainSpecificContextType } from '../utils';
-
-const bs58 = require('bs58');
+import { BaseDefaultChainContext, ChainSpecificContextType } from '../utils';
 
 export type SolanaContextType = ChainSpecificContextType;
 
@@ -18,7 +15,6 @@ type Props = {
 };
 
 export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
-  const [pubKey, setPubKey] = useState<string>('');
   const [address, setAddress] = useState<string>('');
 
   const cosmosAddress = convertToCosmosAddress(address);
@@ -47,13 +43,7 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
 
         const resp = await provider.request({ method: 'connect' });
         const address = resp.publicKey.toBase58();
-        const pubKey = resp.publicKey.toBase58();
         setAddress(address);
-
-        const solanaPublicKeyBase58 = pubKey;
-        const solanaPublicKeyBuffer = bs58.decode(solanaPublicKeyBase58);
-        const publicKeyToSet = Buffer.from(solanaPublicKeyBuffer).toString('base64');
-        setPubKey(publicKeyToSet);
       } catch (e) {
         if (auto) return;
         console.error(e);
@@ -84,23 +74,21 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
     return { message: message, signature: signedMessage.signature.toString('hex') };
   };
 
-  const signBitBadgesTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
+  const signBitBadgesTxn = async (
+    context: TxContext,
+    payload: TransactionPayload,
+    messages: any[],
+    simulate: boolean
+  ) => {
     if (!account) throw new Error('Account not found.');
 
     let sig = '';
     if (!simulate) {
-      const normalMessage = false;
-      let message = payload.jsonToSign;
-      let encodedMessage = new TextEncoder().encode(message);
-
-      if (!normalMessage) {
-        encodedMessage = new TextEncoder().encode(payload.humanReadableMessage);
-      }
-
+      let message = payload.txnString;
       const signedMessage = await getProvider().request({
         method: 'signMessage',
         params: {
-          message: encodedMessage,
+          message: message,
           display: 'utf8'
         }
       });
@@ -108,12 +96,8 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
     }
 
     //We need to pass in solAddress manually here
-    const txBody = createTxBroadcastBody(context, payload, sig, address);
+    const txBody = createTxBroadcastBody(context, messages, sig, address);
     return txBody;
-  };
-
-  const getPublicKey = async () => {
-    return pubKey;
   };
 
   const solanaContext: SolanaContextType = {
@@ -122,8 +106,7 @@ export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
     disconnect,
     signMessage,
     signBitBadgesTxn,
-    address,
-    getPublicKey
+    address
   };
 
   return <SolanaContext.Provider value={solanaContext}>{children}</SolanaContext.Provider>;

@@ -73,7 +73,12 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
     };
   };
 
-  const signBitBadgesTxn = async (context: TxContext, payload: TransactionPayload, simulate: boolean) => {
+  const signBitBadgesTxn = async (
+    context: TxContext,
+    payload: TransactionPayload,
+    messages: any[],
+    simulate: boolean
+  ) => {
     const { sender } = context;
     await window.keplr?.enable(chainId);
 
@@ -81,7 +86,7 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
     if (!simulate) {
       const signResponse = await window?.keplr?.signDirect(
         chainId,
-        sender.accountAddress,
+        sender.address,
         {
           bodyBytes: payload.signDirect.body.toBinary(),
           authInfoBytes: payload.signDirect.authInfo.toBinary(),
@@ -101,15 +106,8 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
     }
 
     const hexSig = Buffer.from(signatures[0]).toString('hex');
-    const txBody = createTxBroadcastBody(context, payload, hexSig);
+    const txBody = createTxBroadcastBody(context, messages, hexSig);
     return txBody;
-  };
-
-  const getPublicKey = async () => {
-    const account = await window?.keplr?.getKey(chainId);
-    if (!account) return '';
-
-    return Buffer.from(account.pubKey).toString('base64');
   };
 
   const cosmosContext: CosmosContextType = {
@@ -118,8 +116,7 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
     autoConnect,
     signMessage,
     signBitBadgesTxn,
-    address,
-    getPublicKey
+    address
   };
 
   return <CosmosContext.Provider value={cosmosContext}>{children}</CosmosContext.Provider>;
