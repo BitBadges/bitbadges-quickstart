@@ -110,6 +110,18 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
     }
 
     const hexSig = Buffer.from(signatures[0]).toString('hex');
+
+    const getPublicKey = async () => {
+      const account = await window?.keplr?.getKey(
+        getConfig().publicRuntimeConfig.TESTNET_MODE ? 'bitbadges-2' : 'bitbadges-1'
+      );
+      if (!account) return '';
+
+      return Buffer.from(account.pubKey).toString('base64');
+    };
+
+    context.sender.publicKey = await getPublicKey();
+
     const txBody = createTxBroadcastBody(context, messages, hexSig);
     return txBody;
   };

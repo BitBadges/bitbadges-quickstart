@@ -5,14 +5,13 @@ import { UserQueryInfo } from '@/components/QueryUserInfo';
 import { useAccount } from '@/global/contexts/AccountsContext';
 import { useChainContext } from '@/global/contexts/ChainContext';
 import { getBitBadgesTxContextFromAccount } from '@/global/contexts/utils';
+import { useWalletModeContext } from '@/global/contexts/WalletModeContext';
 import { Col, notification } from 'antd';
-import { createTransactionPayload, proto, SupportedChain } from 'bitbadgesjs-sdk';
+import { createTransactionPayload, proto } from 'bitbadgesjs-sdk';
 import { NextPage } from 'next/types';
 import { ReactNode } from 'react';
 import { BroadcastTxPopupButton } from '../components/BitBadgesTxnPopup';
 import Header from '../components/Header';
-import { useWalletModeContext } from '@/global/contexts/WalletModeContext';
-import getConfig from 'next/config';
 
 const Home: NextPage = () => {
   const chainContext = useChainContext();
@@ -69,19 +68,6 @@ const Home: NextPage = () => {
                             denom: 'ubadge',
                             gas: `40000000`
                           });
-
-                          if (chainContext.chain === SupportedChain.COSMOS) {
-                            const getPublicKey = async () => {
-                              const account = await window?.keplr?.getKey(
-                                getConfig().publicRuntimeConfig.TESTNET_MODE ? 'bitbadges-2' : 'bitbadges-1'
-                              );
-                              if (!account) return '';
-
-                              return Buffer.from(account.pubKey).toString('base64');
-                            };
-
-                            txContext.sender.publicKey = await getPublicKey();
-                          }
 
                           const protoMsgs = [
                             new proto.cosmos.bank.v1beta1.MsgSend({
