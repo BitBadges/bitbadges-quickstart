@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { BITCOIN_LOGO, COSMOS_LOGO, ETH_LOGO, SOLANA_LOGO } from '../../constants';
 import { AddressDisplay } from './address/AddressDisplay';
 import { AltTabs } from './display/AltTabs';
-import { ownershipRequirementsToCheck } from '@/bitbadges-api';
+import { claimIdToUse, ownershipRequirementsToCheck } from '@/bitbadges-api';
 
 export const GatedInfoButton = () => {
   const chain = useChainContext();
@@ -68,7 +68,11 @@ export const ConnectDisplay = ({ hideLogo }: { hideLogo?: boolean }) => {
     // It is not cached with the request and needs to be specified server-side as well to actually check them.
     //
     // You may also choose to not display requirements to the user and handle everything behind the scenes, depending on your use case.
-    ownershipRequirements: ownershipRequirementsToCheck
+    ownershipRequirements: ownershipRequirementsToCheck,
+
+    //You can also specify a claim ID
+    claimId: claimIdToUse
+    // hideIfAlreadyClaimed?: boolean;
   };
 
   const { walletMode } = useWalletModeContext();

@@ -1,7 +1,7 @@
 import { VerifySIWBBOptions } from 'bitbadgesjs-sdk';
 import cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { BitBadgesApi, ownershipRequirementsToCheck } from '../../bitbadges-api';
+import { BitBadgesApi, claimIdToUse, ownershipRequirementsToCheck } from '../../bitbadges-api';
 
 const CLIENT_ID = process.env.CLIENT_ID ?? '';
 const CLIENT_SECRET = process.env.CLIENT_SECRET ?? '';
@@ -19,7 +19,12 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
       // Its important to note that ownership requirements must be specified here (even if specified on the frontend).
       // The frontend one id for display purposes, but this is the real one that we use.
       // We do not cache the requirements with the request.
-      ownershipRequirements: ownershipRequirementsToCheck
+      ownershipRequirements: ownershipRequirementsToCheck,
+      claimId: claimIdToUse,
+      //TODO: You should only check one of these. simulateClaim is used for non-indexed claims. checkClaimedMinOnce is used for indexed claims.
+      // You may also custom check claim statuses with the BitBadges API. See docs for more information.
+      simulateClaim: true,
+      checkClaimedMinOnce: true
     };
     const authCodeRes = await BitBadgesApi.exchangeSIWBBAuthorizationCode({
       code,

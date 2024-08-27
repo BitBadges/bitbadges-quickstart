@@ -34,3 +34,5 @@ export const ownershipRequirementsToCheck: SiwbbAssetConditionGroup<bigint> | un
     }
   ]
 });
+
+export const claimIdToUse: string | undefined = undefined;
