@@ -26,6 +26,7 @@ const signIn = async (req: NextApiRequest, res: NextApiResponse) => {
       simulateClaim: true,
       checkClaimedMinOnce: true
     };
+
     const authCodeRes = await BitBadgesApi.exchangeSIWBBAuthorizationCode({
       code,
       options: verifyOptions,
