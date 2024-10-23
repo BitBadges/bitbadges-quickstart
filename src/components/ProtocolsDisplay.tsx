@@ -87,7 +87,7 @@ export const ProtocolsDisplay = ({ addressOrUsername }: { addressOrUsername?: st
     map: MapWithValues<bigint>;
     idx: number;
   }) => {
-    const userValue = map.values[account?.cosmosAddress ?? '']?.value;
+    const userValue = map.values[account?.bitbadgesAddress ?? '']?.value;
     const image = map.metadata?.image;
     // const description = Protocols.find((protocol) => protocol.mapId === map.mapId)?.description ?? map.metadata?.description;
     return (

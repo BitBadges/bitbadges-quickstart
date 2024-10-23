@@ -35,7 +35,7 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
   const chainId = CHAIN_DETAILS.cosmosChainId;
 
   const [address, setAddress] = useState<string>('');
-  const cosmosAddress = address;
+  const bitbadgesAddress = address;
 
   const autoConnect = async () => {
     await connect(true);
@@ -67,7 +67,7 @@ export const CosmosContextProvider: React.FC<Props> = ({ children }) => {
   };
 
   const signMessage = async (message: string) => {
-    let sig = await window.keplr?.signArbitrary(chainId, cosmosAddress, message);
+    let sig = await window.keplr?.signArbitrary(chainId, bitbadgesAddress, message);
     if (!sig) sig = { signature: '', pub_key: { type: '', value: '' } };
 
     return {

@@ -17,7 +17,7 @@ export const BACKEND_URL = `https://${HOSTNAME !== 'localhost' ? 'api.' + HOSTNA
 export const WEBSITE_HOSTNAME = `https://${HOSTNAME}`;
 
 export const ETH_LOGO = '/images/ethereum-logo.png';
-export const COSMOS_LOGO = '/images/cosmos-logo.png';
+export const COSMOS_LOGO = '/images/bitbadgeslogo.png';
 export const BITCOIN_LOGO = '/images/bitcoin-logo.png';
 export const SOLANA_LOGO = '/images/solana-logo.png';
 export const CHAIN_LOGO = '/images/encryption-icon.svg';

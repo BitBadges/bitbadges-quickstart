@@ -131,7 +131,7 @@ export function ButtonDisplay({
 
   const openSeaLink = 'https://opensea.io/' + address;
   const etherscanLink = 'https://etherscan.io/address/' + address;
-  const stargazeLink = `https://www.stargaze.zone/p/${address?.replace('cosmos', 'stars')}/tokens`;
+  const stargazeLink = `https://www.stargaze.zone/p/${address?.replace('bb', 'stars')}/tokens`;
 
   return (
     <>

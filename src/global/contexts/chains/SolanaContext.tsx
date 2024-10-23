@@ -1,5 +1,5 @@
 import { notification } from 'antd';
-import { TransactionPayload, TxContext, convertToCosmosAddress, createTxBroadcastBody } from 'bitbadgesjs-sdk';
+import { TransactionPayload, TxContext, convertToBitBadgesAddress, createTxBroadcastBody } from 'bitbadgesjs-sdk';
 import { createContext, useContext, useState } from 'react';
 import { useAccount } from '../AccountsContext';
 import { BaseDefaultChainContext, ChainSpecificContextType } from '../utils';
@@ -17,8 +17,8 @@ type Props = {
 export const SolanaContextProvider: React.FC<Props> = ({ children }) => {
   const [address, setAddress] = useState<string>('');
 
-  const cosmosAddress = convertToCosmosAddress(address);
-  const account = useAccount(cosmosAddress);
+  const bitbadgesAddress = convertToBitBadgesAddress(address);
+  const account = useAccount(bitbadgesAddress);
 
   const getProvider = () => {
     if ('phantom' in window) {

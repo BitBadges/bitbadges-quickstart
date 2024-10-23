@@ -27,15 +27,15 @@ export const BroadcastTxPopupButton = ({}: {}) => {
     {
       type: 'MsgDeleteCollection',
       msg: new MsgDeleteCollection({
-        creator: chain.cosmosAddress,
+        creator: chain.bitbadgesAddress,
         collectionId: '1'
       })
     },
     {
       type: 'MsgSend',
       msg: new MsgSend({
-        fromAddress: chain.cosmosAddress,
-        toAddress: 'cosmos14d0y596ujj7s40n7nxu86qg4c835p3xa8vucja',
+        fromAddress: chain.bitbadgesAddress,
+        toAddress: 'bb14d0y596ujj7s40n7nxu86qg4c835p3xay35twv',
         amount: [{ denom: 'badge', amount: '1' }]
       })
     }
@@ -58,20 +58,20 @@ export const BroadcastTxPopupButton = ({}: {}) => {
       {
         type: 'MsgDeleteCollection',
         msg: new MsgDeleteCollection({
-          creator: chain.cosmosAddress,
+          creator: chain.bitbadgesAddress,
           collectionId: '1'
         })
       },
       {
         type: 'MsgSend',
         msg: new MsgSend({
-          fromAddress: chain.cosmosAddress,
-          toAddress: 'cosmos14d0y596ujj7s40n7nxu86qg4c835p3xa8vucja',
+          fromAddress: chain.bitbadgesAddress,
+          toAddress: 'bb14d0y596ujj7s40n7nxu86qg4c835p3xay35twv',
           amount: [{ denom: 'badge', amount: '1' }]
         })
       }
     ]);
-  }, [chain.cosmosAddress]);
+  }, [chain.bitbadgesAddress]);
 
   //https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
   const FRONTEND_URL = 'https://bitbadges.io';

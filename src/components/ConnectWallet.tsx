@@ -1,3 +1,4 @@
+import { claimIdToUse, ownershipRequirementsToCheck } from '@/bitbadges-api';
 import { StyledButton } from '@/components/display/StyledButton';
 import { getPrivateInfo, signOut } from '@/global/backend_connectors';
 import { useChainContext } from '@/global/contexts/ChainContext';
@@ -6,10 +7,9 @@ import { Avatar, notification } from 'antd';
 import { CodeGenQueryParams, SupportedChain, generateBitBadgesAuthUrl } from 'bitbadgesjs-sdk';
 import getConfig from 'next/config';
 import { useEffect, useState } from 'react';
-import { BITCOIN_LOGO, COSMOS_LOGO, ETH_LOGO, SOLANA_LOGO } from '../../constants';
+import { BITCOIN_LOGO, ETH_LOGO, SOLANA_LOGO } from '../../constants';
 import { AddressDisplay } from './address/AddressDisplay';
 import { AltTabs } from './display/AltTabs';
-import { claimIdToUse, ownershipRequirementsToCheck } from '@/bitbadges-api';
 
 export const GatedInfoButton = () => {
   const chain = useChainContext();
@@ -43,10 +43,11 @@ export const ConnectDisplay = ({ hideLogo }: { hideLogo?: boolean }) => {
     });
   }, []);
 
-  const [isXDefi, setIsXDefi] = useState(false);
-  useEffect(() => {
-    setIsXDefi(!!('xfi' in window));
-  }, []);
+  // const [isXDefi, setIsXDefi] = useState(false);
+  // useEffect(() => {
+  //   setIsXDefi(!!('xfi' in window));
+  // }, []);
+  const isXDefi = false;
 
   const signedIn = chainContext.loggedIn;
   const clientId = getConfig().publicRuntimeConfig.CLIENT_ID;
@@ -101,7 +102,7 @@ export const ConnectDisplay = ({ hideLogo }: { hideLogo?: boolean }) => {
                           {
                             label: (
                               <>
-                                <Avatar src={COSMOS_LOGO} alt="Cosmos" size={20} className="mr-2" />
+                                <Avatar src={'/images/cosmos-logo.png'} alt="Cosmos" size={20} className="mr-2" />
                                 Cosmos
                               </>
                             ),

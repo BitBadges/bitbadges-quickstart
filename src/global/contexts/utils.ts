@@ -6,7 +6,7 @@ export const BaseDefaultChainContext: ChainContextType = {
   loggedInAddress: '',
   connected: false,
   loggedIn: false,
-  cosmosAddress: '',
+  bitbadgesAddress: '',
   setLoggedInAddress: () => {},
   connect: async () => {},
   autoConnect: async () => {},
@@ -31,7 +31,7 @@ export type ChainContextType = ChainSpecificContextType & {
   chain: SupportedChain;
   setChain: Dispatch<SetStateAction<SupportedChain>>;
 
-  cosmosAddress: string;
+  bitbadgesAddress: string;
 
   loggedIn: boolean;
   connected: boolean;

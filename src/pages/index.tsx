@@ -71,8 +71,8 @@ const Home: NextPage = () => {
 
                           const protoMsgs = [
                             new proto.cosmos.bank.v1beta1.MsgSend({
-                              fromAddress: signedInAccount?.cosmosAddress ?? '',
-                              toAddress: 'cosmos1zd5dsage58jfrgmsu377pk6w0q5zhc67fn4gsl',
+                              fromAddress: signedInAccount?.bitbadgesAddress ?? '',
+                              toAddress: 'bb1zd5dsage58jfrgmsu377pk6w0q5zhc672wamvw',
                               amount: [{ denom: 'ubadge', amount: '1' }]
                             })
                           ];

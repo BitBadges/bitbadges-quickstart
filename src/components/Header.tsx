@@ -1,10 +1,10 @@
-import { Switch } from 'antd';
-import Image from 'next/image';
-import { BITCOIN_LOGO, COSMOS_LOGO, ETH_LOGO, SOLANA_LOGO } from '../../constants';
-import DarkModeSwitcher from './display/DarkModeSwitcher';
-import { LinkGroup } from './display/LinkGroup';
 import { useDevModeContext } from '@/global/contexts/DevModeContext';
 import { useWalletModeContext } from '@/global/contexts/WalletModeContext';
+import { Switch } from 'antd';
+import Image from 'next/image';
+import { BITCOIN_LOGO, ETH_LOGO, SOLANA_LOGO } from '../../constants';
+import DarkModeSwitcher from './display/DarkModeSwitcher';
+import { LinkGroup } from './display/LinkGroup';
 
 const Header = () => {
   const { devMode, setDevMode } = useDevModeContext();
@@ -25,7 +25,7 @@ const Header = () => {
           />
           <Image
             className="mx-2"
-            src={COSMOS_LOGO}
+            src={'/images/cosmos-logo.png'}
             alt="Cosmos Logo"
             width={50}
             height={50}

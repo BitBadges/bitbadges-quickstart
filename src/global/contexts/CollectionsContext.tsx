@@ -13,7 +13,7 @@ const CollectionsContext = createContext<CollectionsContextType | undefined>(und
 // Create a provider component
 export const CollectionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [collections, setCollections] = useState<{
-    [cosmosAddress: string]: BitBadgesCollection<bigint>;
+    [bitbadgesAddress: string]: BitBadgesCollection<bigint>;
   }>({});
 
   const setCollectionsInStore = (collectionsToAdd: BitBadgesCollection<bigint>[]) => {

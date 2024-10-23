@@ -1,4 +1,4 @@
-import { BitBadgesUserInfo, SupportedChain, convertToCosmosAddress, getChainForAddress } from 'bitbadgesjs-sdk';
+import { BitBadgesUserInfo, SupportedChain, convertToBitBadgesAddress, getChainForAddress } from 'bitbadgesjs-sdk';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { BitBadgesApi } from '@/bitbadges-api';
 import { checkSignIn, signOut } from '../backend_connectors';
@@ -78,7 +78,7 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
     ...currentChainContext,
     chain,
     setChain,
-    cosmosAddress: convertToCosmosAddress(currentChainContext.address),
+    bitbadgesAddress: convertToBitBadgesAddress(currentChainContext.address),
     loggedIn: !!loggedInAddress,
     loggedInAddress,
     connected: !!currentChainContext.address,
@@ -89,7 +89,7 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
     chainContext = {
       ...BaseDefaultChainContext,
       address: loggedInAddress,
-      cosmosAddress: convertToCosmosAddress(loggedInAddress),
+      bitbadgesAddress: convertToBitBadgesAddress(loggedInAddress),
       loggedInAddress,
       connected: !!loggedInAddress,
       loggedIn: !!loggedInAddress,

@@ -1,9 +1,9 @@
-import { BitBadgesUserInfo, convertToCosmosAddress } from 'bitbadgesjs-sdk';
+import { BitBadgesUserInfo, convertToBitBadgesAddress } from 'bitbadgesjs-sdk';
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
 // Define the context type
 type AccountsContextType = {
-  accounts: { [cosmosAddress: string]: BitBadgesUserInfo<bigint> };
+  accounts: { [bitbadgesAddress: string]: BitBadgesUserInfo<bigint> };
   setAccounts: (accounts: BitBadgesUserInfo<bigint>[]) => void;
 };
 
@@ -12,12 +12,12 @@ const AccountsContext = createContext<AccountsContextType | undefined>(undefined
 
 // Create a provider component
 export const AccountsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [accounts, setAccounts] = useState<{ [cosmosAddress: string]: BitBadgesUserInfo<bigint> }>({});
+  const [accounts, setAccounts] = useState<{ [bitbadgesAddress: string]: BitBadgesUserInfo<bigint> }>({});
 
   const setAccountsInStore = (accountsToAdd: BitBadgesUserInfo<bigint>[]) => {
     const newAccounts = { ...accounts };
     for (const account of accountsToAdd) {
-      newAccounts[account.cosmosAddress] = account;
+      newAccounts[account.bitbadgesAddress] = account;
     }
 
     setAccounts((accounts) => ({ ...accounts, ...newAccounts }));
@@ -46,10 +46,10 @@ export const useAccount = (address: string): BitBadgesUserInfo<bigint> | undefin
     throw new Error('useAccountsData must be used within a AccountsProvider');
   }
 
-  const cosmosAddress = convertToCosmosAddress(address);
-  if (!context.accounts[cosmosAddress]) {
+  const bitbadgesAddress = convertToBitBadgesAddress(address);
+  if (!context.accounts[bitbadgesAddress]) {
     return undefined;
   }
 
-  return context.accounts[cosmosAddress];
+  return context.accounts[bitbadgesAddress];
 };
