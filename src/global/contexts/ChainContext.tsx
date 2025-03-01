@@ -103,9 +103,7 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
       if (!chainContext.address && !chainContext.loggedInAddress) return;
       if (chainContext.address) {
         const account = await BitBadgesUserInfo.FetchAndInitialize(BitBadgesApi, {
-          address: chainContext.address,
-          fetchBalance: true,
-          fetchSequence: true
+          address: chainContext.address
         });
 
         setAccounts([account]);
@@ -113,9 +111,7 @@ export const ChainContextProvider: React.FC<Props> = ({ children }) => {
 
       if (chainContext.loggedInAddress && chainContext.loggedInAddress !== chainContext.address) {
         const account = await BitBadgesUserInfo.FetchAndInitialize(BitBadgesApi, {
-          address: chainContext.loggedInAddress,
-          fetchBalance: true,
-          fetchSequence: true
+          address: chainContext.loggedInAddress
         });
 
         setAccounts([account]);

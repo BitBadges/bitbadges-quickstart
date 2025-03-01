@@ -64,7 +64,7 @@ export const ApiQueryInputDisplay = ({
 };
 
 export const ProtocolsDisplay = ({ addressOrUsername }: { addressOrUsername?: string }) => {
-  const [maps, setMaps] = useState<MapWithValues<bigint>[] | null>(null);
+  const [maps, setMaps] = useState<(MapWithValues<bigint> | undefined)[] | null>(null);
   const account = useAccount(addressOrUsername ?? '');
 
   useEffect(() => {
@@ -146,7 +146,7 @@ dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800 cursor-pointer`}
     <>
       <div className="rounded-lg px-1 mt-2 custom-scrollbar text-start" style={{ maxHeight: 800, overflowY: 'auto' }}>
         {Protocols.map((protocol, idx) => {
-          const map = maps?.find((map) => map.mapId === protocol.mapId);
+          const map = maps?.find((map) => map?.mapId === protocol.mapId);
           if (!map) return null;
           return <MapRowUI key={idx} map={map} idx={idx} isCollectionProtocol={protocol.isCollectionProtocol} />;
         })}

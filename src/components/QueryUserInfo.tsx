@@ -2,7 +2,7 @@ import { BitBadgesApi } from '@/bitbadges-api';
 import { useAccount, useAccountsContext } from '@/global/contexts/AccountsContext';
 import { useCollectionsContext } from '@/global/contexts/CollectionsContext';
 import { Avatar, Tooltip } from 'antd';
-import { BatchBadgeDetailsArray, SupportedChain } from 'bitbadgesjs-sdk';
+import { BatchBadgeDetailsArray, BitBadgesCollection, SupportedChain } from 'bitbadgesjs-sdk';
 import { useEffect, useState } from 'react';
 import { AddressDisplay } from './address/AddressDisplay';
 import { AddressSelect } from './address/AddressSelect';
@@ -53,7 +53,7 @@ export const UserQueryInfo = () => {
         return { collectionId: x.collectionId, badgeIds: x.badgeIds };
       })
     }).then((res) => {
-      setCollections(res.collections);
+      setCollections(res.collections.filter((x) => x !== undefined) as BitBadgesCollection<bigint>[]);
     });
 
     setBadgesToDisplay(badgesToDisplay);
