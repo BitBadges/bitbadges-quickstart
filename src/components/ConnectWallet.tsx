@@ -1,4 +1,4 @@
-import { claimIdToUse, ownershipRequirementsToCheck } from '@/bitbadges-api';
+import { claimIdToUse } from '@/bitbadges-api';
 import { StyledButton } from '@/components/display/StyledButton';
 import { getPrivateInfo, signOut } from '@/global/backend_connectors';
 import { useChainContext } from '@/global/contexts/ChainContext';
@@ -43,12 +43,6 @@ export const ConnectDisplay = ({ hideLogo }: { hideLogo?: boolean }) => {
     });
   }, []);
 
-  // const [isXDefi, setIsXDefi] = useState(false);
-  // useEffect(() => {
-  //   setIsXDefi(!!('xfi' in window));
-  // }, []);
-  const isXDefi = false;
-
   const signedIn = chainContext.loggedIn;
   const clientId = getConfig().publicRuntimeConfig.CLIENT_ID;
   const redirectUri = getConfig().publicRuntimeConfig.REDIRECT_URI;
@@ -58,22 +52,8 @@ export const ConnectDisplay = ({ hideLogo }: { hideLogo?: boolean }) => {
     client_id: clientId || 'example-client-id',
     redirect_uri: redirectUri, //Leave undefined if not applicable and using QR codes
 
-    // state?: string;
-    // scope?: string;
-    // otherSignIns?: ('discord' | 'twitter' | 'github' | 'google')[];
-
-    // If you are expecting the user to provide an attestation, set this to true
-    // expectAttestationsPresentations?: boolean;
-
-    // This parameter is ONLY for display purposes to the user.
-    // It is not cached with the request and needs to be specified server-side as well to actually check them.
-    //
-    // You may also choose to not display requirements to the user and handle everything behind the scenes, depending on your use case.
-    ownershipRequirements: ownershipRequirementsToCheck,
-
-    //You can also specify a claim ID
+    //You can also specify a claim ID. This is an all-inclusive concept that can check any criteria you want.
     claimId: claimIdToUse
-    // hideIfAlreadyClaimed?: boolean;
   };
 
   const { walletMode } = useWalletModeContext();
@@ -166,16 +146,14 @@ export const ConnectDisplay = ({ hideLogo }: { hideLogo?: boolean }) => {
                                   <div className="flex" style={{ backgroundColor: 'inherit' }}>
                                     <Avatar
                                       src={
-                                        isXDefi
-                                          ? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAFTklEQVRogdVaMWwTZxT+3n9Hxcke4AaOEgbAHoPTgooaKsVhAGeM2YLiKupExcBiZsoMSDAUMkVRg8RWPJJkKEGqqRwJJTbjOWTAlOtwoCrWqeTu/g5nO7Hvzj6f7SR8U/Tbvv9973/fe+9/F0IN4zNvj/xrH75JnI8DfBwHEYQ1zvnD1wsn53eWAHw/8/epbYv/AfBT+2ddV9g8JLBLf81/vUkAcD7z/u0XZHwdm5bw+VvhXObdDAEz+21NCBwRIPwnEsdNJ5B6R0QixE4QjsvAMXnnoVWDY6MCbBlA+b3dn80AcE5JEUTf9PKQRIxhJE4YPSsgNtTZE5rOUVRt5Es28m96JcPH6XymwsP8NBFjyEwISMRZ6O01nWPhuYnl1fBEuiagyITslNiT4a3ohUhXBNJjAjITAiJSn0TTgtyKid8WbVSN4D4N7MbrkyKup8WBGQ8Ak0kRj7OHoMjB9whEIDslIp0UQhvWDRSZcPdGcBIdCUynRFy+sDfG11EnEeS02xK4/J2TafYDikz4ebLz3r4EFJmQmRD7alS3uHxBQHqsPQlfApmU0JWYBoXpifaJw5OAItOex70fohJwdcw/0j0/yaQOhvF1TCb9T8GTwJmh/lXZfiAqAReHAxKISgjUlO01Lp71jgoXgUFW2nbIl2wsFSzfNsKv99rfPFnDUsHC/acmAGB5leHujUOu70QlJ7loejPBAxHsG7v6yS3D/3uJmDs6XAQ0nXfVDfYD6aSA2AkG5Sjhx5S/T6Me4e0ZQmqFYyS+d1pQZMKjW+6waUVEcq950n1V6t+9ddDwJLC8arnEchBQ9dCHJ4EtA7hXywoHCdpHt1N9FVNUbTzOWYMxROehTljT3Wtt60BuxUTV4H3rTKsGx+8vbTxbsUDgmEyKgfuuLQMoV9za7FjIlgsWiqqN6ZSAKyE7VE3nWFp1DK+naEUmjHjkdT9seBgPBKzEms5x/6mJJ4sWEnGGi8OE2BDzPRVN5yhXbBTLzhCr3DL4aJ1uzOZMbBnt7yBLPiMXTwL1B7cWNE3nWC5YWC7srLVu2C62nSuq2PiNpnPcmdtuEPxhmKDI7lPWdI68T2p3EYhIzoU6KgELz00Uy+0F10mM9dFjOik0OaauhbqTslMiRmsd5525bYwOs0bIrqv+syIXgePyTuOUveZUx3oYFFUbVQP4oHNXSlOOEqISQZEBRQYScQEjcWrqbqsGx2LBRu7lTp2JSIRbU0LD+NmciXzJxpkTrOGgJ4v+2dB3Mle/UPfjbrCu2nj1xsZSodmTiRhD9tpOSM3mTDxbsRAbIjzKftW05gdfETuxbkGRqSFcRWY4LvvfGaoGb6S7DzpQKttYV93NoSITMimhce+uGhy/zJkoqjYUmXD7J+fk8yWrrfFAiOHubiN2I0hhSsQY0knWdLvKlyzce+poYfdUTtM5bv263fG5oS80QQyOSE6uT8QZrlxgTSe3rtp4sujUGKA5nIIaH5pAIs4QPew0VxHJET3gvJVRZEfMsSFynVLV4FArvMnwiES4OsYwXRuidWN8aALTKQEjAd8PaDrHumqjVLbxZ6lZD611YV21cWfO7OpCFYrARoUjKvGG5z/UvKXpjoj/+chr1dhdQ/zqwsJiZ8F6IbSIu0Em5eT51gzmVdC6xZ5MJY7J1KgndR141YUwEAF6Meh/LXj1xtFAucJdjV0vIMKaSMRXOMdACfg1Yr3C5vwhM9nnByDaHMgOgwRh8/XCyXm2Nn/6k8Xo0hdFgrBpMXbJ+XMXzmXezTCim5yjp7f3gwKBXoBbK6ZoPlibP/0JAP4HIf5rn2DrOnEAAAAASUVORK5CYII='
-                                          : 'https://assets-global.website-files.com/63eb7ddf41cf5b1c8fdfbc74/63fcb4fc23dfbad06e19f84b_icon-kplr-br.svg'
+                                        'https://assets-global.website-files.com/63eb7ddf41cf5b1c8fdfbc74/63fcb4fc23dfbad06e19f84b_icon-kplr-br.svg'
                                       }
-                                      alt={isXDefi ? 'XDEFI' : 'Keplr'}
+                                      alt={'Keplr'}
                                       size={20}
                                       shape="square"
                                       className="mr-1"
                                     />{' '}
-                                    {isXDefi ? 'XDEFI' : 'Keplr'}
+                                    Keplr
                                   </div>
                                 </>
                               ),
