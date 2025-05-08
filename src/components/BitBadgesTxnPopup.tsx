@@ -28,7 +28,8 @@ export const BroadcastTxPopupButton = ({}: {}) => {
       type: 'MsgDeleteCollection',
       msg: new MsgDeleteCollection({
         creator: chain.bitbadgesAddress,
-        collectionId: '1'
+        collectionId: '1',
+        creatorOverride: ''
       })
     },
     {
@@ -59,7 +60,8 @@ export const BroadcastTxPopupButton = ({}: {}) => {
         type: 'MsgDeleteCollection',
         msg: new MsgDeleteCollection({
           creator: chain.bitbadgesAddress,
-          collectionId: '1'
+          collectionId: '1',
+          creatorOverride: ''
         })
       },
       {

@@ -1,7 +1,8 @@
 import { useCollection } from '@/global/contexts/CollectionsContext';
 import { Avatar, Tooltip } from 'antd';
+import { CollectionId } from 'bitbadgesjs-sdk';
 
-export const BadgeMetadataDisplay = ({ badgeId, collectionId }: { badgeId: bigint; collectionId: bigint }) => {
+export const BadgeMetadataDisplay = ({ badgeId, collectionId }: { badgeId: bigint; collectionId: CollectionId }) => {
   const collection = useCollection(collectionId);
   const badgeIdOneMetadata = collection?.getBadgeMetadata(badgeId);
 
